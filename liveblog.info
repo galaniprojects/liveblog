@@ -1,0 +1,10 @@
+name = "LiveBlog"
+description = "LiveBlog"
+core = 6.x
+version = "6.x-1.0"
+package = "LiveBlog"
+project = "LiveBlog"
+
+dependencies[] = jquery_update
+dependencies[] = jq
+dependencies[] = jquery_plugin

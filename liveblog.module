@@ -1,0 +1,711 @@
+<?php
+/**
+ * liveblog.module
+ * Santa's Little Helper
+ * A liveblogging system for AEF
+ * --
+ * WORKFLOW:
+ *  - A journalist creates a LiveBlog CT
+ *  - Fields:
+ *    x Title
+ *    x Short Name (no spaces, etc - used as a unique marker for URLs etc)
+ *    x Date (Defaults to today)
+ *      - Time Zone (Defaults to Europe/France)   
+ *    x Start Time (Defaults to now)
+ *    x Originating URL (Defaults to main site (F24.com/RFI.fr)
+ *      NOTE: ^^^ REQUIRED for sharing
+ *    x Allow Embed Yes/No
+ *    X Allow Comments
+ *    X Allow Sharing (Done through AEF Virality)
+ *
+ *  - Back-end allows editing of all fields.
+ *
+ *  - Logged-in user front end:
+ *    - assumes authenticated = journalist
+ *    - provides front-end submission box
+ *    - Allows images, video, links to be uploaded or attached manually
+ *    - Allows moderation of twitter content
+ *    - Track Twitter Feeds (input specific Twitter users to follow)
+ *    - Allows moderation of comments
+ *    - Tracking??
+ *    - External Sources/Node Reference
+ **/
+
+/**
+ * Implementation of hook_cron()
+ */
+function liveblog_cron() {
+  // Assuming the cron runs every 30 seconds, we should aggregate the content for every active liveblog.
+  $get_active_liveblogs = db_query("SELECT nid FROM {liveblog_master} WHERE active = 1");
+  while ($active_liveblog_nid = db_fetch_object($get_active_liveblogs)) {
+    $liveblog = node_load($active_liveblog_nid->nid);
+    liveblog_update_records($liveblog);
+    //That's it!
+  }
+}
+
+/**
+ * Implementation of hook_init().
+ */
+function liveblog_init() {
+  drupal_add_js(drupal_get_path('module', 'liveblog').'/liveblog.js');
+  //Add the JS lib
+  jq_add('scrollTo');
+  drupal_add_css(drupal_get_path('module', 'liveblog') .'/liveblog.css', 'module');
+  if (is_numeric(arg(1)) && arg(0) == 'node') {
+    drupal_add_js(array('aefSlh' => array('nid' => arg(1))), 'setting');
+  }
+}
+
+/**
+ * Implementation of hook_menu()
+ */
+function liveblog_menu() {
+  $items = array();
+  $items['node/%node/liveblog'] = array(
+    'title' => 'Manage Liveblog Content',
+    'page callback' => 'liveblog_manage',
+    'page arguments' => array(1),
+    'access arguments' => array('manage liveblog content'),
+    'file' => 'liveblog.admin.inc',
+    'weight' => 1,
+    'type' => MENU_LOCAL_TASK,
+  );
+  $items['admin/settings/liveblog'] = array(
+    'title' => t('Liveblogging Administration'),
+    'page callback' => 'drupal_get_form',
+    'page arguments' => array('liveblog_admin_settings'),
+    'access arguments' => array('administer site configuration'),
+    'file' => 'liveblog.admin.inc',
+  );
+  // Path for dynamic cache creation
+  $items[file_directory_path() .'/liveblog'] = array(
+    'page callback' => 'liveblog_check_cache',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK
+  );
+  //Handle comment posts
+  $items['tech/liveblog/post-comment'] = array(
+    'page callback' => '_liveblog_post_comment',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK
+  );
+  //Handle post modifications
+  $items['tech/liveblog/modify-post'] = array(
+    'page callback' => '_liveblog_modify_post',
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK,
+  );
+  //Handle comment requests
+  $items['tech/liveblog/get-new-admin-comments'] = array(
+    'page callback' => '_liveblog_get_comments_from_ahah',
+    'access arguments' => array('manage liveblog content'),
+    'type' => MENU_CALLBACK,
+  );
+  //Handle post requests
+  $items['tech/liveblog/get-new-admin-posts'] = array(
+    'page callback' => '_liveblog_get_posts_from_ahah',
+    'access arguments' => array('manage liveblog content'),
+    'type' => MENU_CALLBACK,
+  );
+
+  return $items;
+}
+
+/**
+ * Implementation of hook_perm().
+ */
+function liveblog_perm() {
+  $perms = array(
+    'manage liveblog content',
+    'publish liveblog',
+  );
+  return $perms;
+}
+
+/**
+ * Function _liveblog_set_master_data()
+ **/
+function _liveblog_set_master_data($data) {
+  // Update or insert the data into the master table
+  if ($data->is_new) {// New item
+    unset($data->is_new);
+    $wrote_data = drupal_write_record('liveblog_master', $data);
+  } else {// Updating an existing one
+    $wrote_data = drupal_write_record('liveblog_master', $data, array('nid', 'vid'));
+  }
+  if (!$wrote_data) {
+    watchdog('liveblog', 'There was an error writing the following data to the master liveblog table: '.print_r($data, TRUE));
+  }
+  return $wrote_data;
+}
+
+/**
+ * Function _liveblog_get_master_data()
+ */
+function _liveblog_get_master_data($node) {
+  // Does the master data exist? If not, return FALSE.
+  $find_master_data = db_fetch_object(db_query("SELECT * FROM {liveblog_master} WHERE nid = %d AND vid = %d", $node->nid, $node->vid));
+  if (!$find_master_data->nid) {// No result!
+    return FALSE;
+  } else {
+    return $find_master_data;
+  }
+}
+
+/**
+ * Function _liveblog_calculate_update_integer()
+ * Calculates the update integer based on refresh rate,
+ * start time and current (or provided) time
+ */
+function _liveblog_calculate_update_integer($start, $time = 0) {
+  $start = intval($start);
+  $time = intval($time);
+
+  if ($time == 0) { $time = time(); }
+  $refresh_rate = intval(variable_get('liveblog_refresh_rate', 30));
+  $difference = $time - $start;
+  $rounded = intval(round($difference/$refresh_rate));
+  $return = intval($rounded * $refresh_rate);
+  return $return;
+}
+ 
+/**
+ * Implementation of hook_nodeapi()
+ */
+function liveblog_nodeapi(&$node, $op, $a3, $a4) {
+  if ($op == 'delete') {
+    $delete_master = db_query("DELETE FROM {liveblog_master} WHERE nid = %d", $node->nid);
+    $delete_posts = db_query("DELETE FROM {liveblog_posts} WHERE nid = %d", $node->nid);
+    $delete_comments = db_query("DELETE FROM {liveblog_comments} WHERE nid = %d", $node->nid);
+  }
+  if ($op == 'delete revision') {
+    $delete_master = db_query("DELETE FROM {liveblog_master} WHERE vid = %d", $node->vid);
+    $delete_posts = db_query("DELETE FROM {liveblog_posts} WHERE vid = %d", $node->vid);
+    $delete_comments = db_query("DELETE FROM {liveblog_comments} WHERE vid = %d", $node->vid);
+  }
+  if ($op == 'load') {
+    $master_data = _liveblog_get_master_data($node);
+    $node->liveblog_master_data = $master_data;
+    $node->liveblog_path = str_replace('/event.html', '', _liveblog_get_liveblog_url($node->path, TRUE));
+  }
+  if ($op == 'insert' || $op == 'update') {
+    // Here we create (or modify) the HTML to be served by
+    // the production-side version of this file.
+    
+    // Insert data into the master table if the node is
+    // published (and there's no data in the system)
+    $master_data = _liveblog_get_master_data($node);
+    $node->liveblog_master_data = $master_data;
+    $node->liveblog_path = str_replace('/event.html', '', _liveblog_get_liveblog_url($node->path, TRUE));
+    if (!$master_data && $node->status == 1) {
+      // Set the start_timestamp, refresh_rate and master 'active' status
+      $master_data->is_new = TRUE;
+      $master_data->nid = $node->nid;
+      $master_data->vid = $node->vid;
+      $master_data->start_timestamp = time();
+      $master_data->refresh_rate = variable_get('liveblog_refresh_rate', 30);
+      $master_data->active = 1;
+      _liveblog_set_master_data($master_data);
+    } else if ($master_data->active == 0 && $node->status == 1) {
+      $master_data->active = 1;
+      $master_data->end_timestamp = 0;
+      _liveblog_set_master_data($master_data);    
+    } else if ($master_data->active == 1 && $node->status == 0) {
+      // Deactivate the liveblog
+      $master_data->active = 0;
+      $master_data->end_timestamp = time();
+      _liveblog_set_master_data($master_data);
+    }
+    
+    // Create the cachefile
+    _liveblog_create_cachefile($node);
+    // Update the records to create a new 'master'
+    if ($master_data->end_timestamp > 0) {
+      $time = $master_data->end_timestamp;
+    } else {
+      $time = time();
+    }
+    $update_integer = _liveblog_calculate_update_integer($master_data->start_timestamp, $time);
+    liveblog_update_records($node, $update_integer);
+  }
+  if ($op == 'validate') {
+    // Make sure the short name is correctly parsed, and that it does not previously exist.
+    $exists = db_fetch_object(db_query("SELECT nid FROM {node} WHERE nid != %s AND title = '%s'", $node->nid, $node->title));
+    if ($exists->nid) {
+      form_set_error($node->title['_error_element'], 'This title already exists. Please choose another.');
+    }
+    // Make sure the URL is valid.
+    $stripped_name = preg_replace("/[^a-zA-Z0-9-\s]/", "", $node->title);
+    if ($node->title != $stripped_name) {
+      form_set_error($node->title['_error_element'], 'Please re-format the title to meet the guidelines specified.');
+    }
+  }
+  if ($op == 'presave') {
+    if ($node->title) {
+      $node->pathauto_perform_alias = 0;
+      $node->path = strtolower(preg_replace("/[^a-zA-Z0-9-\s]/", "", str_replace(' ', '-', $node->title)));
+    }
+  } 
+}
+
+/**
+ * function _liveblog_create_cachefile($node)
+ */
+function _liveblog_create_cachefile($node) {
+  $path_to_file = _liveblog_get_liveblog_url($node->path);
+  // Output the JS
+  $jq_path = jquery_update_jquery_path();
+  $js = fread(fopen($jq_path, "r"), filesize($jq_path));
+  $js_path = drupal_get_path('module', 'liveblog').'/liveblog.js';
+  $js .= fread(fopen($js_path, "r"), filesize($js_path));
+
+  $data = theme('liveblog_cachefile', $js, $node);
+
+  $dir = dirname($path_to_file);
+  $check_dir = file_check_directory($dir, FILE_CREATE_DIRECTORY);
+  if ($check_dir) {
+    file_save_data($data, $path_to_file, FILE_EXISTS_REPLACE);
+  } else {
+    watchdog('liveblog liveblog', 'Failed to create liveblog directory: %dir', array('%dir' => $dir), WATCHDOG_ERROR);
+    return FALSE;
+  }
+  
+}
+
+/**
+ * Implementation of hook_preprocess_node
+ */
+function liveblog_preprocess_node(&$vars) {
+  $vars['iframe'] = theme('liveblog_render_iframe', $vars['node']);
+
+  $vars['content'] = theme('liveblog_render_iframe', $vars['node'], '660', '890');
+}
+
+/**
+ * Implementation of hook_theme()
+ */
+function liveblog_theme($existing, $type, $theme, $path) {
+  return array(
+    'liveblog_render_iframe' => array(
+      'arguments' => array('node' => NULL, 'width' => NULL, 'height' => NULL),
+      ),
+     'liveblog_cachefile' => array(
+      'arguments' => array('js' => NULL, 'node' => NULL),
+      'path' => drupal_get_path('module', 'liveblog').'/theme',
+      'template' => 'liveblog_master_cachefile',
+     ),
+     'liveblog_comment' => array(
+      'arguments' => array('comment' => NULL),     
+     ),
+  );
+}
+
+function theme_liveblog_comment($comment) {
+  $output = '<strong>'.t('Comment from %name', array('%name' => $comment->username)).'</strong>';
+  $output .= '<br />';
+  $output .= $comment->text;
+  return $output;
+}
+
+/**
+ * function _liveblog_get_liveblog_url($short_name)
+ */
+function _liveblog_get_liveblog_url($short_name, $absolute = FALSE, $type = 'container', $id = FALSE) {
+  if ($type == 'container') {
+    $file = 'event.html';
+  }
+  if ($type == 'master' && $id) {
+    $file = 'master-'.$id.'.json';
+  }
+  if ($type == 'update' && $id) {
+    $file = 'update-'.$id.'.json';
+  }
+  if ($file) {
+    if ($absolute) {
+      return url(file_directory_path().'/liveblog/'.$short_name.'/'.$file, array('absolute' => $absolute));
+    } else {
+      return file_directory_path().'/liveblog/'.$short_name.'/'.$file; 
+    }
+  } else { return FALSE; }
+}
+
+/**
+ * function theme_liveblog_render_iframe($node)
+ */
+function theme_liveblog_render_iframe($node, $width = NULL, $height = NULL) {
+  $url = _liveblog_get_liveblog_url($node->path, TRUE);
+  if (is_numeric($width)) { $width_o = ' width="'.$width.'" '; }
+  if (is_numeric($height)) { $height_o = ' height="'.$height.'" '; }
+  $iframe = '<iframe style="border:none;" '.$width_o.' '.$height_o.' src="'.$url.'"><p>'.t('Your browser does not support iframes').'</p></iframe>';
+  return $iframe;
+}
+
+/**
+ * liveblog_create_post()
+ * Create a post based on a passed array of data
+ */
+function liveblog_create_post($post, $node) {
+  $master = $node->liveblog_master_data;
+  switch ($post['type']) {
+    case 'post':
+      // Standard post
+      $post['nid'] = $node->nid;
+      $post['vid'] = $node->vid;
+      $post['created'] = time();
+      $post['published'] = 1;
+      $wrote = drupal_write_record('liveblog_posts', $post);
+      break;
+    case 'comment':
+      //Comment
+      $post['nid'] = $node->nid;
+      $post['vid'] = $node->vid;
+      $post['created'] = time();
+      //Comments themselves are never actually published, so we don't
+      //bother having a published flag.
+      return drupal_write_record('liveblog_comments', $post);
+      break;
+    default:
+      break;
+  } 
+}
+
+/**
+ * liveblog_modify_post()
+ * Allows the modification of a post based on
+ * a passed array of data
+ */
+function liveblog_modify_post($post, $node) {
+  $post['posted'] = 0;
+  drupal_write_record('liveblog_posts', $post, 'id');
+}
+
+/**
+ * liveblog_check_cache()
+ * Checks against the (non)existence of JSON records 
+ * for liveblogs. If it doesn't exist, generate if
+ * possible. If not, return a 404.
+ */
+function liveblog_check_cache() {
+  // Args:
+  // 0 => short name
+  // 1 => filename
+  $args = func_get_args();
+  if (!$args[0] || !$args[1]) {
+    // Send a 404 if not all args are present
+    header("HTTP/1.0 404 Not Found");
+    exit;
+  }
+  
+  $shortname = $args[0];
+  $filename = $args[1];
+  // Validate the filename argument & breakdown
+  // Remove .json
+  $filename = str_replace('.json','',$filename);
+  $filename_arr = explode('-', $filename);
+  $file_type = $filename_arr[0];
+  $update_id = $filename_arr[1];
+
+  if (($file_type != 'update' && $file_type != 'master') || (!is_numeric($update_id))) {
+    // another fail!
+    header("HTTP/1.0 404 Not Found");
+    exit;
+  }
+
+  // Verify that the file_id is a multiple of the specified refresh rate.
+  $refresh_rate = intval(variable_get('liveblog_refresh_rate', 30));
+  if ($update_id % $refresh_rate != 0) {
+    // another fail! not a multiple of the specified refresh rate.
+    header("HTTP/1.0 404 Not Found");
+    exit;
+  }
+  
+  // Now we have enough to proceed.
+  
+  // Deliver now if it exists; useful to prevent lock files
+  // from being created when delivering private files.
+  $existing_path = _liveblog_get_liveblog_url($shortname, FALSE, $file_type, $update_id);
+
+  if (is_file($existing_path)) {
+    _liveblog_transfer_file($existing_path);
+  }
+  
+  // Manual query against the table.
+  $get_path_to_nid = drupal_get_normal_path($shortname);
+
+  $break_paths = explode('/', $get_path_to_nid);
+
+  if ($break_paths[0] == 'node' && is_numeric($break_paths[1])) {
+    $fetch_liveblog_nid->nid = $break_paths[1];  
+  } 
+
+  if ($fetch_liveblog_nid->nid) {
+    // We need the node data in order to properly generate everything.
+    $liveblog = node_load($fetch_liveblog_nid->nid);
+    $created_path = liveblog_update_records($liveblog, $update_id, $file_type);
+    if (!$created_path) {
+      // Something bad happened.
+      header("HTTP/1.0 404 Not Found");
+      exit;    
+    } else {
+      //Serve the file?
+      if (is_file($created_path)) {
+        //SERVE IT!
+        _liveblog_transfer_file($created_path);
+      } else {
+        // Path failed.
+        header("HTTP/1.0 404 Not Found");
+        exit;
+      }
+    }
+  } else {
+    // Invalid!
+    header("HTTP/1.0 404 Not Found");
+    exit;
+  }
+}
+
+function _liveblog_transfer_file($path) {
+  $size = getimagesize($path);
+  //Assume a JSON file.
+  $headers = array('Content-type: application/json');
+  if ($fileinfo = stat($path)) {
+    $headers[] = 'Content-Length: ' . $fileinfo[7];
+    $headers[] = 'Expires: ' . gmdate('D, d M Y H:i:s', time() + 1209600) . ' GMT';
+    $headers[] = 'Cache-Control: max-age=1209600, private, must-revalidate';
+  }
+  file_transfer($path, $headers);
+  exit;
+}
+
+/**
+ * liveblog_update_master_record()
+ * Updates the master JSON record containing info about all
+ * posts to the liveblog since the beginning
+ * $update_integer (int) = optional update integer to use for 
+ * file creation.
+ *
+ * This happens on cron every 30 seconds (assuming a 30 sec cron)
+ * there should be an offset of one cycle due to cron run race
+ * condition risk
+ *
+ */
+function liveblog_update_records($node, $update_integer = NULL, $return = FALSE) {
+  $master_data = $node->liveblog_master_data;
+  if (!$update_integer) {
+    // Calculate update integer
+    if ($master_data->end_timestamp > 0) {
+      $time = $master_data->end_timestamp;
+    } else {
+      $time = time();
+    }
+
+    $update_integer = _liveblog_calculate_update_integer($master_data->start_timestamp, $time);
+  }
+  $time_max = $master_data->start_timestamp + $update_integer;
+  // What's the order by?
+  $order_by = variable_get('liveblog_display_order', 'ASC');
+  // Get the new filepath to the updated master json file
+  $path_to_file = _liveblog_get_liveblog_url($node->path, FALSE, 'master', $update_integer);
+  $master_path = $path_to_file;
+  // Data for MASTER should contain a JSON of all content posted to the site so far.
+  $get_posts = db_query("SELECT * FROM {liveblog_posts} WHERE nid = %d AND vid = %d AND created < %d ORDER BY created %s", $node->nid, $node->vid, $time_max, $order_by);
+  $posts = array();
+  while ($post_item = db_fetch_object($get_posts)) {
+    $posts[] = (array) $post_item;
+  }
+  
+  $data = drupal_to_js($posts);
+  
+  $dir = dirname($path_to_file);
+  $check_dir = file_check_directory($dir, FILE_CREATE_DIRECTORY);
+  if ($check_dir) {
+    file_save_data($data, $path_to_file, FILE_EXISTS_REPLACE);
+  } else {
+    watchdog('liveblog liveblog', 'Failed to create liveblog directory: %dir', array('%dir' => $dir), WATCHDOG_ERROR);
+    return FALSE;
+  }
+
+  // Get the new filepath to the updated 'update' json file
+  $path_to_file = _liveblog_get_liveblog_url($node->path, FALSE, 'update', $update_integer);
+  $update_path = $path_to_file;
+  // Data for update should contain a JSON of all content posted
+  // since the last post ('posted' = 0) but no later than $update_integer
+  // 'posted' should be changed to 1 for each item
+  $get_posts = db_query("SELECT * FROM {liveblog_posts} WHERE nid = %d AND vid = %d AND posted = 0 AND created < %d ORDER BY created %s", $node->nid, $node->vid, $time_max, $order_by);
+  $posts = array();
+  while ($post_item = db_fetch_object($get_posts)) {
+    $posts[] = (array) $post_item;
+    $update_post = db_query("UPDATE {liveblog_posts} SET posted = 1 WHERE id = %d", $post_item->id);
+  }
+
+  $data = drupal_to_js($posts);
+  
+  // For each item added, 'posted' should be set to 1.
+  $dir = dirname($path_to_file);
+  $check_dir = file_check_directory($dir, FILE_CREATE_DIRECTORY);
+  if ($check_dir) {
+    file_save_data($data, $path_to_file, FILE_EXISTS_REPLACE);
+    if ($return == 'master') {
+      return $master_path;
+    } else if ($return == 'update') {
+      return $update_path;
+    }
+  } else {
+    watchdog('liveblog liveblog', 'Failed to create liveblog directory: %dir', array('%dir' => $dir), WATCHDOG_ERROR);
+    return FALSE;
+  }
+
+}
+
+/**
+ * Function to handle comment posting from the liveblog.
+ */
+function _liveblog_post_comment() {
+  $username = check_plain($_POST['username']);
+  $comment = check_plain($_POST['comment']);
+  $nid = check_plain($_POST['nid']);
+  if ($username && $comment && is_numeric($nid)) {
+    //Post comments into the comment table, but leave it unpublished.
+    $node = node_load($nid);
+    $comment_arr['type'] = 'comment';
+    $comment_arr['text'] = $comment;
+    $comment_arr['username'] = $username;
+    $created = liveblog_create_post($comment_arr, $node);
+    if ($created) {
+      print drupal_to_js(array('response' => t('Thank you. Your comment has been received.')));
+    } else {
+      print drupal_to_js(array('error' => t('An error occured when posting your comment. Please try again later.')));    
+    }
+  } else{
+    print drupal_to_js(array('error' => t('An error occured when posting your comment. Please try again later.')));
+  }
+  exit();
+}
+
+/**
+ * Function to handle post modifications from the liveblog admin.
+ */
+function _liveblog_modify_post() {
+  $action = $_POST['action'];
+  $post_id = $_POST['id'];
+  $parent_nid = node_load($_POST['nid']);
+  
+  //Send button_text
+  //send button_id
+  if (is_numeric($post_id) && is_numeric($parent_nid->nid)) {
+    switch ($action) {
+      case 'unpublish':
+        //Unpublish the given post.
+        $post['published'] = 0;
+        $post['id'] = $post_id;
+        liveblog_modify_post($post, $parent_nid);
+        $result['button_text'] = t('Publish');
+        $result['button_action'] = 'publish';
+        break;
+      case 'publish':
+        //Publish the post.
+        $post['published'] = 1;
+        $post['id'] = $post_id;
+        liveblog_modify_post($post, $parent_nid);
+        $result['button_text'] = t('Unpublish');
+        $result['button_action'] = 'unpublish';
+        break;
+    }
+    print drupal_to_js($result);
+  } else {
+    print drupal_to_js(array('error' => t('An error occured when modifying the post. Please try again later.')));
+  }
+  exit();
+}
+
+function _liveblog_get_posts_from_ahah($no_js = FALSE) {
+  $nid = $_POST['nid'];
+  $start = $_POST['start'];
+  $limit = $_POST['limit'];
+  $newest = $_POST['newest'];
+    
+  if (!$nid) { $nid = arg(1); }
+  if (!$start) { $start = 0; }
+  if (!$limit) { $limit = 5; }
+  if (!$newest) { $newest = FALSE; }
+
+  if ($newest) {
+    //Get the 5 most recent posts.
+    $get_posts = db_query("SELECT * from {liveblog_posts} where nid = %d AND id > %d ORDER BY created DESC limit %d", $nid, $newest, $limit);
+    $count = 0;  
+  } else {
+    //Get the 5 most recent posts.
+    $get_posts = db_query("SELECT * from {liveblog_posts} where nid = %d ORDER BY created DESC limit %d, %d", $nid, $start, $limit);
+    $count = 0;
+  }
+  
+  if ($get_posts) {
+    while ($q_posts = db_fetch_object($get_posts)) {
+      $count = $count + 1;
+      $output = '<div post_id="'.$q_posts->id.'" class="post-'.$q_posts->id.'">';
+      $output .= $q_posts->text;
+      $output .= '<br />';
+      $output .= '<a id="post-edit" href="'.url('node/'.$nid.'/liveblog', array('query' => array('post_id' => $q_posts->id))).'">Edit post</a> | ';
+      if ($q_posts->published == 1) {
+        $output .= '<a post_id="'.$q_posts->id.'" id="post-modify" parent_nid="'.$node->nid.'" action="unpublish" href="'.url('tech/liveblog/modify-post').'">Unpublish</a><span class="throbber" style="display:none;">Loading...</span>';
+      } else {
+        $output .= '<a post_id="'.$q_posts->id.'" id="post-modify" parent_nid="'.$node->nid.'" action="publish" href="'.url('tech/liveblog/modify-post').'">Unpublish</a><span class="throbber" style="display:none;">Loading...</span>';
+      }
+      $output .= '</div>';
+      $output .= '<hr/>';
+      $html[] = $output;
+    }
+  }
+  if ($no_js) {
+    return $html;
+  } else {
+    print drupal_to_js(array('html' => $html));
+    exit();  
+  }
+}
+
+/**
+ * Get comments from AHAH
+ */
+function _liveblog_get_comments_from_ahah($no_js = FALSE) {
+  $nid = $_POST['nid'];
+  $start = $_POST['start'];
+  $limit = $_POST['limit'];
+  $newest = $_POST['newest'];
+  
+  if (!$nid) { $nid = arg(1); }
+  if (!$start) { $start = 0; }
+  if (!$limit) { $limit = 5; }
+  if (!$newest) { $newest = FALSE; }
+  if ($newest) {
+    //Get the most recent 5 comments.
+    $get_comments = db_query("SELECT * from {liveblog_comments} where nid = %d AND id > %d ORDER BY created ASC limit %d", $nid, $newest, $limit);
+    //Assuming a default URL
+    $count = 0;    
+  } else { 
+    //Get the most recent 5 comments.
+    $get_comments = db_query("SELECT * from {liveblog_comments} where nid = %d ORDER BY created DESC limit %d, %d", $nid, $start, $limit);
+    //Assuming a default URL
+    $count = 0;
+  }
+  if ($get_comments) {
+    while ($q_comments = db_fetch_object($get_comments)) {
+      $count = $count + 1;
+      $output = '<div comment_id="'.$q_comments->id.'" id="comments_'.$q_comments->id.'">';
+      $output .= $q_comments->text.' - '.$q_comments->username;
+      $output .= '<br />';
+      $output .= '<a id="comment-publish" href="'.url('node/'.$nid.'/liveblog', array('query' => array('comment_id' => $q_comments->id))).'">Publish as post</a>';
+      $output .= '</div>';
+      $output .= '<hr/>';
+      $html[] = $output;
+    }
+  }
+  if ($no_js) { 
+    return $html;
+  } else {
+    print drupal_to_js(array('html' => $html));
+    exit();
+  }
+}
+

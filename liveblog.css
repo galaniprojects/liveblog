@@ -1,0 +1,29 @@
+/**
+ * SLH CSS (Admin-only pretty much)
+ */
+
+#load-more {
+  background-color:#eee;
+  color:#999;
+  font-weight:bold;
+  text-align:center;
+  padding:10px 0;
+  cursor:pointer;
+}
+#load-more:hover {
+  color:#666;
+}
+
+/**
+ * Admin theme changes
+ */
+#-liveblog-manage-form .controls { 
+  width:56%;
+  margin-left:2%;
+  float:left;
+}
+#-liveblog-manage-form #post_new fieldset{
+  width:40%;
+  height:200%;
+  float:left;
+}

@@ -1,0 +1,204 @@
+<?php
+/*
+ *
+ * NOTE!!! The directory "liveblog" must be created
+ * in the files directory for this module to function.
+ *
+ */
+ 
+/**
+ * Implementation of hook_install.
+ */
+function liveblog_install() 
+{
+  drupal_install_schema('liveblog');
+}
+
+/**
+ * Implementation of hook_uninstall.
+ * Delete the cck fields
+ */
+function liveblog_uninstall() 
+{
+  drupal_uninstall_schema('liveblog');
+}
+
+function liveblog_schema() {
+  $schema['liveblog_master'] = array(
+    /**
+     * Contains the master data for each liveblog.
+     * Schema:
+     *  nid  
+     *  vid
+     *  start_timestamp
+     *  refresh_rate
+     *  
+     **/
+    'description' => 'Master table for liveblogs.', 
+    'fields' => array(
+      'nid' => array(
+        'type' => 'int', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE,
+        'default' => 0,
+      ), 
+      'vid' => array(
+        'description' => 'The current {node_revisions}.vid version identifier.', 
+        'type' => 'int', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE, 
+        'default' => 0,
+      ), 
+      'start_timestamp' => array(
+        'type' => 'int', 
+        'length' => 12, 
+        'not null' => TRUE, 
+        'default' => 0,
+      ),
+      'end_timestamp' => array(
+        'type' => 'int', 
+        'length' => 12, 
+        'not null' => TRUE, 
+        'default' => 0,
+      ),
+      'refresh_rate' => array(
+        'type' => 'int', 
+        'length' => 3, 
+        'not null' => TRUE, 
+        'default' => 0,
+      ),
+      'active' => array(
+        'description' => 'The status (active or inactive) of the liveblog',
+        'type' => 'int', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE,
+        'default' => 0,      
+      ),
+    ), 
+    'indexes' => array(
+      'start_timestamp' => array('start_timestamp'), 
+      'refresh_rate' => array('refresh_rate'),
+    ), 
+    'unique keys' => array(
+      'nid_vid' => array('nid', 'vid'), 
+      'vid' => array('vid'),
+    ), 
+    'primary key' => array('nid'),
+  );
+  $schema['liveblog_posts'] = array(
+    'description' => 'post data for normal posts on liveblogs',
+    'fields' => array(
+      'id'  => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'nid' => array(
+        'type' => 'int', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE,
+        'default' => 0,
+      ), 
+      'vid' => array(
+        'description' => 'The current {node_revisions}.vid version identifier.', 
+        'type' => 'int', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE, 
+        'default' => 0,
+      ),
+      'created' => array(
+        'type' => 'int', 
+        'length' => 12, 
+        'not null' => TRUE, 
+        'default' => 0,
+      ),
+      'published' => array(
+        'type' => 'int',
+        'length' => 2,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'posted' => array(
+        'type' => 'int',
+        'length' => 2,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+      'type' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+        'default' => '',      
+      ),
+      'username' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'text' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+    ),
+    'indexes' => array(
+      'nid' => array('nid'), 
+      'vid' => array('vid'),
+    ), 
+    'unique keys' => array(
+      'id' => array('id'),
+    ), 
+    'primary key' => array('id'),
+  );
+  $schema['liveblog_comments'] = array(
+    'description' => 'post data for comments on liveblog posts',
+    'fields' => array(
+      'id'  => array(
+        'type' => 'serial',
+        'not null' => TRUE,
+      ),
+      'nid' => array(
+        'type' => 'int', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE,
+        'default' => 0,
+      ), 
+      'vid' => array(
+        'description' => 'The current {node_revisions}.vid version identifier.', 
+        'type' => 'int', 
+        'unsigned' => TRUE, 
+        'not null' => TRUE, 
+        'default' => 0,
+      ),
+      'created' => array(
+        'type' => 'int', 
+        'length' => 12, 
+        'not null' => TRUE, 
+        'default' => 0,
+      ),
+      'username' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+        'default' => '',      
+      ),
+      'text' => array(
+        'type' => 'text',
+        'not null' => TRUE,
+        'default' => '',
+      ),
+      'ip_address' => array(
+        'type' => 'varchar',
+        'length' => 15,
+        'not null' => TRUE,
+        'default' => 0,
+      ),
+    ),
+    'indexes' => array(
+      'nid' => array('nid'), 
+      'vid' => array('vid'),
+    ), 
+    'unique keys' => array(
+      'id' => array('id'),
+    ), 
+    'primary key' => array('id'),
+  );
+  return $schema;
+}
