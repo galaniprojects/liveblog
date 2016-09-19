@@ -6,7 +6,7 @@ This module concentrates on providing the best User Experience for the editor as
 It will be splitted into different components.
 
 1. A UI component
-2. A drupal module
+2. A Drupal module
 
 These components should talk with each other over a defined API.  
 The API and the UI component should be as flexible as possible, so that new content-types can be added easily later.
