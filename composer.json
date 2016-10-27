@@ -1,0 +1,10 @@
+{
+  "name": "drupal/liveblog",
+  "description": "Liveblogging module for Drupal",
+  "autoload": {
+    "psr-4": {
+      "Drupal\\liveblog": "src/"
+    }
+  }
+}
+
