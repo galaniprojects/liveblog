@@ -1,0 +1,22 @@
+# Define the 'local' links for the module
+
+liveblog_post.settings_tab:
+  route_name: liveblog_post.liveblog_post_settings
+  title: Settings
+  base_route: liveblog_post.liveblog_post_settings
+
+liveblog_post.view:
+  route_name: entity.liveblog_post.canonical
+  base_route: entity.liveblog_post.canonical
+  title: View
+
+liveblog_post.page_edit:
+  route_name: entity.liveblog_post.edit_form
+  base_route: entity.liveblog_post.canonical
+  title: Edit
+
+liveblog_post.delete_confirm:
+  route_name:  entity.liveblog_post.delete_form
+  base_route:  entity.liveblog_post.canonical
+  title: Delete
+  weight: 10

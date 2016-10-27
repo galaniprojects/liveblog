@@ -1,0 +1,14 @@
+name: Liveblog
+description: Liveblogging module for Drupal
+type: module
+core: 8.x
+dependencies:
+  - field
+  - language
+  - menu_ui
+  - node
+  - path
+  - scheduler
+  - taxonomy
+  - text
+  - user

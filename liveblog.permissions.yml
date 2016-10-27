@@ -1,0 +1,10 @@
+'delete liveblog_post entity':
+  title: Delete entity content.
+'add liveblog_post entity':
+  title: Add entity content
+'view liveblog_post entity':
+  title: View entity content
+'edit liveblog_post entity':
+  title: Edit entity content
+'administer liveblog_post entity':
+  title: Administer settings
