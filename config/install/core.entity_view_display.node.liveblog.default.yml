@@ -1,0 +1,42 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.field.node.liveblog.body
+    - field.field.node.liveblog.field_highlights
+    - field.field.node.liveblog.field_status
+    - node.type.liveblog
+  module:
+    - text
+    - user
+id: node.liveblog.default
+targetEntityType: node
+bundle: liveblog
+mode: default
+content:
+  body:
+    label: hidden
+    type: text_default
+    weight: 101
+    settings: {  }
+    third_party_settings: {  }
+  field_highlights:
+    weight: 103
+    label: above
+    settings:
+      link: true
+    third_party_settings: {  }
+    type: entity_reference_label
+  field_status:
+    weight: 102
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
+    type: boolean
+  links:
+    weight: 100
+hidden:
+  langcode: true
