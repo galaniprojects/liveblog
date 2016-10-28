@@ -49,8 +49,8 @@ class LiveblogPostDeleteForm extends ContentEntityConfirmFormBase {
       '%title' => $this->entity->label(),
     ]);
 
-    // @todo: redirect to the views list.
-    $form_state->setRedirect('<front>');
+    // Redirect to the posts list.
+    $form_state->setRedirect('view.liveblog_posts.page_related_posts');
   }
 
 }
