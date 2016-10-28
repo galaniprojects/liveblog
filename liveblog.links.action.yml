@@ -6,5 +6,6 @@ liveblog_post.liveblog_post_add:
   title: 'Add Liveblog Post'
 
   # Where will the link appear, defined by route name.
-  appears_on:
-    - entity.liveblog_post.canonical
+  # @todo show on the views list.
+  #appears_on:
+  #  - entity.liveblog_post.canonical

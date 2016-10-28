@@ -21,13 +21,8 @@ class LiveblogPostForm extends ContentEntityForm {
     $form = parent::buildForm($form, $form_state);
     $entity = $this->entity;
 
-    // @todo should we support multilingual posts?
-    /*$form['langcode'] = array(
-      '#title' => $this->t('Language'),
-      '#type' => 'language_select',
-      '#default_value' => $entity->getUntranslated()->language()->getId(),
-      '#languages' => Language::STATE_ALL,
-    );*/
+    // @todo Implement ajax logic here.
+
     return $form;
   }
 
@@ -35,9 +30,12 @@ class LiveblogPostForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $form_state->setRedirect('entity.liveblog_post.collection');
     $entity = $this->getEntity();
     $entity->save();
+    $url = $entity->toUrl();
+
+    // Redirect to the post's full page.
+    $form_state->setRedirect($url->getRouteName(), $url->getRouteParameters());
   }
 
 }

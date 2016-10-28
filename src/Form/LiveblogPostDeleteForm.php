@@ -4,7 +4,6 @@ namespace Drupal\liveblog\Form;
 
 use Drupal\Core\Entity\ContentEntityConfirmFormBase;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Url;
 
 /**
  * Provides a form for deleting a liveblog_post entity.
@@ -23,10 +22,10 @@ class LiveblogPostDeleteForm extends ContentEntityConfirmFormBase {
   /**
    * {@inheritdoc}
    *
-   * If the delete command is canceled, return to the liveblog_post list.
+   * If the delete command is canceled, return to the liveblog_post page.
    */
   public function getCancelUrl() {
-    return new Url('entity.liveblog_post.collection');
+    return $this->getEntity()->toUrl();
   }
 
   /**
@@ -50,7 +49,8 @@ class LiveblogPostDeleteForm extends ContentEntityConfirmFormBase {
         '@type' => $this->entity->bundle(),
         '%title' => $this->entity->label(),
       ));
-    $form_state->setRedirect('entity.liveblog_post.collection');
+    // @todo: redirect to the views list.
+    $form_state->setRedirect('<front>');
   }
 
 }
