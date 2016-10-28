@@ -1,12 +1,7 @@
 # Define the menu links for this module
 
-entity.liveblog_post.collection:
-  title: 'Content Entity Example: LiveblogPosts Listing'
-  route_name: entity.liveblog_post.collection
-  description: 'List LiveblogPosts'
-  weight: 10
 liveblog_post.admin.structure.settings:
-  title: LiveblogPost Settings
-  description: 'Configure LiveblogPost entity'
+  title: Liveblog Post Settings
+  description: 'Configure Liveblog Post entity'
   route_name:  liveblog_post.liveblog_post_settings
   parent: system.admin_structure

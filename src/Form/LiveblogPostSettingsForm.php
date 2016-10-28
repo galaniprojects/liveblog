@@ -34,7 +34,7 @@ class LiveblogPostSettingsForm extends FormBase {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    $form['liveblog_post_settings']['#markup'] = 'Settings form for ContentEntityExample. Manage field settings here.';
+    $form['liveblog_post_settings']['#markup'] = 'Settings form for Liveblog Post. Manage field settings here.';
     return $form;
   }
 

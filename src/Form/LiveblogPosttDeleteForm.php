@@ -17,7 +17,7 @@ class LiveblogPostDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to delete entity %title?', array('%title' => $this->entity->label()));
+    return $this->t('Are you sure you want to delete the post "%title"?', array('%title' => $this->entity->label()));
   }
 
   /**

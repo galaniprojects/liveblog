@@ -7,5 +7,4 @@ liveblog_post.liveblog_post_add:
 
   # Where will the link appear, defined by route name.
   appears_on:
-    - entity.liveblog_post.collection
     - entity.liveblog_post.canonical

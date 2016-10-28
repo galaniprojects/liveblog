@@ -12,3 +12,4 @@ dependencies:
   - taxonomy
   - text
   - user
+  - simple_gmap

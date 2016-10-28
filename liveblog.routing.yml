@@ -12,16 +12,6 @@ entity.liveblog_post.canonical:
   # Calls the access controller of the entity, $operation 'view'
     _entity_access: 'liveblog_post.view'
 
-entity.liveblog_post.collection:
-  path: '/liveblog_post/list'
-  defaults:
-  # Calls the list controller, defined in the annotation of the liveblog_post entity.
-    _entity_list: 'liveblog_post'
-    _title: 'Liveblog Post List'
-  requirements:
-  # Checks for permission directly.
-    _permission: 'view liveblog_post entity'
-
 liveblog_post.liveblog_post_add:
   path: '/liveblog_post/add'
   defaults:

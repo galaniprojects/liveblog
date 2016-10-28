@@ -43,7 +43,6 @@ use Drupal\link\LinkItemInterface;
  *     "canonical" = "/liveblog_post/{liveblog_post}",
  *     "edit-form" = "/liveblog_post/{liveblog_post}/edit",
  *     "delete-form" = "/liveblog_post/{liveblog_post}/delete",
- *     "collection" = "/liveblog_post/list"
  *   },
  *   field_ui_base_route = "liveblog_post.liveblog_post_settings",
  * )
