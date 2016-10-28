@@ -2,6 +2,7 @@
 
 namespace Drupal\liveblog\Entity;
 
+use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityStorageInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
@@ -9,6 +10,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\liveblog\LiveblogPostInterface;
+use Drupal\taxonomy\Entity\Term;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\link\LinkItemInterface;
@@ -51,6 +53,11 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
   use EntityChangedTrait;
 
   /**
+   * Liveblog posts highlights taxonomy vocabulary id.
+   */
+  const LIVEBLOG_POSTS_HIGHLIGHTS_VID = 'highlights';
+
+  /**
    * {@inheritdoc}
    *
    * When a new entity instance is added, set the user_id entity reference to
@@ -62,7 +69,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
       'user_id' => \Drupal::currentUser()->id(),
     );
   }
-
+  // @todo add getters, setters ********************
   /**
    * {@inheritdoc}
    */
@@ -128,7 +135,19 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
     $options = [];
 
     // @todo: get terms from liveblog.
-    $options = [1,2,3];
+    $ids = \Drupal::entityQuery('taxonomy_term')
+      ->condition('vid', self::LIVEBLOG_POSTS_HIGHLIGHTS_VID)
+      ->execute();
+    if (!empty($ids)) {
+      $terms = Term::loadMultiple($ids);
+      foreach ($terms as $term) {
+        $name = $term->name->value;
+        // Convert term name to a machine name, which will be used as a CSS
+        // class in templates.
+        $key = strtolower(Html::cleanCssIdentifier($name));
+        $options[$key] = $name;
+      }
+    }
 
     return $options;
   }
@@ -163,42 +182,58 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
     $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Title'))
       ->setDescription(t('The title of the liveblog post.'))
+      ->setRequired(TRUE)
       ->setSettings(array(
         'default_value' => '',
         'max_length' => 255,
         'text_processing' => 0,
       ))
       ->setDisplayOptions('view', array(
-        'label' => 'above',
+        'label' => 'hidden',
         'type' => 'string',
-        'weight' => -6,
+        'weight' => 1,
       ))
       ->setDisplayOptions('form', array(
         'type' => 'string_textfield',
-        'weight' => -6,
+        'weight' => 1,
       ))
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['body'] = BaseFieldDefinition::create('string_long')
+    $fields['body'] = BaseFieldDefinition::create('text_long')
       ->setLabel(t('Body'))
       ->setDescription(t('Body text for the liveblog post.'))
+      ->setRequired(TRUE)
       ->setDisplayOptions('form', array(
-        'type' => 'string_textarea',
-        'weight' => 7,
+        'type' => 'text_textarea',
+        'weight' => 2,
         'settings' => array(
           'rows' => 3,
         ),
       ))
-      ->setDisplayConfigurable('form', TRUE)
       ->setDisplayOptions('view', array(
         'type' => 'string',
-        'weight' => 7,
-        'label' => 'above',
+        'weight' => 5,
+        'label' => 'hidden',
       ))
+      ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    // @todo: Location.
+    $fields['highlight'] = BaseFieldDefinition::create('list_string')
+      ->setLabel(t('Highlight'))
+      ->setDescription(t('Adds the possibility to mark a post as a highlight.'))
+      ->setSetting('allowed_values_function', __CLASS__ . '::getHighlightOptions')
+      ->setDefaultValue('')
+      ->setDisplayOptions('form', array(
+        'type' => 'select',
+        'weight' => 3,
+      ))
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'weight' => 0,
+      ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['source'] = BaseFieldDefinition::create('link')
       ->setLabel(t('Source'))
@@ -207,46 +242,44 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
         'title' => DRUPAL_REQUIRED,
         'link_type' => LinkItemInterface::LINK_GENERIC,
       ))
-      ->setDisplayOptions('view', array(
-        'label' => 'above',
-        'type' => 'string',
-        'weight' => -5,
-      ))
       ->setDisplayOptions('form', array(
         'type' => 'link',
-        'weight' => -5,
+        'weight' => 4,
+      ))
+      ->setDisplayOptions('view', array(
+        'label' => 'inline',
+        'type' => 'string',
+        'weight' => 6,
       ))
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['highlight'] = BaseFieldDefinition::create('list_string')
-      ->setLabel(t('Highlight'))
-      ->setDescription(t('Adds the possibility to mark a post as a highlight.'))
-
-      ->setRequired(TRUE)
-      ->setSetting('allowed_values_function', __CLASS__ . '::getHighlightOptions')
-      ->setDefaultValue('')
+    $fields['location'] = BaseFieldDefinition::create('string')
+      ->setLabel(t('Location'))
+      ->setDescription(t('Location address string related to the post.'))
       ->setDisplayOptions('form', array(
-        'type' => 'select',
-        'weight' => 2,
+        'type' => 'string_textfield',
+        'weight' => 5,
+      ))
+      ->setDisplayOptions('view', array(
+        'type' => 'simple_gmap',
+        'weight' => 7,
+        'label' => 'hidden',
       ))
       ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayOptions('view', array(
-        'label' => 'inline',
-        'weight' => 2,
-      ))
       ->setDisplayConfigurable('view', TRUE);
 
     // Entityreference to Liveblog.
     $fields['liveblog'] = BaseFieldDefinition::create('entity_reference')
       ->setLabel(t('Liveblog'))
+      ->setRequired(TRUE)
       ->setSettings(array(
         'target_type' => 'node',
         'target_bundles' => ['liveblog'],
       ))
       ->setDisplayOptions('form', array(
         'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
+        'weight' => 8,
         'settings' => array(
           'match_operator' => 'CONTAINS',
           'size' => '60',
@@ -254,12 +287,35 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
           'placeholder' => '',
         ),
       ))
-      ->setDisplayConfigurable('form', TRUE)
       ->setDisplayOptions('view', array(
-        'label' => 'above',
-        'weight' => 5,
+        'label' => 'inline',
+        'weight' => 7,
         'type' => 'entity_reference_label',
       ))
+      ->setDisplayConfigurable('form', TRUE)
+      ->setDisplayConfigurable('view', TRUE);
+
+    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
+      ->setLabel(t('Authored by'))
+      ->setDescription(t('The username of the content author.'))
+      ->setRequired(TRUE)
+      ->setSetting('target_type', 'user')
+      ->setDefaultValueCallback('Drupal\node\Entity\Node::getCurrentUserId')
+      ->setDisplayOptions('form', array(
+        'type' => 'entity_reference_autocomplete',
+        'weight' => 6,
+        'settings' => array(
+          'match_operator' => 'CONTAINS',
+          'size' => '60',
+          'placeholder' => '',
+        ),
+      ))
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'author',
+        'weight' => 2,
+      ))
+      ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
@@ -267,53 +323,42 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
       ->setDescription(t('Whether post is published.'))
       ->setDefaultValue(FALSE)
       ->setDisplayOptions('form', [
-        'type' => 'boolean',
-        'weight' => 7,
-      ])
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayOptions('form', [
         'settings' => [
           'display_label' => TRUE
         ],
-        'weight' => 7,
+        'weight' => 8,
       ])
-      ->setDisplayConfigurable('view', TRUE);
+     ->setDisplayConfigurable('form', TRUE);
 
-    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
-      ->setLabel(t('Authored by'))
-      ->setDescription(t('The username of the content author.'))
-      ->setRevisionable(TRUE)
-      ->setSetting('target_type', 'user')
-      ->setDefaultValueCallback('Drupal\node\Entity\Node::getCurrentUserId')
-      ->setTranslatable(TRUE)
-      ->setDisplayOptions('view', array(
-        'label' => 'hidden',
-        'type' => 'author',
-        'weight' => 0,
-      ))
-      ->setDisplayOptions('form', array(
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 5,
-        'settings' => array(
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'placeholder' => '',
-        ),
-      ))
-      ->setDisplayConfigurable('form', TRUE)
-      ->setDisplayConfigurable('view', TRUE);
-
-    // @todo should we support multilingual posts?
-    /*$fields['langcode'] = BaseFieldDefinition::create('language')
-      ->setLabel(t('Language code'))
-      ->setDescription(t('The language code of Liveblog Post entity.'));*/
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
-      ->setDescription(t('The time that the entity was created.'));
+      ->setDescription(t('The time that the entity was created.'))
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'timestamp',
+        'weight' => 3,
+        'settings' => [
+          'date_format' => 'medium',
+          'custom_date_format' => '',
+          'timezone' => '',
+        ],
+      ))
+      ->setDisplayConfigurable('view', TRUE);
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the entity was last edited.'));
+      ->setDescription(t('The time that the entity was last edited.'))
+      ->setDisplayOptions('view', array(
+        'label' => 'hidden',
+        'type' => 'timestamp',
+        'weight' => 4,
+        'settings' => [
+          'date_format' => 'medium',
+          'custom_date_format' => '',
+          'timezone' => '',
+        ],
+      ))
+      ->setDisplayConfigurable('view', TRUE);
 
     return $fields;
   }
