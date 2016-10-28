@@ -10,6 +10,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\liveblog\LiveblogPostInterface;
+use Drupal\node\NodeInterface;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
@@ -68,7 +69,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
       'user_id' => \Drupal::currentUser()->id(),
     );
   }
-  // @todo add getters, setters ********************
+
   /**
    * {@inheritdoc}
    */
@@ -87,21 +88,21 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
    * {@inheritdoc}
    */
   public function getOwner() {
-    return $this->get('user_id')->entity;
+    return $this->get('uid')->entity;
   }
 
   /**
    * {@inheritdoc}
    */
   public function getOwnerId() {
-    return $this->get('user_id')->target_id;
+    return $this->get('uid')->target_id;
   }
 
   /**
    * {@inheritdoc}
    */
   public function setOwnerId($uid) {
-    $this->set('user_id', $uid);
+    $this->set('uid', $uid);
     return $this;
   }
 
@@ -109,7 +110,40 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
    * {@inheritdoc}
    */
   public function setOwner(UserInterface $account) {
-    $this->set('user_id', $account->id());
+    $this->set('uid', $account->id());
+    return $this;
+  }
+
+  /**
+   * Returns the related liveblog node.
+   *
+   * @return \Drupal\node\NodeInterface
+   *   The related liveblog node.
+   */
+  public function getLiveblog() {
+    return $this->get('liveblog')->entity;
+  }
+
+  /**
+   * Returns the related liveblog node ID.
+   *
+   * @return int
+   *   The related liveblog node ID.
+   */
+  public function getLiveblogId() {
+    return $this->get('liveblog')->target_id;
+  }
+
+  /**
+   * Sets the related liveblog node.
+   *
+   * @param \Drupal\node\NodeInterface $node
+   *   The related liveblog node.
+   *
+   * @return $this
+   */
+  public function setLiveblog(NodeInterface $node) {
+    $this->set('liveblog', $node->id());
     return $this;
   }
 
