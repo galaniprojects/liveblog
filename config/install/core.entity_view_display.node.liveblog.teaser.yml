@@ -4,6 +4,8 @@ dependencies:
   config:
     - core.entity_view_mode.node.teaser
     - field.field.node.liveblog.body
+    - field.field.node.liveblog.field_highlights
+    - field.field.node.liveblog.field_status
     - node.type.liveblog
   module:
     - text
@@ -23,4 +25,6 @@ content:
   links:
     weight: 100
 hidden:
+  field_highlights: true
+  field_status: true
   langcode: true

@@ -308,7 +308,9 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
       ->setRequired(TRUE)
       ->setSettings(array(
         'target_type' => 'node',
-        'target_bundles' => ['liveblog'],
+        'handler_settings' => [
+          'target_bundles' => ['liveblog' => 'liveblog'],
+        ],
       ))
       ->setDisplayOptions('form', array(
         'type' => 'entity_reference_autocomplete',
@@ -355,6 +357,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
       ->setLabel(t('Status'))
       ->setDescription(t('Whether post is published.'))
       ->setDefaultValue(FALSE)
+      ->setDefaultValue(TRUE)
       ->setDisplayOptions('form', [
         'settings' => [
           'display_label' => TRUE
