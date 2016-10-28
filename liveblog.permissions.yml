@@ -1,10 +1,10 @@
 'delete liveblog_post entity':
-  title: Delete entity content.
+  title: Delete liveblog posts.
 'add liveblog_post entity':
-  title: Add entity content
+  title: Add liveblog posts
 'view liveblog_post entity':
-  title: View entity content
+  title: View liveblog posts
 'edit liveblog_post entity':
-  title: Edit entity content
+  title: Edit liveblog posts
 'administer liveblog_post entity':
-  title: Administer settings
+  title: Administer liveblog posts

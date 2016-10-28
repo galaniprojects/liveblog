@@ -21,7 +21,7 @@ use Drupal\link\LinkItemInterface;
  *
  * @ContentEntityType(
  *   id = "liveblog_post",
- *   label = @Translation("Liveblog Post entity"),
+ *   label = @Translation("Liveblog Post"),
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\liveblog\Entity\Controller\LiveblogPostListBuilder",
@@ -31,6 +31,7 @@ use Drupal\link\LinkItemInterface;
  *       "delete" = "Drupal\liveblog\Form\LiveblogPostDeleteForm",
  *     },
  *     "access" = "Drupal\liveblog\LiveblogPostAccessControlHandler",
+ *     "views_data" = "Drupal\views\EntityViewsData",
  *   },
  *   list_cache_contexts = { "user" },
  *   base_table = "liveblog_post",
@@ -165,7 +166,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
   public static function getHighlightOptions(FieldStorageDefinitionInterface $definition, FieldableEntityInterface $entity = NULL, &$cacheable = NULL) {
     $options = [];
 
-    // @todo: get terms from liveblog.
+    // @todo: get terms from liveblog. hook_entity_prepare_form
     $ids = \Drupal::entityQuery('taxonomy_term')
       ->condition('vid', self::LIVEBLOG_POSTS_HIGHLIGHTS_VID)
       ->execute();
