@@ -16,7 +16,7 @@ class LiveblogPostDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to delete the post "%title"?', array('%title' => $this->entity->label()));
+    return $this->t('Are you sure you want to delete the post "%title"?', ['%title' => $this->entity->label()]);
   }
 
   /**
@@ -44,11 +44,11 @@ class LiveblogPostDeleteForm extends ContentEntityConfirmFormBase {
     $entity = $this->getEntity();
     $entity->delete();
 
-    $this->logger('liveblog_post')->notice('@type: deleted %title.',
-      array(
-        '@type' => $this->entity->bundle(),
-        '%title' => $this->entity->label(),
-      ));
+    $this->logger('liveblog_post')->notice('@type: deleted %title.', [
+      '@type' => $this->entity->bundle(),
+      '%title' => $this->entity->label(),
+    ]);
+
     // @todo: redirect to the views list.
     $form_state->setRedirect('<front>');
   }
