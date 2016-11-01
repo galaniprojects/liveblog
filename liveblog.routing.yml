@@ -1,0 +1,48 @@
+# This file brings everything together. Very nifty!
+
+# Route name can be used in several places; e.g. links, redirects, and local
+# actions.
+entity.liveblog_post.canonical:
+  path: '/liveblog_post/{liveblog_post}'
+  defaults:
+  # Calls the view controller, defined in the annotation of the liveblog_post entity
+    _entity_view: 'liveblog_post'
+    _title: 'Liveblog Post Content'
+  requirements:
+  # Calls the access controller of the entity, $operation 'view'
+    _entity_access: 'liveblog_post.view'
+
+liveblog_post.liveblog_post_add:
+  path: '/liveblog_post/add'
+  defaults:
+  # Calls the form.add controller, defined in the liveblog_post entity.
+    _entity_form: liveblog_post.add
+    _title: 'Add Liveblog Post'
+  requirements:
+    _entity_create_access: 'liveblog_post'
+
+entity.liveblog_post.edit_form:
+  path: '/liveblog_post/{liveblog_post}/edit'
+  defaults:
+  # Calls the form.edit controller, defined in the liveblog_post entity.
+    _entity_form: liveblog_post.edit
+    _title: 'Edit Liveblog Post'
+  requirements:
+    _entity_access: 'liveblog_post.edit'
+
+entity.liveblog_post.delete_form:
+  path: '/liveblog_post/{liveblog_post}/delete'
+  defaults:
+    # Calls the form.delete controller, defined in the liveblog_post entity.
+    _entity_form: liveblog_post.delete
+    _title: 'Delete Liveblog Post'
+  requirements:
+    _entity_access: 'liveblog_post.delete'
+
+liveblog_post.liveblog_post_settings:
+  path: 'admin/structure/liveblog_post_settings'
+  defaults:
+    _form: '\Drupal\liveblog\Form\LiveblogPostSettingsForm'
+    _title: 'Liveblog Post Settings'
+  requirements:
+    _permission: 'administer liveblog_post entity'

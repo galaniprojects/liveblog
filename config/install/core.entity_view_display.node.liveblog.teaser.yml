@@ -1,0 +1,30 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - core.entity_view_mode.node.teaser
+    - field.field.node.liveblog.body
+    - field.field.node.liveblog.field_highlights
+    - field.field.node.liveblog.field_status
+    - node.type.liveblog
+  module:
+    - text
+    - user
+id: node.liveblog.teaser
+targetEntityType: node
+bundle: liveblog
+mode: teaser
+content:
+  body:
+    label: hidden
+    type: text_summary_or_trimmed
+    weight: 101
+    settings:
+      trim_length: 600
+    third_party_settings: {  }
+  links:
+    weight: 100
+hidden:
+  field_highlights: true
+  field_status: true
+  langcode: true
