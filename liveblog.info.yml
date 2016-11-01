@@ -8,8 +8,10 @@ dependencies:
   - menu_ui
   - node
   - path
+  - rest
   - scheduler
   - taxonomy
   - text
   - user
   - simple_gmap
+  - views
