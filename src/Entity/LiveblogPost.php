@@ -176,12 +176,25 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
         $name = $term->name->value;
         // Convert term name to a machine name, which will be used as a CSS
         // class in templates.
-        $key = strtolower(Html::cleanCssIdentifier($name));
+        $key = self::convertTextToMachineName($name);
         $options[$key] = $name;
       }
     }
 
     return $options;
+  }
+
+  /**
+   * Converts text to a machine name.
+   *
+   * @param string $text
+   *   The target text.
+   *
+   * @return string
+   *   Machine name.
+   */
+  public static function convertTextToMachineName($text) {
+    return strtolower(Html::cleanCssIdentifier($text));
   }
 
   /**
