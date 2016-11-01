@@ -4,12 +4,16 @@ type: module
 core: 8.x
 dependencies:
   - field
+  - hal
   - language
   - menu_ui
   - node
   - path
+  - rest
   - scheduler
+  - serialization
   - taxonomy
   - text
   - user
   - simple_gmap
+  - views
