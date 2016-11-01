@@ -4,7 +4,6 @@ dependencies:
   module:
     - basic_auth
     - hal
-    - liveblog
     - serialization
 id: entity.liveblog_post
 plugin_id: 'entity:liveblog_post'

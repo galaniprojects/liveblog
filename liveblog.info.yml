@@ -3,13 +3,16 @@ description: Liveblogging module for Drupal
 type: module
 core: 8.x
 dependencies:
+  - basic_auth
   - field
+  - hal
   - language
   - menu_ui
   - node
   - path
   - rest
   - scheduler
+  - serialization
   - taxonomy
   - text
   - user
