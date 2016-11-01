@@ -1,4 +1,5 @@
 # All action links for this module
+# @todo: Remove this page as all posts will be created in frontend only.
 
 liveblog_post.liveblog_post_add:
   # Which route will be called by the link
@@ -6,6 +7,5 @@ liveblog_post.liveblog_post_add:
   title: 'Add Liveblog Post'
 
   # Where will the link appear, defined by route name.
-  # @todo show on the views list.
-  #appears_on:
-  #  - entity.liveblog_post.canonical
+  appears_on:
+    - view.liveblog_posts.page_related_posts
