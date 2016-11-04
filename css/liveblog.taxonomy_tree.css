@@ -1,0 +1,4 @@
+/* Show the taxonomy tree nodes nested. */
+.field--widget-liveblog-taxonomy-tree--node .field--widget-liveblog-taxonomy-tree--node {
+  margin-left: 2em;
+}

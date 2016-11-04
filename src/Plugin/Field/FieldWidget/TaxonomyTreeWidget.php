@@ -29,34 +29,51 @@ class TaxonomyTreeWidget extends OptionsWidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
+    $element['#attached']['library'][] = 'liveblog/taxonomy_tree';
 
     $options = $this->getOptions($items->getEntity());
     $selected = $this->getSelectedOptions($items);
+    // Copy options stack.
+    $stack = $options;
+    // Map options as an elements tree.
+    $tree = $this->mapTree($stack);
+    // Add nested form elements.
+    $element['values'] = $this->prepareTreeElements($tree, $selected);
 
-    $data = $options;
-    $tree = $this->mapTree($data);
+    return $element;
+  }
 
-    /*$add_elements_level = function ($parent_level, $options, $selected) {
-      foreach ($options as $key => $option) {
-        preg_match('/^\-+/', $option, $matches);
-        $level = 0;
-        if (!empty($matches[0])) {
-          $level = count($matches[0]);
-        }
+  /**
+   * Prepares nested structure of form elements according to the elements tree.
+   *
+   * @param array $tree
+   *   The tree of elements.
+   * @param string[] $selected
+   *   The list of selected values.
+   *
+   * @return array
+   *   Nested structure of form elements according to the elements tree.
+   */
+  protected function prepareTreeElements(array $tree, array $selected) {
+    $element = [];
+    foreach ($tree as $item) {
+      $element[$item['value']] = [
+        '#type' => 'container',
+        '#attributes' => ['class' => ['field--widget-liveblog-taxonomy-tree--node']],
+      ];
 
-        $element[$key] = [
-          '#type' => 'container',
-        ];
+      $element[$item['value']]['element'] = array(
+        '#type' => 'checkbox',
+        '#title' => $item['title'],
+        '#default_value' => in_array($item['value'], $selected) ? TRUE : FALSE,
+        '#attributes' => ['class' => ['field--widget-liveblog-taxonomy-tree--item']],
+      );
 
-        $element[$key] = array(
-          '#type' => 'checkbox',
-          '#title' => $option,
-          '#default_value' => in_array($key, $selected) ? TRUE : FALSE,
-        );
+      if (!empty($item['children'])) {
+        $element[$item['value']]['children'] = $this->prepareTreeElements($item['children'], $selected);
+        $element[$item['value']]['element']['#attributes']['class'][] = 'field--widget-liveblog-taxonomy-tree--elements--parent';
       }
-      return $element;
-    };
-    $element['values'] = $add_elements_level(0, $options, $selected);*/
+    }
 
     return $element;
   }
