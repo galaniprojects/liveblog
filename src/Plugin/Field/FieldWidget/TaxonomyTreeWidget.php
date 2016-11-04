@@ -33,78 +33,8 @@ class TaxonomyTreeWidget extends OptionsWidgetBase {
     $options = $this->getOptions($items->getEntity());
     $selected = $this->getSelectedOptions($items);
 
-    /*$element['values'] = [
-      '#type' => 'container',
-    ];
-    foreach ($options as $key => $option) {
-      $element['values'][$key] = array(
-        '#type' => 'checkbox',
-        '#title' => $option,
-        '#default_value' => in_array($key, $selected) ? TRUE : FALSE,
-      );
-    }*/
-
-    $tree = [0 => []];
-    $levels = [];
-    foreach ($options as $key => $option) {
-      preg_match('/^\-+/', $option, $matches);
-      $level = 0;
-      if (!empty($matches[0])) {
-        $level = count($matches[0]);
-      }
-
-      if (empty($levels[$level])) {
-        // Create a sub-item of level - 1.
-        $tree[$level];
-      }
-      else {
-        // Create a sub-item of level -1.
-      }
-      $levels[$level] = $key;
-    }
-
-    $tree_source = [
-      1 => 'title1', // 0 1
-      2 => '-title2', // 0 1, 1 2
-      3 => '--title3', // 0 1, 1 2, 2 3
-      4 => '--title4', // 0 1, 1 2, 2 4
-      5 => 'title5', // 0 5
-      6 => '-title6', // 0 5, 1 6
-      7 => 'title7', // 0 7
-    ];
-
-    $tree_text = $this->mapTree($tree_source);
-
-    $tree_test = [
-      [
-        'value' => 1,
-        'title' => 'title1',
-        'children' => [
-          [
-            'value' => 2,
-            'title' => 'title2',
-            'children' => [
-              [
-                'value' => 3,
-                'title' => 'title3',
-              ],
-              [
-                'value' => 4,
-                'title' => 'title4',
-              ]
-            ],
-          ],
-        ],
-      ],
-      [
-        'value' => 5,
-        'title' => 'title5',
-      ],
-      [
-        'value' => 6,
-        'title' => 'title6',
-      ]
-    ];
+    $data = $options;
+    $tree = $this->mapTree($data);
 
     /*$add_elements_level = function ($parent_level, $options, $selected) {
       foreach ($options as $key => $option) {
@@ -131,47 +61,53 @@ class TaxonomyTreeWidget extends OptionsWidgetBase {
     return $element;
   }
 
-  protected function mapTree(array $data, $parentKey = NULL) {
+  /**
+   * Maps options tree.
+   *
+   * @param array $data
+   *   The options array nested using the "-" symbol.
+   * @param int $level
+   *   (optional) The current tree level.
+   *
+   * @return array
+   *   Mapped options tree.
+   */
+  protected function mapTree(array &$data, $level = 0) {
     $tree = array();
 
-    /*$data = [
-      1 => 'title1', // 0 1
-      2 => '-title2', // 0 1, 1 2
-      3 => '--title3', // 0 1, 1 2, 2 3
-      4 => '--title4', // 0 1, 1 2, 2 4
-      5 => 'title5', // 0 5
-      6 => '-title6', // 0 5, 1 6
-      7 => 'title7', // 0 7
-    ];*/
-
-    $processChildren = FALSE;
-
-    foreach ($data as $key => $val) {
-      if ($parentKey) {
-        if ($key == $parentKey) {
-          $processChildren = TRUE;
-        }
-      }
-
-      preg_match('/^\-+/', $val, $m);
+    $get_level = function($a) {
       $level = 0;
-
-      if (preg_match('/^\-+/', $val, $m)) {
-        $level = count($m) - 1;
-        $level2 = count($m[0]);
-
-        if ($level != $level2) {
-          throw new \Exception('level');
-        }
+      if (preg_match('/^-+/', $a, $m)) {
+        $level = strlen($m[0]);
       }
+      return $level;
+    };
+
+    while (list($key, $val) = each($data)) {
+      reset($data);
+      $item_level = $get_level($val);
 
       $node = array(
         'value' => $key,
-        'title' => str_replace('-', '', $val),
-        'children' => mapTree($data, $key),
+        'title' => preg_replace('/^-+/', '', $val),
       );
 
-      $tree[] = $node;
+      // Same level, add sibling.
+      if ($level == $item_level) {
+        $next = next($data);
+        unset($data[$key]);
+
+        // More items below.
+        if ($get_level($next) > $level) {
+          $node['children'] = $this->mapTree($data, $level + 1);
+        }
+
+        $tree[] = $node;
+      }
+      // We are finished on this level, return.
+      elseif ($item_level < $level) {
+        return $tree;
+      }
     }
 
     return $tree;
