@@ -144,15 +144,16 @@ class TaxonomyTreeWidget extends OptionsWidgetBase {
     }
 
     $values = [];
+    $tree = [];
     // Massage submitted form values.
     // Drupal\Core\Field\WidgetBase::submit() expects values as
     // an array of values keyed by delta first, then by column, while our
-    // widgets return the opposite.
+    // widget returns a values tree.
     foreach (Element::children($element['values']) as $key) {
-      if (!empty($element['values'][$key]['#value'])) {
-        $values[] = $key;
-      }
+      $tree[$key] = $element['values'][$key];
     }
+    // Collect values from the tree structure in the values array.
+    self::collectTreeValues($tree, $values);
 
     // Filter out the 'none' option. Use a strict comparison, because
     // 0 == 'any string'.
@@ -167,6 +168,25 @@ class TaxonomyTreeWidget extends OptionsWidgetBase {
       $items[] = array($element['#key_column'] => $value);
     }
     $form_state->setValueForElement($element, $items);
+  }
+
+  /**
+   * Collects values from the tree structure in the values array.
+   *
+   * @param array $tree
+   *   The elements tree.
+   * @param array $values
+   *   The target values array.
+   */
+  protected static function collectTreeValues(array $tree, array &$values) {
+    foreach ($tree as $key => $item) {
+      if (!empty($item['element']['#value'])) {
+        $values[] = $key;
+      }
+      if (!empty($item['children'])) {
+        self::collectTreeValues($item['children'], $values);
+      }
+    }
   }
 
   /**
