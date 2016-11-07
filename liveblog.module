@@ -1,0 +1,48 @@
+<?php
+
+/**
+ * @file
+ * The module file.
+ */
+
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\node\Entity\Node;
+
+/**
+ * Implements hook_entity_extra_field_info().
+ */
+function liveblog_entity_extra_field_info() {
+  $fields['node']['liveblog']['display']['liveblog_posts'] = [
+    'label' => t('Liveblog posts'),
+    'description' => t('List of the related liveblog posts.'),
+    'weight' => 4,
+  ];
+
+  return $fields;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for user entities.
+ */
+function liveblog_node_view(array &$build, Node $node, EntityViewDisplayInterface $display) {
+  if ($display->getComponent('liveblog_posts')) {
+    $build['liveblog_posts'] = [
+      '#theme' => 'liveblog_posts',
+      '#node' => $node,
+      // @todo: Add js, css assets.
+    ];
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function liveblog_theme() {
+  return [
+    'liveblog_posts' => [
+      'variables' => [
+        'node' => NULL,
+      ],
+    ],
+  ];
+}
