@@ -29,6 +29,10 @@ class TaxonomyTreeWidget extends OptionsWidgetBase {
    */
   public function formElement(FieldItemListInterface $items, $delta, array $element, array &$form, FormStateInterface $form_state) {
     $element = parent::formElement($items, $delta, $element, $form, $form_state);
+    $element['label'] = [
+      '#type' => 'item',
+      '#title' => $element['#title'],
+    ];
     $element['#attached']['library'][] = 'liveblog/taxonomy_tree';
 
     $options = $this->getOptions($items->getEntity());
@@ -104,10 +108,10 @@ class TaxonomyTreeWidget extends OptionsWidgetBase {
       reset($data);
       $item_level = $get_level($val);
 
-      $node = array(
+      $node = [
         'value' => $key,
         'title' => preg_replace('/^-+/', '', $val),
-      );
+      ];
 
       // Same level, add sibling.
       if ($level == $item_level) {
@@ -140,7 +144,7 @@ class TaxonomyTreeWidget extends OptionsWidgetBase {
    */
   public static function validateElement(array $element, FormStateInterface $form_state) {
     if ($element['#required'] && $element['#value'] == '_none') {
-      $form_state->setError($element, t('@name field is required.', array('@name' => $element['#title'])));
+      $form_state->setError($element, t('@name field is required.', ['@name' => $element['#title']]));
     }
 
     $values = [];
@@ -163,9 +167,9 @@ class TaxonomyTreeWidget extends OptionsWidgetBase {
     }
 
     // Transpose selections from field => delta to delta => field.
-    $items = array();
+    $items = [];
     foreach ($values as $value) {
-      $items[] = array($element['#key_column'] => $value);
+      $items[] = [$element['#key_column'] => $value];
     }
     $form_state->setValueForElement($element, $items);
   }
