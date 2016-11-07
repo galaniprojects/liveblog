@@ -54,7 +54,7 @@ function liveblog_theme() {
  * Implements hook_preprocess_HOOK().
  */
 function template_preprocess_liveblog_post(&$variables) {
-  /* @vat \Drupal\liveblog\Entity\LiveblogPost $post */
+  /* @var \Drupal\liveblog\Entity\LiveblogPost $post */
   $post = $variables['elements']['#liveblog_post'];
   $variables['highlight'] = $post->highlight->value;
 }
