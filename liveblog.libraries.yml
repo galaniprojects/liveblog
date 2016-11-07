@@ -1,0 +1,6 @@
+taxonomy_tree:
+  css:
+    theme:
+      css/liveblog.taxonomy_tree.css: {}
+  js:
+    js/liveblog.taxonomy_tree.js: {}

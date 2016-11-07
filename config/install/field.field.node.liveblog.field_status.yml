@@ -8,7 +8,7 @@ id: node.liveblog.field_status
 field_name: field_status
 entity_type: node
 bundle: liveblog
-label: Status
+label: Live
 description: 'Whether Liveblog is actually “live”, or already finished.'
 required: false
 translatable: false
@@ -17,6 +17,6 @@ default_value:
     value: 1
 default_value_callback: ''
 settings:
-  on_label: Active
-  off_label: 'Not active'
+  on_label: 'Is live'
+  off_label: 'Is not live'
 field_type: boolean
