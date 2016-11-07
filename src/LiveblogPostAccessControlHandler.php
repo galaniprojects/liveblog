@@ -25,13 +25,16 @@ class LiveblogPostAccessControlHandler extends EntityAccessControlHandler {
       case 'view':
         return AccessResult::allowedIfHasPermission($account, 'view liveblog_post entity');
 
-      case 'edit':
+      case 'update':
         return AccessResult::allowedIfHasPermission($account, 'edit liveblog_post entity');
 
       case 'delete':
         return AccessResult::allowedIfHasPermission($account, 'delete liveblog_post entity');
+
+      default:
+        // No opinion.
+        return AccessResult::neutral();
     }
-    return AccessResult::allowed();
   }
 
   /**
