@@ -1210,19 +1210,23 @@ display:
           operator: contains
           value: ''
           group: 1
-          exposed: false
+          exposed: true
           expose:
-            operator_id: ''
-            label: ''
+            operator_id: highlight_op
+            label: Highlight
             description: ''
             use_operator: false
-            operator: ''
-            identifier: ''
+            operator: highlight_op
+            identifier: highlight
             required: false
             remember: false
             multiple: false
             remember_roles:
               authenticated: authenticated
+              anonymous: '0'
+              editor: '0'
+              seo: '0'
+              administrator: '0'
           is_grouped: false
           group_info:
             label: ''
@@ -1318,7 +1322,7 @@ display:
           relationship: none
           group_type: group
           admin_label: Content
-          required: true
+          required: false
           entity_type: liveblog_post
           entity_field: liveblog
           plugin_id: standard
