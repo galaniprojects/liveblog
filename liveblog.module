@@ -27,7 +27,7 @@ function liveblog_entity_extra_field_info() {
 function liveblog_node_view(array &$build, Node $node, EntityViewDisplayInterface $display) {
   if ($display->getComponent('liveblog_posts')) {
     $javascriptSettings = [
-      'getURL' => '/liveblog/'.$node->id().'/posts'
+      'getURL'      => '/liveblog/'.$node->id().'/posts?items_per_page=2',
     ];
     $build['liveblog_posts'] = [
       '#theme' => 'liveblog_posts',
