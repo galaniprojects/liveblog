@@ -40,9 +40,17 @@ entity.liveblog_post.delete_form:
     _entity_access: 'liveblog_post.delete'
 
 liveblog_post.liveblog_post_settings:
-  path: 'admin/structure/liveblog_post_settings'
+  path: '/admin/structure/liveblog_post_settings'
   defaults:
     _form: '\Drupal\liveblog\Form\LiveblogPostSettingsForm'
     _title: 'Liveblog Post Settings'
   requirements:
     _permission: 'administer liveblog_post entity'
+
+liveblog.notification_channel_settings:
+  path: '/admin/config/services/liveblog-notification-channel'
+  defaults:
+    _form:  '\Drupal\liveblog\Form\NotificationChannelSettingsForm'
+    _title: 'Liveblog notification channel settings'
+  requirements:
+    _permission: 'administer liveblog settings'

@@ -1,0 +1,4 @@
+services:
+  plugin.manager.liveblog.notification_channel:
+    class: Drupal\liveblog\NotificationChannel\NotificationChannelManager
+    parent: default_plugin_manager

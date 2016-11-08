@@ -36,6 +36,8 @@ class LiveblogPostForm extends ContentEntityForm {
 
     // Redirect to the post's full page.
     $form_state->setRedirect($url->getRouteName(), $url->getRouteParameters());
+
+    // @todo Trigger an notification channel update.
   }
 
 }
