@@ -5,10 +5,13 @@ import ReactDOM from 'react-dom'
 import Posts from './components/posts'
 
 class LiveblogStream {
-  constructor(element, urls = {getURL}) {
+  constructor(element, urls = {getURL, getNextURL}) {
     const App = () => (
       <div>
-        <Posts getURL={urls.getURL} />
+        <Posts
+          getURL={urls.getURL}
+          getNextURL={urls.getNextURL}
+        />
       </div>
     )
     ReactDOM.render(<App />, element)

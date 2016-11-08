@@ -28,6 +28,7 @@ function liveblog_node_view(array &$build, Node $node, EntityViewDisplayInterfac
   if ($display->getComponent('liveblog_posts')) {
     $javascriptSettings = [
       'getURL'      => '/liveblog/'.$node->id().'/posts?items_per_page=2',
+      'getNextURL'  => '/liveblog/'.$node->id().'/posts?items_per_page=1&created_op=<&created[value]=@%s'
     ];
     $build['liveblog_posts'] = [
       '#theme' => 'liveblog_posts',
