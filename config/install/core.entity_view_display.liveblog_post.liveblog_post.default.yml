@@ -1,8 +1,6 @@
 langcode: en
 status: true
 dependencies:
-  config:
-    - field.field.liveblog_post.liveblog_post.field_embed_media
   module:
     - entity_reference_revisions
     - link
@@ -29,14 +27,6 @@ content:
       date_format: medium
       custom_date_format: ''
       timezone: ''
-    third_party_settings: {  }
-  field_embed_media:
-    type: entity_reference_revisions_entity_view
-    weight: 5
-    label: above
-    settings:
-      view_mode: default
-      link: ''
     third_party_settings: {  }
   location:
     type: simple_gmap
