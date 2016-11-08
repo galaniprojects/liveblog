@@ -18,13 +18,24 @@ content:
   body:
     label: hidden
     type: text_summary_or_trimmed
-    weight: 101
+    weight: 1
     settings:
       trim_length: 600
     third_party_settings: {  }
+  field_status:
+    type: boolean
+    weight: 0
+    label: above
+    settings:
+      format: default
+      format_custom_false: ''
+      format_custom_true: ''
+    third_party_settings: {  }
   links:
-    weight: 100
+    weight: 2
+    settings: {  }
+    third_party_settings: {  }
 hidden:
   field_highlights: true
-  field_status: true
   langcode: true
+  liveblog_posts: true

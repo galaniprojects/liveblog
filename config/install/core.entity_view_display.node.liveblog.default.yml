@@ -1,3 +1,4 @@
+uuid: 7feccaff-7331-49f2-afc9-a6dc5d7d101a
 langcode: en
 status: true
 dependencies:
@@ -17,19 +18,12 @@ content:
   body:
     label: hidden
     type: text_default
-    weight: 101
+    weight: 1
     settings: {  }
     third_party_settings: {  }
-  field_highlights:
-    weight: 103
-    label: above
-    settings:
-      link: true
-    third_party_settings: {  }
-    type: entity_reference_label
   field_status:
-    weight: 102
-    label: above
+    weight: 2
+    label: hidden
     settings:
       format: default
       format_custom_false: ''
@@ -37,6 +31,13 @@ content:
     third_party_settings: {  }
     type: boolean
   links:
-    weight: 100
+    weight: 0
+    settings: {  }
+    third_party_settings: {  }
+  liveblog_posts:
+    weight: 4
+    settings: {  }
+    third_party_settings: {  }
 hidden:
+  field_highlights: true
   langcode: true

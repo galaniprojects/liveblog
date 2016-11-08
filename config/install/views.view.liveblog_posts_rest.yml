@@ -13,7 +13,7 @@ dependencies:
     - text
     - user
 id: liveblog_posts_rest
-label: 'Liveblog posts REST'
+label: 'Liveblog posts (REST)'
 module: views
 description: ''
 tag: ''
@@ -1055,7 +1055,8 @@ display:
         - 'url.query_args:sort_by'
         - 'url.query_args:sort_order'
         - user
-      tags: {  }
+      tags:
+        - 'config:core.entity_view_display.liveblog_post.liveblog_post.default'
   # @todo Remove the 'related_posts_page' display in future. It was created only
   # for convinient discovery of get parameters in the 'related_posts_rest'
   # display.
@@ -1085,7 +1086,8 @@ display:
         - 'url.query_args:sort_order'
         - user
         - user.permissions
-      tags: {  }
+      tags:
+        - 'config:core.entity_view_display.liveblog_post.liveblog_post.default'
   related_posts_rest:
     display_plugin: rest_export
     id: related_posts_rest
@@ -1137,4 +1139,5 @@ display:
         - 'url.query_args:sort_by'
         - 'url.query_args:sort_order'
         - user
-      tags: {  }
+      tags:
+        - 'config:core.entity_view_display.liveblog_post.liveblog_post.default'
