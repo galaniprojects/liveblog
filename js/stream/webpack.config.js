@@ -3,7 +3,7 @@ const webpack = require('webpack')
 const isProd = (process.env.NODE_ENV === 'production')
 
 module.exports = {
-  entry: "./src/entry.js",
+  entry: "./src/liveblogStream.js",
   output: {
     path: './dist',
     filename: isProd ? "bundle.min.js" : "bundle.js"
