@@ -70,7 +70,7 @@ function template_preprocess_liveblog_posts(&$variables) {
     $views_content = views_embed_view('liveblog_posts', 'liveblog_posts', $node->id());
   }
   else {
-    $views_content = views_embed_view('liveblog_posts', 'liveblog_posts_not_active', $node->id());
+    $views_content = views_embed_view('liveblog_posts', 'liveblog_posts_archive', $node->id());
   }
   $variables['posts'] = \Drupal::service('renderer')->render($views_content);
 }
