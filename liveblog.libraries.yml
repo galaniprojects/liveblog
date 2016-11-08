@@ -4,3 +4,11 @@ taxonomy_tree:
       css/liveblog.taxonomy_tree.css: {}
   js:
     js/liveblog.taxonomy_tree.js: {}
+stream:
+  title: 'Liveblog Stream'
+  js:
+    js/stream/dist/bundle.js: {}
+    js/liveblog.stream.js: {}
+  dependencies:
+    - core/jquery
+    - core/drupalSettings
