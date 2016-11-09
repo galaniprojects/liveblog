@@ -69,7 +69,7 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
    *   Notification channel config.
    */
   protected function getConfig() {
-    return $this->config('liveblog.notification_channel.settings');
+    return $this->config('liveblog.notification_channel');
   }
 
   /**
@@ -81,7 +81,7 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
    *   The config variable value.
    */
   protected function setConfig($name, $value) {
-    $config = $this->configFactory()->getEditable('liveblog.notification_channel.settings');
+    $config = $this->configFactory()->getEditable('liveblog.notification_channel');
     $config->set($name, $value)->save();
   }
 
@@ -124,7 +124,7 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
         '#open' => TRUE,
       );
 
-      $plugin = $this->notificationChannelManager->createInstance($plugin_id, $config->get('plugin_settings'));
+      $plugin = $this->notificationChannelManager->createInstance($plugin_id);
       if ($plugin_form = $plugin->buildConfigurationForm($form['plugin_wrapper']['plugin_settings'], $form_state)) {
         $form['plugin_wrapper']['plugin_settings'] += $plugin_form;
       }
@@ -164,7 +164,6 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->setConfig('plugin', $form_state->getValue('plugin'));
-    $this->setConfig('plugin_settings', $form_state->getValue('plugin_settings'));
 
     $plugin = $form_state->getValue('plugin');
     $plugin = $this->notificationChannelManager->createInstance($plugin);
