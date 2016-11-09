@@ -6,6 +6,8 @@ export default class Posts extends Component {
     this.state = {
       posts: []
     }
+    this.isloading = false
+    this.reachedEnd = false
   }
 
   componentWillMount() {
@@ -24,7 +26,7 @@ export default class Posts extends Component {
 
   _lazyload() {
     var el = this._getLastElement()
-    if (!this.isloading && el && this._elementInViewport(el)) {
+    if (!this.isloading && !this.reachedEnd && el && this._elementInViewport(el)) {
       this.isloading = true
       this._loadNextPosts()
     }
@@ -45,14 +47,22 @@ export default class Posts extends Component {
     var posts = this.state.posts
     var lastPost = posts[posts.length-1]
     var url = this.props.getNextURL.replace('%s', lastPost.created)
-    // TODO: stop trying to load, if we reached the end
+    // TODO: error handling
     jQuery.getJSON(url, (lazyPosts) => {
-      this.setState({
-        posts: [
-          ...this.state.posts,
-          ...lazyPosts
-        ]
-      })
+      if (lazyPosts && Array.isArray(lazyPosts)) {
+        if (lazyPosts.length != 0) {
+          this.setState({
+            posts: [
+              ...this.state.posts,
+              ...lazyPosts
+            ]
+          })
+        }
+        else {
+          this.reachedEnd = true
+        }
+      }
+
       this.isloading = false
     })
   }
