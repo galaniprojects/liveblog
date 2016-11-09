@@ -14,7 +14,7 @@ use Drupal\liveblog\NotificationChannel\NotificationChannelPluginBase;
  *   description = @Translation("Pusher.com notification channel."),
  * )
  */
-class Pusher extends NotificationChannelPluginBase {
+class PusherNotificationChannel extends NotificationChannelPluginBase {
 
   /**
    * {@inheritdoc}
@@ -51,7 +51,10 @@ class Pusher extends NotificationChannelPluginBase {
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::validateConfigurationForm($form, $form_state);
-    // @todo: require dependency on pusher library.
+    // Check the required dependency on the Pusher library.
+    if (!class_exists('\Pusher')) {
+      $form_state->setErrorByName('plugin', t('The "\Pusher" class was not found. Please make sure you have included the <a href="https://github.com/pusher/pusher-http-php">Pusher PHP Library</a>.'));
+    }
   }
 
 }

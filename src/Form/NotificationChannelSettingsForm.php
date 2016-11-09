@@ -125,7 +125,15 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
       );
 
       $plugin = $this->notificationChannelManager->createInstance($plugin_id, $config->get('plugin_settings'));
-      $form['plugin_wrapper']['plugin_settings'] += $plugin->buildConfigurationForm($form['plugin_wrapper']['plugin_settings'], $form_state);
+      if ($plugin_form = $plugin->buildConfigurationForm($form['plugin_wrapper']['plugin_settings'], $form_state)) {
+        $form['plugin_wrapper']['plugin_settings'] += $plugin_form;
+      }
+      else {
+        $form['plugin_wrapper']['plugin_settings']['no_settings'] = [
+          '#type' => 'item',
+          '#markup' => t('The plugin does not provide any settings.'),
+        ];
+      }
     }
 
     $form['actions'] = [
@@ -157,6 +165,11 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->setConfig('plugin', $form_state->getValue('plugin'));
     $this->setConfig('plugin_settings', $form_state->getValue('plugin_settings'));
+
+    $plugin = $form_state->getValue('plugin');
+    $plugin = $this->notificationChannelManager->createInstance($plugin);
+    $plugin->submitConfigurationForm($form, $form_state);
+
     drupal_set_message(t('Liveblog notification settings have been updated.'));
   }
 
