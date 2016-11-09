@@ -50,7 +50,7 @@ class LiveblogPostDeleteForm extends ContentEntityConfirmFormBase {
     ]);
 
     // Redirect to the posts list.
-    $form_state->setRedirect('view.liveblog_posts.page_related_posts');
+    $form_state->setRedirect('view.liveblog_posts.liveblog_posts_admin');
   }
 
 }
