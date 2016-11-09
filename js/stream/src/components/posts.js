@@ -32,7 +32,7 @@ export default class Posts extends Component {
     }
   }
   _getLastElement() {
-    return document.querySelector('div.liveblog-post:last-child')
+    return this.postsWrapper.querySelector('div.liveblog-post:last-child')
   }
   _elementInViewport(el) {
     var rect = el.getBoundingClientRect()
@@ -69,7 +69,7 @@ export default class Posts extends Component {
 
   render() {
     return (
-      <div>
+      <div className="liveblog-posts-wrapper" ref={(wrapper) => this.postsWrapper = wrapper}>
         { this.state.posts.map((post) => {
           return (
             <div className="liveblog-post" key={post.id}>
