@@ -28,7 +28,7 @@ entity.liveblog_post.edit_form:
     _entity_form: liveblog_post.edit
     _title: 'Edit Liveblog Post'
   requirements:
-    _entity_access: 'liveblog_post.edit'
+    _entity_access: 'liveblog_post.update'
 
 entity.liveblog_post.delete_form:
   path: '/liveblog_post/{liveblog_post}/delete'
