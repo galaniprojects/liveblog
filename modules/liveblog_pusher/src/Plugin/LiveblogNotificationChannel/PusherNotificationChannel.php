@@ -3,6 +3,7 @@
 namespace Drupal\liveblog_pusher\Plugin\LiveblogNotificationChannel;
 
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\liveblog\Entity\LiveblogPost;
 use Drupal\liveblog\NotificationChannel\NotificationChannelPluginBase;
 
 /**
@@ -15,6 +16,13 @@ use Drupal\liveblog\NotificationChannel\NotificationChannelPluginBase;
  * )
  */
 class PusherNotificationChannel extends NotificationChannelPluginBase {
+
+  /**
+   * The pusher client.
+   *
+   * @var \Pusher
+   */
+  protected $client;
 
   /**
    * {@inheritdoc}
@@ -55,6 +63,43 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
     if (!class_exists('\Pusher')) {
       $form_state->setErrorByName('plugin', t('The "\Pusher" class was not found. Please make sure you have included the <a href="https://github.com/pusher/pusher-http-php">Pusher PHP Library</a>.'));
     }
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * @return \Pusher
+   *   The notification channel client.
+   */
+  public function getClient() {
+    if (!$this->client) {
+      // @todo Add logger.
+      $options = array(
+        'encrypted' => true
+      );
+      $this->client = new \Pusher(
+        $this->getConfigurationValue('key'),
+        $this->getConfigurationValue('secret'),
+        $this->getConfigurationValue('app_id'),
+        $options
+      );
+    }
+    return $this->client;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  function triggerLiveblogPostEvent(LiveblogPost $liveblogPost, $event) {
+    $client = $this->getClient();
+
+    $channel = "liveblog-{$liveblogPost->id()}";
+
+    $data['message'] = 'hello world';
+
+    // Trigger an event by providing event name and payload.
+    $response = $client->trigger($channel, $event, $data);
+    // @todo: Log response if there is an error.
   }
 
 }

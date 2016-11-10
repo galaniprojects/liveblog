@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\liveblog\Entity\LiveblogPost;
 
 /**
  * Interface for service plugin controllers.
@@ -13,5 +14,23 @@ use Drupal\Core\Plugin\PluginFormInterface;
  * @ingroup liveblog_notification_channel
  */
 interface NotificationChannelInterface extends PluginInspectionInterface, PluginFormInterface, ConfigurablePluginInterface, ContainerFactoryPluginInterface {
+
+  /**
+   * Gets the notification channel client.
+   *
+   * @return mixed
+   *   The notification channel client.
+   */
+  public function getClient();
+
+  /**
+   * Triggers event notification connected to the liveblog post.
+   *
+   * @param \Drupal\liveblog\Entity\LiveblogPost $liveblogPost
+   *   The target liveblog post.
+   * @param string $event
+   *   The event name.
+   */
+  public function triggerLiveblogPostEvent(LiveblogPost $liveblogPost, $event);
 
 }

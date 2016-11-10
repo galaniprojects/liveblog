@@ -17,7 +17,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 class NotificationChannelSettingsForm extends ConfigFormBase  {
 
   /**
-   * Translator plugin manager.
+   * The notification channel manager.
    *
    * @var \Drupal\liveblog\NotificationChannel\NotificationChannelManager
    */
@@ -29,7 +29,7 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
    * @param \Drupal\liveblog\NotificationChannel\NotificationChannelManager $notification_channel_manager
-   *   The module handler service.
+   *   The notification channel service.
    */
   public function __construct(ConfigFactoryInterface $config_factory, NotificationChannelManager $notification_channel_manager) {
     parent::__construct($config_factory);

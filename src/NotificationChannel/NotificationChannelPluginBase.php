@@ -77,6 +77,18 @@ abstract class NotificationChannelPluginBase extends PluginBase implements Notif
   }
 
   /**
+   * Gets configuration value of a single variable.
+   *
+   * @param string $name
+   *   The variable name.
+   * @return mixed
+   *   The variable value, null if not set.
+   */
+  public function getConfigurationValue($name) {
+    return isset($this->configuration[$name]) ? $this->configuration[$name] : NULL;
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function setConfiguration(array $configuration) {

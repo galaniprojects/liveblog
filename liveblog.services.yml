@@ -1,4 +1,4 @@
 services:
   plugin.manager.liveblog.notification_channel:
     class: Drupal\liveblog\NotificationChannel\NotificationChannelManager
-    parent: default_plugin_manager
+    arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@config.factory']

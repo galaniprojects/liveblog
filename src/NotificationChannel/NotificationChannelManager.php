@@ -3,6 +3,7 @@
 namespace Drupal\liveblog\NotificationChannel;
 
 use Drupal\Core\Cache\CacheBackendInterface;
+use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Extension\ModuleHandlerInterface;
 use Drupal\Core\Plugin\DefaultPluginManager;
 use Drupal\Core\Plugin\Factory\ContainerFactory;
@@ -18,6 +19,20 @@ use Drupal\Core\Plugin\Factory\ContainerFactory;
 class NotificationChannelManager extends DefaultPluginManager {
 
   /**
+   * The instance of the current active plugin.
+   *
+   * @var \Drupal\liveblog\NotificationChannel\NotificationChannelInterface|null
+   */
+  protected $plugin;
+
+  /**
+   * The config factory.
+   *
+   * @var \Drupal\Core\Config\ConfigFactoryInterface
+   */
+  protected $config;
+
+  /**
    * Constructs a NotificationChannelManager object.
    *
    * @param \Traversable $namespaces
@@ -27,8 +42,10 @@ class NotificationChannelManager extends DefaultPluginManager {
    *   Cache backend instance to use.
    * @param \Drupal\Core\Extension\ModuleHandlerInterface $module_handler
    *   The module handler to invoke the alter hook with.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The factory for configuration objects.
    */
-  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler) {
+  public function __construct(\Traversable $namespaces, CacheBackendInterface $cache_backend, ModuleHandlerInterface $module_handler, ConfigFactoryInterface $config_factory) {
     parent::__construct(
       'Plugin/LiveblogNotificationChannel',
       $namespaces,
@@ -39,6 +56,7 @@ class NotificationChannelManager extends DefaultPluginManager {
     $this->alterInfo('liveblog_notification_channel_info');
     $this->setCacheBackend($cache_backend, 'liveblog_notification_channel_info_plugins');
     $this->factory = new ContainerFactory($this, '\Drupal\liveblog\NotificationChannel\NotificationChannelInterface');
+    $this->config = $config_factory->get('liveblog.notification_channel.settings');
   }
 
   /**
@@ -53,6 +71,21 @@ class NotificationChannelManager extends DefaultPluginManager {
       $list[$plugin] = $definition['label'];
     }
     return $list;
+  }
+
+  /**
+   * Creates an instance of the current active plugin.
+   *
+   * @return \Drupal\liveblog\NotificationChannel\NotificationChannelInterface|null
+   *   The instance of the current active plugin, null if not set.
+   */
+  public function createActiveInstance() {
+    if (empty($this->plugin) || $this->plugin->getPluginId() != $this->config->get('plugin')) {
+      if ($plugin_id = $this->config->get('plugin')) {
+        $this->plugin = $this->createInstance($plugin_id);
+      }
+    }
+    return $this->plugin;
   }
 
 }
