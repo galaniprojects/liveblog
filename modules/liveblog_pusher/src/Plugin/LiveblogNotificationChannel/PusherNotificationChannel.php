@@ -2,9 +2,13 @@
 
 namespace Drupal\liveblog_pusher\Plugin\LiveblogNotificationChannel;
 
+use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\liveblog\Entity\LiveblogPost;
 use Drupal\liveblog\NotificationChannel\NotificationChannelPluginBase;
+use Drupal\liveblog_pusher\PusherLoggerInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
  * Pusher.com notification channel.
@@ -17,12 +21,54 @@ use Drupal\liveblog\NotificationChannel\NotificationChannelPluginBase;
  */
 class PusherNotificationChannel extends NotificationChannelPluginBase {
 
+
+  /**
+   * The entity type manager.
+   *
+   * @var \Drupal\liveblog_pusher\PusherLoggerInterface
+   */
+  protected $logger;
+
   /**
    * The pusher client.
    *
    * @var \Pusher
    */
   protected $client;
+
+
+  /**
+   * Constructs an EntityForm object.
+   *
+   * @param array $configuration
+   *   A configuration array containing information about the plugin instance.
+   * @param string $plugin_id
+   *   The plugin_id for the plugin instance.
+   * @param mixed $plugin_definition
+   *   The plugin implementation definition.
+   * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
+   *   The factory for configuration objects.
+   * @param \Drupal\liveblog_pusher\PusherLoggerInterface $logger
+   *   The logger.
+   */
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, PusherLoggerInterface $logger) {
+    parent::__construct($configuration, $plugin_id, $plugin_definition, $config_factory, $entity_type_manager);
+    $this->logger = $logger;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public static function create(ContainerInterface $container, array $configuration, $plugin_id, $plugin_definition) {
+    return new static(
+      $configuration,
+      $plugin_id,
+      $plugin_definition,
+      $container->get('config.factory'),
+      $container->get('entity_type.manager'),
+      $container->get('liveblog_pusher.notification_channel.log')
+    );
+  }
 
   /**
    * {@inheritdoc}
@@ -73,7 +119,6 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
    */
   public function getClient() {
     if (!$this->client) {
-      // @todo Add logger.
       $options = array(
         'encrypted' => true
       );
@@ -83,6 +128,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
         $this->getConfigurationValue('app_id'),
         $options
       );
+      $this->client->set_logger($this->logger);
     }
     return $this->client;
   }
@@ -101,7 +147,11 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
 
     // Trigger an event by providing event name and payload.
     $response = $client->trigger($channel, $event, $data);
-    // @todo: Log response if there is an error.
+
+    if (!$response) {
+      // Log response if there is an error.
+      $this->logger->saveLog('error');
+    }
   }
 
 }

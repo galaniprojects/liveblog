@@ -1,0 +1,4 @@
+services:
+  liveblog_pusher.notification_channel.log:
+    class: Drupal\liveblog_pusher\PusherLogger
+    arguments: ['@logger.factory']
