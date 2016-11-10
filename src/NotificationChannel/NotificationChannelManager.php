@@ -56,7 +56,7 @@ class NotificationChannelManager extends DefaultPluginManager {
     $this->alterInfo('liveblog_notification_channel_info');
     $this->setCacheBackend($cache_backend, 'liveblog_notification_channel_info_plugins');
     $this->factory = new ContainerFactory($this, '\Drupal\liveblog\NotificationChannel\NotificationChannelInterface');
-    $this->config = $config_factory->get('liveblog.notification_channel.settings');
+    $this->config = $config_factory->get('liveblog.notification_channel');
   }
 
   /**

@@ -58,7 +58,7 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
    */
   protected function getEditableConfigNames() {
     return [
-      'liveblog.notification_channel.settings',
+      'liveblog.notification_channel',
     ];
   }
 
