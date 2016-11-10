@@ -7,6 +7,10 @@
 
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\node\Entity\Node;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use \Drupal\Component\Utility\Html;
 
 /**
  * Implements hook_entity_extra_field_info().
@@ -73,4 +77,42 @@ function template_preprocess_liveblog_posts(&$variables) {
     $views_content = views_embed_view('liveblog_posts', 'liveblog_posts_archive', $node->id());
   }
   $variables['posts'] = \Drupal::service('renderer')->render($views_content);
+}
+
+/**
+ * Gets highlight options from the liveblog.
+ *
+ * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $definition
+ *   The field storage definition.
+ * @param \Drupal\Core\Entity\FieldableEntityInterface|NULL $entity
+ *   The entity.
+ * @param null $cacheable
+ *   If $cacheable is FALSE, then the allowed values are not statically
+ *   cached. See options_test_dynamic_values_callback() for an example of
+ *   generating dynamic and uncached values.
+ *
+ * @return string[]
+ *   Highlight options.
+ *
+ * @see options_allowed_values()
+ */
+function liveblog_post_get_highlight_options(FieldStorageDefinitionInterface $definition, FieldableEntityInterface $entity = NULL, &$cacheable = NULL) {
+  $options = [];
+
+  // @todo: get terms from liveblog. hook_entity_prepare_form
+  $ids = \Drupal::entityQuery('taxonomy_term')
+    ->condition('vid', 'highlights')
+    ->execute();
+  if (!empty($ids)) {
+    $terms = Term::loadMultiple($ids);
+    foreach ($terms as $term) {
+      $name = $term->name->value;
+      // Convert term name to a machine name, which will be used as a CSS
+      // class in templates.
+      $key = strtolower(Html::cleanCssIdentifier($name));
+      $options[$key] = $name;
+    }
+  }
+
+  return $options;
 }

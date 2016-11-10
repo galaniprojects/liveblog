@@ -254,7 +254,8 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
     $fields['highlight'] = BaseFieldDefinition::create('list_string')
       ->setLabel(t('Highlight'))
       ->setDescription(t('Adds the possibility to mark a post as a highlight.'))
-      ->setSetting('allowed_values_function', __CLASS__ . '::getHighlightOptions')
+      //->setSetting('allowed_values_function', __CLASS__ . '::getHighlightOptions')
+      ->setSetting('allowed_values_function','liveblog_post_get_highlight_options')
       ->setDefaultValue('')
       ->setDisplayOptions('form', [
         'type' => 'select',
