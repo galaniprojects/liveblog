@@ -147,44 +147,6 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
   }
 
   /**
-   * Gets highlight options from the liveblog.
-   *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $definition
-   *   The field storage definition.
-   * @param \Drupal\Core\Entity\FieldableEntityInterface|NULL $entity
-   *   The entity.
-   * @param null $cacheable
-   *   If $cacheable is FALSE, then the allowed values are not statically
-   *   cached. See options_test_dynamic_values_callback() for an example of
-   *   generating dynamic and uncached values.
-   *
-   * @return string[]
-   *   Highlight options.
-   *
-   * @see options_allowed_values()
-   */
-  public static function getHighlightOptions(FieldStorageDefinitionInterface $definition, FieldableEntityInterface $entity = NULL, &$cacheable = NULL) {
-    $options = [];
-
-    // @todo: get terms from liveblog. hook_entity_prepare_form
-    $ids = \Drupal::entityQuery('taxonomy_term')
-      ->condition('vid', self::LIVEBLOG_POSTS_HIGHLIGHTS_VID)
-      ->execute();
-    if (!empty($ids)) {
-      $terms = Term::loadMultiple($ids);
-      foreach ($terms as $term) {
-        $name = $term->name->value;
-        // Convert term name to a machine name, which will be used as a CSS
-        // class in templates.
-        $key = strtolower(Html::cleanCssIdentifier($name));
-        $options[$key] = $name;
-      }
-    }
-
-    return $options;
-  }
-
-  /**
    * {@inheritdoc}
    *
    * Define the field properties here.
@@ -254,7 +216,6 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
     $fields['highlight'] = BaseFieldDefinition::create('list_string')
       ->setLabel(t('Highlight'))
       ->setDescription(t('Adds the possibility to mark a post as a highlight.'))
-      //->setSetting('allowed_values_function', __CLASS__ . '::getHighlightOptions')
       ->setSetting('allowed_values_function','liveblog_post_get_highlight_options')
       ->setDefaultValue('')
       ->setDisplayOptions('form', [
