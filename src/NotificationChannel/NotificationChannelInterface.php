@@ -26,11 +26,11 @@ interface NotificationChannelInterface extends PluginInspectionInterface, Plugin
   /**
    * Triggers event notification connected to the liveblog post.
    *
-   * @param \Drupal\liveblog\Entity\LiveblogPost $liveblogPost
+   * @param \Drupal\liveblog\Entity\LiveblogPost $liveblog_post
    *   The target liveblog post.
    * @param string $event
    *   The event name.
    */
-  public function triggerLiveblogPostEvent(LiveblogPost $liveblogPost, $event);
+  public function triggerLiveblogPostEvent(LiveblogPost $liveblog_post, $event);
 
 }

@@ -146,22 +146,47 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
   /**
    * {@inheritdoc}
    */
-  function triggerLiveblogPostEvent(LiveblogPost $liveblogPost, $event) {
+  function triggerLiveblogPostEvent(LiveblogPost $liveblog_post, $event) {
     $client = $this->getClient();
-
-    $channel = "liveblog-{$liveblogPost->id()}";
-
-    $rendered_entity = $this->entityTypeManager->getViewBuilder('liveblog_post')->view($liveblogPost);
-    $output = $this->renderer->render($rendered_entity);
-    $data['rendered_entity'] = $output;
+    $channel = "liveblog-{$liveblog_post->getLiveblog()->id()}";
 
     // Trigger an event by providing event name and payload.
-    $response = $client->trigger($channel, $event, $data);
+    $response = $client->trigger($channel, $event, $this->getLiveblogPostPayload($liveblog_post));
 
     if (!$response) {
       // Log response if there is an error.
       $this->logger->saveLog('error');
     }
+  }
+
+  /**
+   * Gets payload from the liveblog post entity.
+   *
+   * @param \Drupal\liveblog\Entity\LiveblogPost $liveblog_post
+   *   The target liveblog post.
+   *
+   * @return array
+   *   The payload array.
+   */
+  public function getLiveblogPostPayload(LiveblogPost $liveblog_post) {
+    $rendered_entity = $this->entityTypeManager->getViewBuilder('liveblog_post')->view($liveblog_post);
+    $output = $this->renderer->render($rendered_entity);
+
+    $data['id'] = $liveblog_post->id();
+    $data['uuid'] = $liveblog_post->uuid();
+    $data['title'] = $liveblog_post->get('title')->value;
+    $data['liveblog'] = $liveblog_post->getLiveblog()->id();
+    $data['body__value'] = $liveblog_post->body->value;
+    $data['highlight'] = $liveblog_post->highlight->value;
+    $data['location'] = $liveblog_post->location->value;
+    $data['source__uri'] = $liveblog_post->source->first() ? $liveblog_post->source->first()->getUrl()->toString() : NULL;
+    $data['uid'] = $liveblog_post->getAuthor() ? $liveblog_post->getAuthor()->getAccountName() : NULL;
+    $data['changed'] = $liveblog_post->changed->value;
+    $data['created'] = $liveblog_post->created->value;
+    $data['status'] = $liveblog_post->status->value;
+    $data['rendered_entity'] = $output;
+
+    return $data;
   }
 
 }

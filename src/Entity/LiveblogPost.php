@@ -119,18 +119,18 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
    * @return \Drupal\node\NodeInterface
    *   The related liveblog node.
    */
-  public function getLiveblog() {
-    return $this->get('liveblog')->entity;
+  public function getTitle() {
+    return $this->get('title')->value;
   }
 
   /**
-   * Returns the related liveblog node ID.
+   * Returns the related liveblog node.
    *
-   * @return int
-   *   The related liveblog node ID.
+   * @return \Drupal\node\NodeInterface
+   *   The related liveblog node.
    */
-  public function getLiveblogId() {
-    return $this->get('liveblog')->target_id;
+  public function getLiveblog() {
+    return $this->get('liveblog')->entity;
   }
 
   /**
@@ -144,6 +144,39 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
   public function setLiveblog(NodeInterface $node) {
     $this->set('liveblog', $node->id());
     return $this;
+  }
+
+  /**
+   * Returns the related liveblog author.
+   *
+   * @return \Drupal\user\UserInterface
+   *   The related liveblog author.
+   */
+  public function getAuthor() {
+    return $this->get('uid')->entity;
+  }
+
+  /**
+   * Sets the related liveblog author.
+   *
+   * @param \Drupal\user\UserInterface $user
+   *   The related liveblog author.
+   *
+   * @return $this
+   */
+  public function setAuthor(UserInterface $user) {
+    $this->set('uid', $user->id());
+    return $this;
+  }
+
+  /**
+   * Returns the related liveblog node ID.
+   *
+   * @return int
+   *   The related liveblog node ID.
+   */
+  public function getLiveblogId() {
+    return $this->get('liveblog')->target_id;
   }
 
   /**
