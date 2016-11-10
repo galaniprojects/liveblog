@@ -141,7 +141,7 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
     ];
     $form['actions']['submit'] = [
       '#type' => 'submit',
-      '#value' => $this->t('Submit'),
+      '#value' => $this->t('Save'),
     ];
 
     return $form;

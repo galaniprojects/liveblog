@@ -94,7 +94,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
     ];
     $form['key'] = [
       '#type' => 'textfield',
-      '#title' => t('Username'),
+      '#title' => t('Key'),
       '#required' => TRUE,
       '#default_value' => !empty($this->configuration['key']) ? $this->configuration['key']: '',
       '#description' => t('Please enter your Pusher key.'),
