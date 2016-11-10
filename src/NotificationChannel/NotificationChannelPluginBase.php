@@ -4,6 +4,7 @@ namespace Drupal\liveblog\NotificationChannel;
 
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
+use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -22,6 +23,13 @@ abstract class NotificationChannelPluginBase extends PluginBase implements Notif
   protected $configFactory;
 
   /**
+   * The entity type manager.
+   *
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
+   */
+  protected $entityTypeManager;
+
+  /**
    * Constructs an EntityForm object.
    *
    * @param array $configuration
@@ -33,9 +41,10 @@ abstract class NotificationChannelPluginBase extends PluginBase implements Notif
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
     $this->configFactory = $config_factory;
+    $this->entityTypeManager = $entity_type_manager;
     $this->configuration += $this->defaultConfiguration();
   }
 
@@ -47,7 +56,8 @@ abstract class NotificationChannelPluginBase extends PluginBase implements Notif
       $configuration,
       $plugin_id,
       $plugin_definition,
-      $container->get('config.factory')
+      $container->get('config.factory'),
+      $container->get('entity_type.manager')
     );
   }
 

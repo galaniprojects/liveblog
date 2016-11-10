@@ -95,7 +95,8 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
 
     $channel = "liveblog-{$liveblogPost->id()}";
 
-    $data['message'] = 'hello world';
+    $rendered_entity = render($this->entityTypeManager->getViewBuilder('liveblog_post')->view($liveblogPost));
+    $data['rendered_entity'] = $rendered_entity;
 
     // Trigger an event by providing event name and payload.
     $response = $client->trigger($channel, $event, $data);
