@@ -66,7 +66,7 @@ class NotificationChannelManager extends DefaultPluginManager {
    *   Array of plugin labels, keyed by the plugin id.
    */
   public function getLabels() {
-    $list = array();
+    $list = [];
     foreach ($this->getDefinitions() as $plugin => $definition) {
       $list[$plugin] = $definition['label'];
     }

@@ -91,38 +91,38 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $config = $this->getConfig();
 
-    $form['plugin_wrapper'] = array(
+    $form['plugin_wrapper'] = [
       '#type' => 'container',
       '#prefix' => '<div id="liveblog-plugin-wrapper">',
       '#suffix' => '</div>',
-    );
+    ];
 
     if ($available = $this->notificationChannelManager->getLabels()) {
       // If the plugin is not set, pick the first available as the default.
       $plugin_id = $config->get('plugin') ?: key($available);
       $definition = $this->notificationChannelManager->getDefinition($plugin_id);
 
-      $form['plugin_wrapper']['plugin'] = array(
+      $form['plugin_wrapper']['plugin'] = [
         '#type' => 'select',
         '#title' => t('Provider plugin'),
-        '#limit_validation_errors' => array(array('plugin')),
+        '#limit_validation_errors' => [['plugin']],
         '#executes_submit_callback' => TRUE,
         '#description' => isset($definition['description']) ? Xss::filter($definition['description']) : '',
         '#options' => $available,
         '#default_value' => $plugin_id,
         '#required' => TRUE,
-        '#ajax' => array(
-          'callback' => array($this, 'ajaxPluginSelect'),
+        '#ajax' => [
+          'callback' => [$this, 'ajaxPluginSelect'],
           'wrapper' => 'liveblog-plugin-wrapper',
-        ),
-      );
+        ],
+      ];
 
-      $form['plugin_wrapper']['plugin_settings'] = array(
+      $form['plugin_wrapper']['plugin_settings'] = [
         '#type' => 'details',
-        '#title' => t('@plugin plugin settings', array('@plugin' => $definition['label'])),
+        '#title' => t('@plugin plugin settings', ['@plugin' => $definition['label']]),
         '#tree' => TRUE,
         '#open' => TRUE,
-      );
+      ];
 
       $plugin = $this->notificationChannelManager->createInstance($plugin_id);
       if ($plugin_form = $plugin->buildConfigurationForm($form['plugin_wrapper']['plugin_settings'], $form_state)) {

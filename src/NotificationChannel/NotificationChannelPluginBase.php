@@ -142,7 +142,7 @@ abstract class NotificationChannelPluginBase extends PluginBase implements Notif
    * {@inheritdoc}
    */
   public function calculateDependencies() {
-    return array();
+    return [];
   }
 
 }
