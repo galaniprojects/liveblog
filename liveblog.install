@@ -1,0 +1,32 @@
+<?php
+
+/**
+ * @file
+ * Install file of the liveblog module.
+ */
+
+/**
+ * Implements hook_install().
+ *
+ * Add default highlights.
+ */
+function liveblog_install() {
+  $term_names = [
+    'Breaking news',
+    'First valid information',
+    'Official statement',
+    'Expert analysis',
+    'New important fact',
+    'Summary of last hours',
+    'Unexpected incident',
+    'Situation under control',
+  ];
+  foreach ($term_names as $term_name) {
+    $term = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->create([
+      'name' => $term_name,
+      'vid' => \Drupal\liveblog\Entity\LiveblogPost::LIVEBLOG_POSTS_HIGHLIGHTS_VID,
+    ]);
+    $term->save();
+  }
+  drupal_set_message(t('@count default highlight terms were created.'), ['@count' => count($term_names)]);
+}
