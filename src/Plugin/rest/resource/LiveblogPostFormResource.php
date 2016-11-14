@@ -24,11 +24,11 @@ use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 class LiveblogPostFormResource extends ResourceBase {
 
   /**
-   * The entity type targeted by this resource.
+   * The entity type manager.
    *
-   * @var \Drupal\Core\Entity\EntityStorageInterface
+   * @var \Drupal\Core\Entity\EntityTypeManagerInterface
    */
-  protected $entityStorage;
+  protected $entityTypeManager;
 
   /**
    * Constructs a Drupal\rest\Plugin\ResourceBase object.
@@ -48,7 +48,7 @@ class LiveblogPostFormResource extends ResourceBase {
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, array $serializer_formats, LoggerInterface $logger, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $serializer_formats, $logger);
-    $this->entityStorage = $entity_type_manager->getStorage('liveblog_post');
+    $this->entityTypeManager = $entity_type_manager;
   }
 
   /**
@@ -78,9 +78,9 @@ class LiveblogPostFormResource extends ResourceBase {
    */
   public function get($id = NULL) {
     if ($id) {
-      if ($entity = $this->entityStorage->load($id)) {
-        $form_object = \Drupal::entityTypeManager()
-          ->getFormObject('liveblog_post', 'add')
+      if ($entity = $this->entityTypeManager->getStorage('liveblog_post')->load($id)) {
+        $form_object = $this->entityTypeManager
+          ->getFormObject('liveblog_post', 'edit')
           ->setEntity($entity);
         $form = \Drupal::formBuilder()->getForm($form_object);
         $variables['form'] = $form;

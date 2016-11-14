@@ -70,8 +70,9 @@ class LiveblogPostForm extends ContentEntityForm {
 
     $form = parent::buildForm($form, $form_state);
 
+    $html_id = "{$this->getFormId()}-wrapper";
     if ($node) {
-      $form['#prefix'] = "<div id=\"{$this->getFormId()}-wrapper\">";
+      $form['#prefix'] = "<div id=\"$html_id\">";
       $form['#suffix'] = '</div>';
 
       // Hide author and liveblog fields, as they are already pre-populated and
@@ -80,7 +81,7 @@ class LiveblogPostForm extends ContentEntityForm {
       $form['liveblog']['#access'] = FALSE;
 
       $form['actions']['submit']['#ajax'] = [
-        'wrapper' => $this->getFormId() . '-wrapper',
+        'wrapper' => $html_id,
         'callback' => array($this, 'ajaxRebuildCallback'),
         'effect' => 'fade',
       ];
@@ -108,7 +109,17 @@ class LiveblogPostForm extends ContentEntityForm {
    *   The rebuilt form.
    */
   public function ajaxRebuildCallback(array $form, FormStateInterface $form_state) {
-    drupal_set_message(t('Liveblog post was successfully created'));
+    switch ($this->getOperation()) {
+      case 'add':
+        drupal_set_message(t('Liveblog post was successfully created.'));
+        break;
+      case 'edit':
+        drupal_set_message(t('Liveblog post was successfully updated.'));
+        $html_id = "{$this->getFormId()}-wrapper";
+        $element = ['#markup' => "<div id=\"$html_id\"></div>"];
+        return $element;
+        break;
+    }
     return $form;
   }
 
@@ -133,14 +144,11 @@ class LiveblogPostForm extends ContentEntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $entity = $this->getEntity();
-
-    $event = $entity->isNew() ? 'created' : 'updated';
-
     $entity->save();
 
     // Trigger an notification channel message.
     if ($plugin = $this->notificationChannelManager->createActiveInstance()) {
-      $plugin->triggerLiveblogPostEvent($entity, $event);
+      $plugin->triggerLiveblogPostEvent($entity, $this->getOperation());
     }
 
     if (!$this->getCurrentLiveblogNode()) {
@@ -148,17 +156,10 @@ class LiveblogPostForm extends ContentEntityForm {
       // Redirect to the post's full page if we are not at the liveblog page.
       $form_state->setRedirect($url->getRouteName(), $url->getRouteParameters());
     }
-    else {
-      // Clear form input, as we stay on the same page.
+    else if ($this->getOperation() == 'add') {
+      // Clear form input fields for the add form, as we stay on the same page.
       $this->clearFormInput($form, $form_state);
     }
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function submitForm(array &$form, FormStateInterface $form_state) {
-    parent::submitForm($form, $form_state);
   }
 
   /**
