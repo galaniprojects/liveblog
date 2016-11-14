@@ -97,16 +97,6 @@ class LiveblogPostForm extends ContentEntityForm {
    */
   public function ajaxRebuildCallback(array $form, FormStateInterface $form_state) {
     drupal_set_message(t('Liveblog post was successfully created'));
-
-    // @todo Clear form values.
-    //$form_state->setRebuild(TRUE);
-    //$form_state->setValues([]);
-    /*$entity = \Drupal::entityTypeManager()->getStorage('liveblog_post')->create([]);
-    $form_object = \Drupal::entityTypeManager()
-      ->getFormObject('liveblog_post', 'add')
-      ->setEntity($entity);*/
-    //$new_form_state = new FormState();
-    //$form = \Drupal::formBuilder()->rebuildForm($this->getFormId(), $form_state);
     return $form;
   }
 
@@ -138,6 +128,43 @@ class LiveblogPostForm extends ContentEntityForm {
       // Redirect to the post's full page if we are not at the liveblog page.
       $form_state->setRedirect($url->getRouteName(), $url->getRouteParameters());
     }
+    else {
+      // Clear form input, as we stay on the same page.
+      $this->clearFormInput($form, $form_state);
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function submitForm(array &$form, FormStateInterface $form_state) {
+    parent::submitForm($form, $form_state);
+  }
+
+  /**
+   * Clears form input.
+   *
+   * @param array $form
+   *   The form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The form state.
+   */
+  protected function clearFormInput(array $form, FormStateInterface $form_state) {
+    // Replace the form entity with an empty instance.
+    $this->entity = $this->entityTypeManager->getStorage('liveblog_post')->create([]);
+    // Clear user input.
+    $input = $form_state->getUserInput();
+    // We should not clear the system items from the user input.
+    $clean_keys = $form_state->getCleanValueKeys();
+    $clean_keys[] = 'ajax_page_state';
+    foreach ($input as $key => $item) {
+      if (!in_array($key, $clean_keys) && substr($key, 0, 1) !== '_') {
+        unset($input[$key]);
+      }
+    }
+    $form_state->setUserInput($input);
+    // Rebuild the form state values.
+    $form_state->setRebuild();
   }
 
 }
