@@ -30,13 +30,6 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
   protected $client;
 
   /**
-   * The renderer.
-   *
-   * @var \Drupal\Core\Render\Renderer
-   */
-  protected $renderer;
-
-  /**
    * The entity type manager.
    *
    * @var \Drupal\liveblog_pusher\PusherLoggerInterface
@@ -54,14 +47,11 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
    *   The plugin implementation definition.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\Core\Render\Renderer $renderer
-   *   The renderer.
    * @param \Drupal\liveblog_pusher\PusherLoggerInterface $logger
    *   The logger.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, Renderer $renderer, PusherLoggerInterface $logger) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, PusherLoggerInterface $logger) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $config_factory, $entity_type_manager);
-    $this->renderer = $renderer;
     $this->logger = $logger;
   }
 
@@ -75,7 +65,6 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
       $plugin_definition,
       $container->get('config.factory'),
       $container->get('entity_type.manager'),
-      $container->get('renderer'),
       $container->get('liveblog_pusher.notification_channel.log')
     );
   }
@@ -151,42 +140,11 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
     $channel = "liveblog-{$liveblog_post->getLiveblog()->id()}";
 
     // Trigger an event by providing event name and payload.
-    $response = $client->trigger($channel, $event, $this->getLiveblogPostPayload($liveblog_post));
-
+    $response = $client->trigger($channel, $event, $liveblog_post->getPayload());
     if (!$response) {
       // Log response if there is an error.
       $this->logger->saveLog('error');
     }
-  }
-
-  /**
-   * Gets payload from the liveblog post entity.
-   *
-   * @param \Drupal\liveblog\Entity\LiveblogPost $liveblog_post
-   *   The target liveblog post.
-   *
-   * @return array
-   *   The payload array.
-   */
-  public function getLiveblogPostPayload(LiveblogPost $liveblog_post) {
-    $rendered_entity = $this->entityTypeManager->getViewBuilder('liveblog_post')->view($liveblog_post);
-    $output = $this->renderer->render($rendered_entity);
-
-    $data['id'] = $liveblog_post->id();
-    $data['uuid'] = $liveblog_post->uuid();
-    $data['title'] = $liveblog_post->get('title')->value;
-    $data['liveblog'] = $liveblog_post->getLiveblog()->id();
-    $data['body__value'] = $liveblog_post->body->value;
-    $data['highlight'] = $liveblog_post->highlight->value;
-    $data['location'] = $liveblog_post->location->value;
-    $data['source__uri'] = $liveblog_post->source->first() ? $liveblog_post->source->first()->getUrl()->toString() : NULL;
-    $data['uid'] = $liveblog_post->getAuthor() ? $liveblog_post->getAuthor()->getAccountName() : NULL;
-    $data['changed'] = $liveblog_post->changed->value;
-    $data['created'] = $liveblog_post->created->value;
-    $data['status'] = $liveblog_post->status->value;
-    $data['rendered_entity'] = $output;
-
-    return $data;
   }
 
 }
