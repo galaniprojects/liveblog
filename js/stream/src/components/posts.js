@@ -7,7 +7,7 @@ export default class Posts extends Component {
       posts: []
     }
     this.isloading = false
-    this.reachedEnd = false
+    this.hasReachedEnd = false
   }
 
   componentWillMount() {
@@ -26,7 +26,7 @@ export default class Posts extends Component {
 
   _lazyload() {
     var el = this._getLastElement()
-    if (!this.isloading && !this.reachedEnd && el && this._elementInViewport(el)) {
+    if (!this.isloading && !this.hasReachedEnd && el && this._elementInViewport(el)) {
       this.isloading = true
       this._loadNextPosts()
     }
@@ -59,7 +59,7 @@ export default class Posts extends Component {
           })
         }
         else {
-          this.reachedEnd = true
+          this.hasReachedEnd = true
         }
       }
 
