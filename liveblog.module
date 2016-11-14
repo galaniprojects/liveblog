@@ -121,16 +121,29 @@ function template_preprocess_liveblog_posts(&$variables) {
 function liveblog_post_get_highlight_options(FieldStorageDefinitionInterface $definition, FieldableEntityInterface $entity = NULL, &$cacheable = NULL) {
   $options = [];
 
-  // @todo: get terms from liveblog. hook_entity_prepare_form
-  $ids = \Drupal::entityQuery('taxonomy_term')
-    ->condition('vid', 'highlights')
-    ->execute();
+  // Get the liveblog node from the URL.
+  $node = \Drupal::request()->attributes->get('node');
+
+  // Get terms from the liveblog node, if we are at the liveblog page.
+  if ($node && $node->getType() == 'liveblog') {
+    $ids = [];
+    foreach ($node->field_highlights as $highlight) {
+      $ids[] = $highlight->target_id;
+    }
+  }
+  else {
+    // Fallback to all the highlight terms.
+    $ids = \Drupal::entityQuery('taxonomy_term')
+      ->condition('vid', 'highlights')
+      ->execute();
+  }
+
   if (!empty($ids)) {
     $terms = Term::loadMultiple($ids);
     foreach ($terms as $term) {
       $name = $term->name->value;
-      // Convert term name to a machine name, which will be used as a CSS
-      // class in templates.
+      // Convert term name to a machine name, which will be used as a CSS class
+      // in templates.
       $key = strtolower(Html::cleanCssIdentifier($name));
       $options[$key] = $name;
     }
