@@ -8,3 +8,5 @@
   title: Edit liveblog posts
 'administer liveblog_post entity':
   title: Administer liveblog posts
+'administer liveblog settings':
+  title: Administer liveblog settings

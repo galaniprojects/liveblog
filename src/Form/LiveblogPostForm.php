@@ -5,6 +5,7 @@ namespace Drupal\liveblog\Form;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\liveblog\NotificationChannel\NotificationChannelManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -23,16 +24,26 @@ class LiveblogPostForm extends ContentEntityForm {
   protected $request;
 
   /**
+   * The notification channel manager.
+   *
+   * @var \Drupal\liveblog\NotificationChannel\NotificationChannelManager
+   */
+  protected $notificationChannelManager;
+
+  /**
    * Constructs a ContentEntityForm object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
    *   The entity manager.
    * @param \Symfony\Component\HttpFoundation\RequestStack
    *   The current request.
+   * @param \Drupal\liveblog\NotificationChannel\NotificationChannelManager $notification_channel_manager
+   *   The notification channel service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_manager, RequestStack $request_stack) {
+  public function __construct(EntityTypeManagerInterface $entity_manager, RequestStack $request_stack, NotificationChannelManager $notification_channel_manager) {
     parent::__construct($entity_manager);
     $this->request = $request_stack->getCurrentRequest();
+    $this->notificationChannelManager = $notification_channel_manager;
   }
 
   /**
@@ -41,7 +52,8 @@ class LiveblogPostForm extends ContentEntityForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.manager'),
-      $container->get('request_stack')
+      $container->get('request_stack'),
+      $container->get('plugin.manager.liveblog.notification_channel')
     );
   }
 
@@ -121,7 +133,15 @@ class LiveblogPostForm extends ContentEntityForm {
    */
   public function save(array $form, FormStateInterface $form_state) {
     $entity = $this->getEntity();
+
+    $event = $entity->isNew() ? 'created' : 'updated';
+
     $entity->save();
+
+    // Trigger an notification channel message.
+    if ($plugin = $this->notificationChannelManager->createActiveInstance()) {
+      $plugin->triggerLiveblogPostEvent($entity, $event);
+    }
 
     if (!$this->getCurrentLiveblogNode()) {
       $url = $entity->toUrl();

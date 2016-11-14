@@ -66,12 +66,12 @@ class TaxonomyTreeWidget extends OptionsWidgetBase {
         '#attributes' => ['class' => ['field--widget-liveblog-taxonomy-tree--node']],
       ];
 
-      $element[$item['value']]['element'] = array(
+      $element[$item['value']]['element'] = [
         '#type' => 'checkbox',
         '#title' => $item['title'],
         '#default_value' => in_array($item['value'], $selected) ? TRUE : FALSE,
         '#attributes' => ['class' => ['field--widget-liveblog-taxonomy-tree--item']],
-      );
+      ];
 
       if (!empty($item['children'])) {
         $element[$item['value']]['children'] = $this->prepareTreeElements($item['children'], $selected);
@@ -94,7 +94,7 @@ class TaxonomyTreeWidget extends OptionsWidgetBase {
    *   Mapped options tree.
    */
   protected function mapTree(array &$data, $level = 0) {
-    $tree = array();
+    $tree = [];
 
     $get_level = function($a) {
       $level = 0;

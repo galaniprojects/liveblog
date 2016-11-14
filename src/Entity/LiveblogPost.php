@@ -59,6 +59,13 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
   const LIVEBLOG_POSTS_HIGHLIGHTS_VID = 'highlights';
 
   /**
+   * The renderer.
+   *
+   * @var \Drupal\Core\Render\Renderer
+   */
+  protected $renderer;
+
+  /**
    * {@inheritdoc}
    *
    * When a new entity instance is added, set the user_id entity reference to
@@ -119,18 +126,18 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
    * @return \Drupal\node\NodeInterface
    *   The related liveblog node.
    */
-  public function getLiveblog() {
-    return $this->get('liveblog')->entity;
+  public function getTitle() {
+    return $this->get('title')->value;
   }
 
   /**
-   * Returns the related liveblog node ID.
+   * Returns the related liveblog node.
    *
-   * @return int
-   *   The related liveblog node ID.
+   * @return \Drupal\node\NodeInterface
+   *   The related liveblog node.
    */
-  public function getLiveblogId() {
-    return $this->get('liveblog')->target_id;
+  public function getLiveblog() {
+    return $this->get('liveblog')->entity;
   }
 
   /**
@@ -147,41 +154,49 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
   }
 
   /**
-   * Gets highlight options from the liveblog.
+   * Returns the related liveblog author.
    *
-   * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $definition
-   *   The field storage definition.
-   * @param \Drupal\Core\Entity\FieldableEntityInterface|NULL $entity
-   *   The entity.
-   * @param null $cacheable
-   *   If $cacheable is FALSE, then the allowed values are not statically
-   *   cached. See options_test_dynamic_values_callback() for an example of
-   *   generating dynamic and uncached values.
-   *
-   * @return string[]
-   *   Highlight options.
-   *
-   * @see options_allowed_values()
+   * @return \Drupal\user\UserInterface
+   *   The related liveblog author.
    */
-  public static function getHighlightOptions(FieldStorageDefinitionInterface $definition, FieldableEntityInterface $entity = NULL, &$cacheable = NULL) {
-    $options = [];
+  public function getAuthor() {
+    return $this->get('uid')->entity;
+  }
 
-    // @todo: get terms from liveblog. hook_entity_prepare_form
-    $ids = \Drupal::entityQuery('taxonomy_term')
-      ->condition('vid', self::LIVEBLOG_POSTS_HIGHLIGHTS_VID)
-      ->execute();
-    if (!empty($ids)) {
-      $terms = Term::loadMultiple($ids);
-      foreach ($terms as $term) {
-        $name = $term->name->value;
-        // Convert term name to a machine name, which will be used as a CSS
-        // class in templates.
-        $key = strtolower(Html::cleanCssIdentifier($name));
-        $options[$key] = $name;
-      }
+  /**
+   * Sets the related liveblog author.
+   *
+   * @param \Drupal\user\UserInterface $user
+   *   The related liveblog author.
+   *
+   * @return $this
+   */
+  public function setAuthor(UserInterface $user) {
+    $this->set('uid', $user->id());
+    return $this;
+  }
+
+  /**
+   * Returns the related liveblog node ID.
+   *
+   * @return int
+   *   The related liveblog node ID.
+   */
+  public function getLiveblogId() {
+    return $this->get('liveblog')->target_id;
+  }
+
+  /**
+   * Returns the render API renderer.
+   *
+   * @return \Drupal\Core\Render\RendererInterface
+   */
+  protected function getRenderer() {
+    if (!isset($this->renderer)) {
+      $this->renderer = \Drupal::service('renderer');
     }
 
-    return $options;
+    return $this->renderer;
   }
 
   /**
@@ -254,7 +269,9 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
     $fields['highlight'] = BaseFieldDefinition::create('list_string')
       ->setLabel(t('Highlight'))
       ->setDescription(t('Adds the possibility to mark a post as a highlight.'))
-      ->setSetting('allowed_values_function', __CLASS__ . '::getHighlightOptions')
+      // We can not make this callback as a static method of the LiveblogPost
+      // class to support older PHP versions.
+      ->setSetting('allowed_values_function','liveblog_post_get_highlight_options')
       ->setDefaultValue('')
       ->setDisplayOptions('form', [
         'type' => 'select',
@@ -396,6 +413,39 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     return $fields;
+  }
+
+  /**
+   * Gets payload from the liveblog post entity.
+   *
+   * @todo Currently the liveblog post has 3 different ways of rendering by REST
+   *   services: 1) views for the list of posts 2) default GET endpoint by the
+   *   REST module 3) this method. Would be good to use this method in all the
+   *   3 cases to follow the same structure, because the frontend library
+   *   should rely on this payload structure in all the cases.
+   *
+   * @return array
+   *   The payload array.
+   */
+  public function getPayload() {
+    $rendered_entity = $this->entityTypeManager()->getViewBuilder('liveblog_post')->view($this);
+    $output = $this->getRenderer()->render($rendered_entity);
+
+    $data['id'] = $this->id();
+    $data['uuid'] = $this->uuid();
+    $data['title'] = $this->get('title')->value;
+    $data['liveblog'] = $this->getLiveblog()->id();
+    $data['body__value'] = $this->body->value;
+    $data['highlight'] = $this->highlight->value;
+    $data['location'] = $this->location->value;
+    $data['source__uri'] = $this->source->first() ? $this->source->first()->getUrl()->toString() : NULL;
+    $data['uid'] = $this->getAuthor() ? $this->getAuthor()->getAccountName() : NULL;
+    $data['changed'] = $this->changed->value;
+    $data['created'] = $this->created->value;
+    $data['status'] = $this->status->value;
+    $data['rendered_entity'] = $output;
+
+    return $data;
   }
 
 }
