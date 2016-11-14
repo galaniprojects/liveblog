@@ -1,0 +1,19 @@
+<?php
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\node\Entity\Node;
+
+/**
+ * Implements hook_ENTITY_TYPE_view().
+ */
+function liveblog_pusher_node_view(array &$build, Node $node, EntityViewDisplayInterface $display, $view_mode) {
+  if ($display->getComponent('liveblog_posts')) {
+    $config = Drupal::config('liveblog.notification_channel.liveblog_pusher');
+    $key = $config->get('key');
+
+    $build['liveblog_posts']['#attached']['library'][] = 'liveblog_pusher/pusher';
+    $build['liveblog_posts']['#attached']['drupalSettings']['liveblog_pusher'] = [
+      'key' => $key,
+      'channel' => "liveblog-{$node->id()}",
+    ];
+  }
+}
