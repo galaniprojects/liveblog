@@ -67,6 +67,30 @@ export default class Posts extends Component {
     })
   }
 
+  addPost(post) {
+    this.setState({
+      posts: [
+          post,
+          ...this.state.posts
+      ]
+    })
+  }
+
+  editPost(editedPost) {
+    var posts = this.state.posts.map((post) => {
+      if (post.id == editedPost.id) {
+        return editedPost
+      }
+      else {
+        return post;
+      }
+    })
+
+    this.setState({
+      posts: posts
+    })
+  }
+
   render() {
     return (
       <div className="liveblog-posts-wrapper" ref={(wrapper) => this.postsWrapper = wrapper}>
