@@ -70,8 +70,9 @@ class LiveblogPostForm extends ContentEntityForm {
 
     $form = parent::buildForm($form, $form_state);
 
-    $html_id = "{$this->getFormId()}-wrapper";
     if ($node) {
+      $html_id = "{$this->getFormId()}-wrapper";
+
       $form['#prefix'] = "<div id=\"$html_id\">";
       $form['#suffix'] = '</div>';
 
@@ -85,6 +86,20 @@ class LiveblogPostForm extends ContentEntityForm {
         'callback' => array($this, 'ajaxRebuildCallback'),
         'effect' => 'fade',
       ];
+
+      $preview_mode = $this->config('liveblog.liveblog_post.settings')->get('preview');
+      $form['actions']['preview'] = array(
+        '#type' => 'submit',
+        '#access' => $preview_mode != FALSE && ($entity->access('create') || $entity->access('update')),
+        '#value' => t('Preview'),
+        '#weight' => 20,
+        '#submit' => array('::submitForm', '::preview'),
+        '#ajax' => [
+          'wrapper' => $html_id,
+          'callback' => array($this, 'ajaxPreviewCallback'),
+          'effect' => 'fade',
+        ],
+      );
     }
 
     if ($entity->isNew()) {
@@ -120,6 +135,21 @@ class LiveblogPostForm extends ContentEntityForm {
         return $element;
         break;
     }
+    return $form;
+  }
+
+  /**
+   * Callback for ajax form submission preview.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form.
+   *
+   * @return array
+   *   The rebuilt form.
+   */
+  public function ajaxPreviewCallback(array $form, FormStateInterface $form_state) {
     return $form;
   }
 
