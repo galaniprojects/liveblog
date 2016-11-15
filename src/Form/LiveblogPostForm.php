@@ -5,7 +5,9 @@ namespace Drupal\liveblog\Form;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
+use Drupal\liveblog\Entity\LiveblogPost;
 use Drupal\liveblog\NotificationChannel\NotificationChannelManager;
+use Drupal\user\PrivateTempStoreFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -31,6 +33,18 @@ class LiveblogPostForm extends ContentEntityForm {
   protected $notificationChannelManager;
 
   /**
+   * The tempstore factory.
+   *
+   * @var \Drupal\user\PrivateTempStoreFactory
+   */
+  protected $tempStoreFactory;
+
+  /**
+   * Whether this node has been previewed or not.
+   */
+  protected $hasBeenPreviewed = FALSE;
+
+  /**
    * Constructs a ContentEntityForm object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
@@ -40,10 +54,11 @@ class LiveblogPostForm extends ContentEntityForm {
    * @param \Drupal\liveblog\NotificationChannel\NotificationChannelManager $notification_channel_manager
    *   The notification channel service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_manager, RequestStack $request_stack, NotificationChannelManager $notification_channel_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_manager, RequestStack $request_stack, NotificationChannelManager $notification_channel_manager, PrivateTempStoreFactory $temp_store_factory) {
     parent::__construct($entity_manager);
     $this->request = $request_stack->getCurrentRequest();
     $this->notificationChannelManager = $notification_channel_manager;
+    $this->tempStoreFactory = $temp_store_factory;
   }
 
   /**
@@ -53,7 +68,8 @@ class LiveblogPostForm extends ContentEntityForm {
     return new static(
       $container->get('entity.manager'),
       $container->get('request_stack'),
-      $container->get('plugin.manager.liveblog.notification_channel')
+      $container->get('plugin.manager.liveblog.notification_channel'),
+      $container->get('user.private_tempstore')
     );
   }
 
@@ -71,10 +87,17 @@ class LiveblogPostForm extends ContentEntityForm {
     $form = parent::buildForm($form, $form_state);
 
     if ($node) {
-      $html_id = "{$this->getFormId()}-wrapper";
+      $rebuild_html_id = "{$this->getFormId()}-wrapper";
+      $preview_html_id = "{$this->getFormId()}-preview";
 
-      $form['#prefix'] = "<div id=\"$html_id\">";
+      $form['#prefix'] = "<div id=\"$rebuild_html_id\">";
       $form['#suffix'] = '</div>';
+
+      $form['preview'] = [
+        '#type' => 'container',
+        '#attributes' => ['id' => $preview_html_id],
+        '#weight' => -100,
+      ];
 
       // Hide author and liveblog fields, as they are already pre-populated and
       // should not be changed.
@@ -82,7 +105,7 @@ class LiveblogPostForm extends ContentEntityForm {
       $form['liveblog']['#access'] = FALSE;
 
       $form['actions']['submit']['#ajax'] = [
-        'wrapper' => $html_id,
+        'wrapper' => $rebuild_html_id,
         'callback' => array($this, 'ajaxRebuildCallback'),
         'effect' => 'fade',
       ];
@@ -95,7 +118,7 @@ class LiveblogPostForm extends ContentEntityForm {
         '#weight' => 20,
         '#submit' => array('::submitForm', '::preview'),
         '#ajax' => [
-          'wrapper' => $html_id,
+          'wrapper' => $preview_html_id,
           'callback' => array($this, 'ajaxPreviewCallback'),
           'effect' => 'fade',
         ],
@@ -150,7 +173,14 @@ class LiveblogPostForm extends ContentEntityForm {
    *   The rebuilt form.
    */
   public function ajaxPreviewCallback(array $form, FormStateInterface $form_state) {
-    return $form;
+    if (!$form_state->getErrors()) {
+      /* @var $entity LiveblogPost */
+      $entity = $this->getEntity();
+      $preview = $this->entityTypeManager->getViewBuilder('liveblog_post')->view($entity);
+      $preview['#weight'] = -100;
+      $form['preview']['content'] = $preview;
+    }
+    return $form['preview'];
   }
 
   /**
@@ -190,6 +220,22 @@ class LiveblogPostForm extends ContentEntityForm {
       // Clear form input fields for the add form, as we stay on the same page.
       $this->clearFormInput($form, $form_state);
     }
+  }
+
+  /**
+   * Form submission handler for the 'preview' action.
+   *
+   * @param $form
+   *   An associative array containing the structure of the form.
+   * @param $form_state
+   *   The current state of the form.
+   */
+  public function preview(array $form, FormStateInterface $form_state) {
+    /*if ($node = $this->getCurrentLiveblogNode()) {
+      $store = $this->tempStoreFactory->get('liveblog_post_preview');
+      $this->entity->in_preview = TRUE;
+      $store->set($node->uuid(), $this->entity);
+    }*/
   }
 
   /**
