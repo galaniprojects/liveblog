@@ -11,6 +11,11 @@
  * Add default highlights.
  */
 function liveblog_install() {
+  $parent = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->create([
+    'name' => 'General',
+    'vid' => \Drupal\liveblog\Entity\LiveblogPost::LIVEBLOG_POSTS_HIGHLIGHTS_VID,
+  ]);
+  $parent->save();
   $term_names = [
     'Breaking news',
     'First valid information',
@@ -22,11 +27,13 @@ function liveblog_install() {
     'Situation under control',
   ];
   foreach ($term_names as $term_name) {
+    /* @var $term \Drupal\taxonomy\Entity\Term */
     $term = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->create([
       'name' => $term_name,
       'vid' => \Drupal\liveblog\Entity\LiveblogPost::LIVEBLOG_POSTS_HIGHLIGHTS_VID,
     ]);
+    $term->parent = [$parent->id()];
     $term->save();
   }
-  drupal_set_message(t('@count default highlight terms were created.'), ['@count' => count($term_names)]);
+  drupal_set_message(t('@count default highlight terms were created.', ['@count' => count($term_names) + 1]));
 }
