@@ -11,7 +11,7 @@ class LiveblogStream {
         <Posts
           getURL={urls.getURL}
           getNextURL={urls.getNextURL}
-          ref={(postsComponent) => self._postComponent = postsComponent}
+          ref={(postsComponent) => this._postComponent = postsComponent}
         />
       </div>
     )
