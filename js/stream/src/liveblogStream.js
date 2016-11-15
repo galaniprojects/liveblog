@@ -23,19 +23,11 @@ class LiveblogStream {
   // TODO: maybe refactor it to the posts component
   _attachEventListeners(element) {
     element.addEventListener('post:created', (event) => {
-      this.addPost(event.detail)
+      this._postComponent.addPost(event.detail)
     })
     element.addEventListener('post:updated', (event) => {
-      this.editPost(event.detail)
+      this._postComponent.editPost(event.detail)
     })
-  }
-
-  // TODO; This could lead to an issue, when App hasn't finished mounting
-  addPost(post) {
-    this._postComponent.addPost(post)
-  }
-  editPost(post) {
-    this._postComponent.editPost(post)
   }
 
 }
