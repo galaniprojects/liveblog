@@ -30,9 +30,11 @@ function liveblog_entity_extra_field_info() {
  */
 function liveblog_node_view(array &$build, Node $node, EntityViewDisplayInterface $display) {
   if ($display->getComponent('liveblog_posts')) {
+    $initial_number = $node->field_posts_number_initial->value;
+    $load_more_number = $node->field_posts_load_limit->value;
     $javascriptSettings = [
-      'getURL'      => '/liveblog/' . $node->id() . '/posts?items_per_page=2',
-      'getNextURL'  => '/liveblog/' . $node->id() . '/posts?items_per_page=1&created_op=<&created[value]=@%s',
+      'getURL'      => '/liveblog/' . $node->id() . '/posts?items_per_page=' . $initial_number,
+      'getNextURL'  => '/liveblog/' . $node->id() . '/posts?items_per_page=' . $load_more_number . '&created_op=<&created[value]=@%s',
     ];
     $build['liveblog_posts'] = [
       '#theme' => 'liveblog_posts',
@@ -77,13 +79,32 @@ function template_preprocess_liveblog_post(&$variables) {
 function template_preprocess_liveblog_posts(&$variables) {
   /* @var $node Drupal\node\Entity\Node */
   $node = $variables['node'];
-  // Render related posts.
+
   if ($node->field_status->value) {
+    // Embed related posts of the active liveblog.
     $views_content = views_embed_view('liveblog_posts', 'liveblog_posts', $node->id());
+
+    $account = \Drupal::currentUser();
+    // Embed liveblog post add form.
+    if ($account->hasPermission('add liveblog_post entity')) {
+      $entity = \Drupal::entityTypeManager()->getStorage('liveblog_post')->create([]);
+      $form_object = \Drupal::entityTypeManager()
+        ->getFormObject('liveblog_post', 'add')
+        ->setEntity($entity);
+      $form = \Drupal::formBuilder()->getForm($form_object);
+      $variables['form'] = array(
+        '#type' => 'details',
+        '#title' => t('Create liveblog post'),
+        '#open' => TRUE,
+      );
+      $variables['form'][] = $form;
+    }
   }
   else {
+    // Embed archive of related posts if the liveblog is not active anymore.
     $views_content = views_embed_view('liveblog_posts', 'liveblog_posts_archive', $node->id());
   }
+  // Embed liveblog posts views.
   $variables['posts'] = \Drupal::service('renderer')->render($views_content);
 }
 
@@ -107,16 +128,29 @@ function template_preprocess_liveblog_posts(&$variables) {
 function liveblog_post_get_highlight_options(FieldStorageDefinitionInterface $definition, FieldableEntityInterface $entity = NULL, &$cacheable = NULL) {
   $options = [];
 
-  // @todo: get terms from liveblog. hook_entity_prepare_form
-  $ids = \Drupal::entityQuery('taxonomy_term')
-    ->condition('vid', 'highlights')
-    ->execute();
+  // Get the liveblog node from the URL.
+  $node = \Drupal::request()->attributes->get('node');
+
+  // Get terms from the liveblog node, if we are at the liveblog page.
+  if ($node && $node->getType() == 'liveblog') {
+    $ids = [];
+    foreach ($node->field_highlights as $highlight) {
+      $ids[] = $highlight->target_id;
+    }
+  }
+  else {
+    // Fallback to all the highlight terms.
+    $ids = \Drupal::entityQuery('taxonomy_term')
+      ->condition('vid', 'highlights')
+      ->execute();
+  }
+
   if (!empty($ids)) {
     $terms = Term::loadMultiple($ids);
     foreach ($terms as $term) {
       $name = $term->name->value;
-      // Convert term name to a machine name, which will be used as a CSS
-      // class in templates.
+      // Convert term name to a machine name, which will be used as a CSS class
+      // in templates.
       $key = strtolower(Html::cleanCssIdentifier($name));
       $options[$key] = $name;
     }
