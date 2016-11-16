@@ -186,7 +186,10 @@ class LiveblogPostForm extends ContentEntityForm {
   public function ajaxPreviewCallback(array $form, FormStateInterface $form_state) {
     if (!$form_state->getErrors()) {
       /* @var $entity LiveblogPost */
-      $entity = $this->getEntity();
+      // @todo We should use $this->getEntity(), but entity does not have the
+      // necessary values if it the ::clearFormInput() was called once.
+      // We have to build it again.
+      $entity = $this->buildEntity($form, $form_state);
       $preview = $this->entityTypeManager->getViewBuilder('liveblog_post')->view($entity);
       $preview['#weight'] = -100;
       $form['preview']['content'] = $preview;
