@@ -5,6 +5,7 @@
         .once('liveblog-pusher-initialised')
         .each(function(i, element) {
           // Enable pusher logging - don't include this in production
+          // TODO: add a setting for "Debugging mode"
           Pusher.logToConsole = true;
 
           var pusher = new Pusher(drupalSettings.liveblog_pusher.key, {
