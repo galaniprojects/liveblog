@@ -29,7 +29,7 @@ display:
       access:
         type: perm
         options:
-          perm: 'edit liveblog_post entity'
+          perm: 'access content'
       cache:
         type: tag
         options: {  }
@@ -1597,6 +1597,12 @@ display:
         context: '0'
         menu_name: admin
       display_description: ''
+      access:
+        type: perm
+        options:
+          perm: 'edit liveblog_post entity'
+      defaults:
+        access: false
     cache_metadata:
       max-age: 0
       contexts:
