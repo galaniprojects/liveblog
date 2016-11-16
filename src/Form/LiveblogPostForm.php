@@ -187,7 +187,8 @@ class LiveblogPostForm extends ContentEntityForm {
     if (!$form_state->getErrors()) {
       /* @var $entity LiveblogPost */
       // @todo We should use $this->getEntity(), but entity does not have the
-      // necessary values if it the ::clearFormInput() was called once.
+      // necessary values if it the $form_state->setRebuild(); was called at
+      // least once (currently is called in ::clearFormInput() on creation).
       // We have to build it again.
       $entity = $this->buildEntity($form, $form_state);
       $preview = $this->entityTypeManager->getViewBuilder('liveblog_post')->view($entity);
