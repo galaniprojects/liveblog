@@ -11,13 +11,14 @@
           var pusher = new Pusher(drupalSettings.liveblog_pusher.key, {
             encrypted: true
           });
+          var liveblogStream = Drupal.behaviors.liveblogStream.getInstance(context)
 
           var channel = pusher.subscribe(drupalSettings.liveblog_pusher.channel);
           channel.bind('add', function(data) {
-            Drupal.behaviors.liveblogStream.trigger('added', data, context)
+            liveblogStream.addPost(data)
           });
           channel.bind('edit', function(data) {
-            Drupal.behaviors.liveblogStream.trigger('edited', data, context)
+            liveblogStream.editPost(data)
           })
         })
     }
