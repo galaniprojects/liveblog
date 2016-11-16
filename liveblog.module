@@ -39,7 +39,7 @@ function liveblog_node_view(array &$build, Node $node, EntityViewDisplayInterfac
       '#node' => $node,
       // @todo: Add js, css assets.
       '#attached' => [
-        'library' => 'liveblog/stream',
+        'library' => ['liveblog/stream'],
         'drupalSettings' => ['liveblog' => $javascriptSettings],
       ],
     ];

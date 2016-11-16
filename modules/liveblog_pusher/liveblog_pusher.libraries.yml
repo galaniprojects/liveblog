@@ -1,0 +1,8 @@
+pusher:
+  title: 'Pusher library'
+  js:
+    https://js.pusher.com/3.2/pusher.min.js: { type: external, minified: true}
+    js/liveblog_pusher.js: {}
+  dependencies:
+    - core/drupalSettings
+    - liveblog/stream
