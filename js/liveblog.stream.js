@@ -9,12 +9,12 @@
     trigger: function(event, data, context) {
       var element = $('.liveblog-posts-container', context)[0]
       switch(event) {
-        case 'created':
+        case 'added':
           // TODO: provide a polyfill for IE (https://developer.mozilla.org/en-US/docs/Web/API/CustomEvent/CustomEvent)
-          element.dispatchEvent(new CustomEvent('post:created', { 'detail': data }))
+          element.dispatchEvent(new CustomEvent('post:added', { 'detail': data }))
           break
-        case 'updated':
-          element.dispatchEvent(new CustomEvent('post:updated', { 'detail': data }))
+        case 'edited':
+          element.dispatchEvent(new CustomEvent('post:edited', { 'detail': data }))
           break
       }
     }

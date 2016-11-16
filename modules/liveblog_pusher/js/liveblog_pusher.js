@@ -9,11 +9,11 @@
       });
 
       var channel = pusher.subscribe(drupalSettings.liveblog_pusher.channel);
-      channel.bind('created', function(data) {
-        Drupal.behaviors.liveblogStream.trigger('created', data, context)
+      channel.bind('add', function(data) {
+        Drupal.behaviors.liveblogStream.trigger('added', data, context)
       });
-      channel.bind('updated', function(data) {
-        Drupal.behaviors.liveblogStream.trigger('updated', data, context)
+      channel.bind('edit', function(data) {
+        Drupal.behaviors.liveblogStream.trigger('edited', data, context)
       })
     }
   }

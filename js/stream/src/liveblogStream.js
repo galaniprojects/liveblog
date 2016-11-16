@@ -22,10 +22,10 @@ class LiveblogStream {
 
   // TODO: maybe refactor it to the posts component
   _attachEventListeners(element) {
-    element.addEventListener('post:created', (event) => {
+    element.addEventListener('post:added', (event) => {
       this._postComponent.addPost(event.detail)
     })
-    element.addEventListener('post:updated', (event) => {
+    element.addEventListener('post:edited', (event) => {
       this._postComponent.editPost(event.detail)
     })
   }
