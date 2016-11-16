@@ -29,7 +29,7 @@ display:
       access:
         type: perm
         options:
-          perm: 'edit liveblog_post entity'
+          perm: 'access content'
       cache:
         type: tag
         options: {  }
@@ -1284,6 +1284,48 @@ display:
           entity_type: node
           entity_field: title
           plugin_id: string
+        status:
+          id: status
+          table: liveblog_post
+          field: status
+          relationship: none
+          group_type: group
+          admin_label: ''
+          operator: '='
+          value: '1'
+          group: 1
+          exposed: true
+          expose:
+            operator_id: ''
+            label: 'Published status'
+            description: ''
+            use_operator: false
+            operator: status_op
+            identifier: status
+            required: true
+            remember: false
+            multiple: false
+            remember_roles:
+              authenticated: authenticated
+              anonymous: '0'
+              editor: '0'
+              seo: '0'
+              administrator: '0'
+          is_grouped: false
+          group_info:
+            label: ''
+            description: ''
+            identifier: ''
+            optional: true
+            widget: select
+            multiple: false
+            remember: false
+            default_group: All
+            default_group_multiple: {  }
+            group_items: {  }
+          entity_type: liveblog_post
+          entity_field: status
+          plugin_id: boolean
       sorts:
         created:
           id: created
@@ -1555,6 +1597,12 @@ display:
         context: '0'
         menu_name: admin
       display_description: ''
+      access:
+        type: perm
+        options:
+          perm: 'edit liveblog_post entity'
+      defaults:
+        access: false
     cache_metadata:
       max-age: 0
       contexts:

@@ -1,0 +1,24 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - field.storage.node.field_posts_number_initial
+    - node.type.liveblog
+id: node.liveblog.field_posts_number_initial
+field_name: field_posts_number_initial
+entity_type: node
+bundle: liveblog
+label: 'Initial number of posts'
+description: 'Initial number of posts when the page is loaded for the first time.'
+required: true
+translatable: false
+default_value:
+  -
+    value: 10
+default_value_callback: ''
+settings:
+  min: 1
+  max: null
+  prefix: ''
+  suffix: ''
+field_type: integer

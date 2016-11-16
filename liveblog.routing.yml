@@ -12,15 +12,6 @@ entity.liveblog_post.canonical:
   # Calls the access controller of the entity, $operation 'view'
     _entity_access: 'liveblog_post.view'
 
-liveblog_post.liveblog_post_add:
-  path: '/liveblog_post/add'
-  defaults:
-  # Calls the form.add controller, defined in the liveblog_post entity.
-    _entity_form: liveblog_post.add
-    _title: 'Add Liveblog Post'
-  requirements:
-    _entity_create_access: 'liveblog_post'
-
 entity.liveblog_post.edit_form:
   path: '/liveblog_post/{liveblog_post}/edit'
   defaults:

@@ -1,10 +1,11 @@
-uuid: 7feccaff-7331-49f2-afc9-a6dc5d7d101a
 langcode: en
 status: true
 dependencies:
   config:
     - field.field.node.liveblog.body
     - field.field.node.liveblog.field_highlights
+    - field.field.node.liveblog.field_posts_load_limit
+    - field.field.node.liveblog.field_posts_number_initial
     - field.field.node.liveblog.field_status
     - node.type.liveblog
   module:
@@ -35,9 +36,11 @@ content:
     settings: {  }
     third_party_settings: {  }
   liveblog_posts:
-    weight: 4
+    weight: 3
     settings: {  }
     third_party_settings: {  }
 hidden:
   field_highlights: true
+  field_posts_load_limit: true
+  field_posts_number_initial: true
   langcode: true

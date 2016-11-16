@@ -6,6 +6,7 @@ use Drupal\Core\Access\AccessResult;
 use Drupal\Core\Entity\EntityAccessControlHandler;
 use Drupal\Core\Entity\EntityInterface;
 use Drupal\Core\Session\AccountInterface;
+use Drupal\liveblog\Entity\LiveblogPost;
 
 /**
  * Access controller for the comment entity.
@@ -23,7 +24,9 @@ class LiveblogPostAccessControlHandler extends EntityAccessControlHandler {
   protected function checkAccess(EntityInterface $entity, $operation, AccountInterface $account) {
     switch ($operation) {
       case 'view':
-        return AccessResult::allowedIfHasPermission($account, 'view liveblog_post entity');
+        // We do need a separate permission access for the 'view' operation as
+        // liveblog posts are displayed at liveblog node page.
+        return AccessResult::allowed();
 
       case 'update':
         return AccessResult::allowedIfHasPermission($account, 'edit liveblog_post entity');

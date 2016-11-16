@@ -132,6 +132,17 @@ class LiveblogPostForm extends ContentEntityForm {
       $form['actions']['submit']['#value'] = t('Update');
     }
 
+    // Hide status, source, location fields in a collapsible wrapper.
+    $form['additional'] = array(
+      '#type' => 'details',
+      '#title' => t('Additional'),
+      '#weight' => 20,
+    );
+    foreach (['status', 'source', 'location'] as $key) {
+      $form['additional'][$key] = $form[$key];
+      unset($form[$key]);
+    }
+
     return $form;
   }
 

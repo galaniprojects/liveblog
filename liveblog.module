@@ -30,16 +30,18 @@ function liveblog_entity_extra_field_info() {
  */
 function liveblog_node_view(array &$build, Node $node, EntityViewDisplayInterface $display) {
   if ($display->getComponent('liveblog_posts')) {
+    $initial_number = $node->field_posts_number_initial->value;
+    $load_more_number = $node->field_posts_load_limit->value;
     $javascriptSettings = [
-      'getURL'      => '/liveblog/' . $node->id() . '/posts?items_per_page=2',
-      'getNextURL'  => '/liveblog/' . $node->id() . '/posts?items_per_page=1&created_op=<&created[value]=@%s',
+      'getURL'      => '/liveblog/' . $node->id() . '/posts?items_per_page=' . $initial_number,
+      'getNextURL'  => '/liveblog/' . $node->id() . '/posts?items_per_page=' . $load_more_number . '&created_op=<&created[value]=@%s',
     ];
     $build['liveblog_posts'] = [
       '#theme' => 'liveblog_posts',
       '#node' => $node,
       // @todo: Add js, css assets.
       '#attached' => [
-        'library' => 'liveblog/stream',
+        'library' => ['liveblog/stream'],
         'drupalSettings' => ['liveblog' => $javascriptSettings],
       ],
     ];
@@ -90,7 +92,12 @@ function template_preprocess_liveblog_posts(&$variables) {
         ->getFormObject('liveblog_post', 'add')
         ->setEntity($entity);
       $form = \Drupal::formBuilder()->getForm($form_object);
-      $variables['form'] = $form;
+      $variables['form'] = array(
+        '#type' => 'details',
+        '#title' => t('Create liveblog post'),
+        '#open' => TRUE,
+      );
+      $variables['form'][] = $form;
     }
   }
   else {
