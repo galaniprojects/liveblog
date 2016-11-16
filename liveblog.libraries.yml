@@ -11,4 +11,5 @@ stream:
     js/liveblog.stream.js: {}
   dependencies:
     - core/jquery
+    - core/jquery.once
     - core/drupalSettings
