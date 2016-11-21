@@ -2,3 +2,6 @@ services:
   plugin.manager.liveblog.notification_channel:
     class: Drupal\liveblog\NotificationChannel\NotificationChannelManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@config.factory']
+  liveblog.renderer:
+    class: Drupal\liveblog\LiveBlogRenderer
+    arguments: ['@ajax_response.attachments_processor', '@renderer']
