@@ -77,6 +77,11 @@ class LiveblogPostForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
+    // Managed File element ajax fails when working with PrivateTempStore in a
+    // form. We have to disable form cache.
+    // @see https://www.drupal.org/node/2647812#comment-11683961.
+    $form_state->disableCache();
+
     /* @var $entity \Drupal\liveblog\Entity\LiveblogPost */
     $entity = $this->entity;
     if ($node = $this->getCurrentLiveblogNode()) {
