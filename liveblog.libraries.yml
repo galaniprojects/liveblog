@@ -24,3 +24,13 @@ assets:
     js/liveblog.assets.js: {}
   dependencies:
     - core/drupalSettings
+
+editor:
+  title: 'Liveblog Editor'
+  js:
+    js/liveblog.editor.js: {}
+  dependencies:
+    - liveblog/stream
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings

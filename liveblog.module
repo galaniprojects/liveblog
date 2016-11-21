@@ -35,13 +35,14 @@ function liveblog_node_view(array &$build, Node $node, EntityViewDisplayInterfac
     $javascriptSettings = [
       'getURL'      => '/liveblog/' . $node->id() . '/posts?_format=json&sort_order=DESC&items_per_page=' . $initial_number,
       'getNextURL'  => '/liveblog/' . $node->id() . '/posts?_format=json&sort_order=DESC&items_per_page=' . $load_more_number . '&created_op=<&created=%s',
+      'editFormURL' => '/liveblog_post/%d/form?_format=json',
     ];
     $build['liveblog_posts'] = [
       '#theme' => 'liveblog_posts',
       '#node' => $node,
       // @todo: Add js, css assets.
       '#attached' => [
-        'library' => ['liveblog/stream'],
+        'library' => ['liveblog/stream', 'liveblog/editor'],
         'drupalSettings' => ['liveblog' => $javascriptSettings],
       ],
     ];
@@ -71,6 +72,7 @@ function template_preprocess_liveblog_post(&$variables) {
   /* @var \Drupal\liveblog\Entity\LiveblogPost $post */
   $post = $variables['elements']['#liveblog_post'];
   $variables['highlight'] = $post->highlight->value;
+  $variables['id'] = $post->id();
 }
 
 /**
