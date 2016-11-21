@@ -96,6 +96,8 @@ class LiveblogPostForm extends ContentEntityForm {
 
     // On the node view page, enable ajax for submitting the form.
     if ($this->request->attributes->get('node')) {
+      $form['#attached']['library'][] = 'liveblog/form_improvements';
+
       $form['actions']['submit']['#ajax'] = [
         'wrapper' => $rebuild_html_id,
         'callback' => array($this, 'ajaxRebuildCallback'),
