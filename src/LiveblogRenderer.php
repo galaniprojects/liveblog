@@ -36,13 +36,13 @@ class LiveblogRenderer implements LiveblogRendererInterface {
   /**
    * {@inheritdoc]
    */
-  public function render(array $content) {
+  public function render(array &$content) {
     // Render the form and convert attachments into ajax commands.
-    $html = $this->renderer->renderRoot($content);
+    $rendered = $this->renderer->renderRoot($content);
 
     return [
       'commands' => isset($content['#attached']) ? $this->getCommandsForAttachments($content['#attached']) : [],
-      'html' => $html,
+      'content' => $rendered,
       'libraries' => $this->ajaxResponseAttachmentsProcessor->getLibraries(),
     ];
   }
