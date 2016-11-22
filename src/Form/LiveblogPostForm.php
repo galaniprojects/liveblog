@@ -93,16 +93,9 @@ class LiveblogPostForm extends ContentEntityForm {
 
     if ($node) {
       $rebuild_html_id = "{$this->getFormId()}-wrapper";
-      $preview_html_id = "{$this->getFormId()}-preview";
 
       $form['#prefix'] = "<div id=\"$rebuild_html_id\">";
       $form['#suffix'] = '</div>';
-
-      $form['preview'] = [
-        '#type' => 'container',
-        '#attributes' => ['id' => $preview_html_id],
-        '#weight' => -100,
-      ];
 
       // Hide author and liveblog fields, as they are already pre-populated and
       // should not be changed.
@@ -115,19 +108,27 @@ class LiveblogPostForm extends ContentEntityForm {
         'effect' => 'fade',
       ];
 
+      // Show preview button if enabled.
       $preview_mode = $this->config('liveblog.liveblog_post.settings')->get('preview');
-      $form['actions']['preview'] = array(
-        '#type' => 'submit',
-        '#access' => $preview_mode != FALSE && ($entity->access('create') || $entity->access('update')),
-        '#value' => t('Preview'),
-        '#weight' => 20,
-        '#submit' => array('::submitForm', '::preview'),
-        '#ajax' => [
-          'wrapper' => $preview_html_id,
-          'callback' => array($this, 'ajaxPreviewCallback'),
-          'effect' => 'fade',
-        ],
-      );
+      if ($preview_mode != FALSE && ($entity->access('create') || $entity->access('update'))) {
+        $preview_html_id = "{$this->getFormId()}-preview";
+        $form['preview'] = [
+          '#type' => 'container',
+          '#attributes' => ['id' => $preview_html_id],
+          '#weight' => -100,
+        ];
+        $form['actions']['preview'] = array(
+          '#type' => 'submit',
+          '#value' => t('Preview'),
+          '#weight' => 20,
+          '#submit' => array('::submitForm', '::preview'),
+          '#ajax' => [
+            'wrapper' => $preview_html_id,
+            'callback' => array($this, 'ajaxPreviewCallback'),
+            'effect' => 'fade',
+          ],
+        );
+      }
 
       if (!$entity->isNew()) {
         $form['actions']['cancel'] = array(
@@ -214,22 +215,6 @@ class LiveblogPostForm extends ContentEntityForm {
       $form['preview']['content'] = $preview;
     }
     return $form['preview'];
-  }
-
-  /**
-   * Callback for ajax form cancel.
-   *
-   * @param array $form
-   *   An associative array containing the structure of the form.
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state o`f the form.
-   *
-   * @return string
-   *   The callback result.
-   */
-  public function ajaxCancelCallback(array $form, FormStateInterface $form_state) {
-    // Replace form with an empty string to remove it from the page.
-    return ['#markup' => ''];
   }
 
   /**
