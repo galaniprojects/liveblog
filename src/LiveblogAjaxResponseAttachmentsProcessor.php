@@ -34,6 +34,8 @@ class LiveblogAjaxResponseAttachmentsProcessor extends AjaxResponseAttachmentsPr
   /**
    * All the css, js assets grouped by libraries.
    *
+   * @todo Cache this. @see \Drupal\Core\Asset\AssetResolver::getCssAssets().
+   *
    * @var array
    */
   protected $libraries;
@@ -68,8 +70,6 @@ class LiveblogAjaxResponseAttachmentsProcessor extends AjaxResponseAttachmentsPr
    * {@inheritdoc}
    */
   protected function buildAttachmentsCommands(AjaxResponse $response, Request $request) {
-    $ajax_page_state = $request->request->get('ajax_page_state');
-
     // Aggregate CSS/JS if necessary, but only during normal site operation.
     $optimize_css = !defined('MAINTENANCE_MODE') && $this->config->get('css.preprocess');
     $optimize_js = !defined('MAINTENANCE_MODE') && $this->config->get('js.preprocess');
@@ -78,8 +78,9 @@ class LiveblogAjaxResponseAttachmentsProcessor extends AjaxResponseAttachmentsPr
 
     // Resolve the attached libraries into asset collections.
     $assets = new AttachedAssets();
+    // We should not set already loaded libraries here from the ajax page state,
+    // as different clients might have different libraries loaded.
     $assets->setLibraries(isset($attachments['library']) ? $attachments['library'] : [])
-      ->setAlreadyLoadedLibraries(isset($ajax_page_state['libraries']) ? explode(',', $ajax_page_state['libraries']) : [])
       ->setSettings(isset($attachments['drupalSettings']) ? $attachments['drupalSettings'] : []);
     $css_assets = $this->assetResolver->getCssAssets($assets, $optimize_css);
     list($js_assets_header, $js_assets_footer) = $this->assetResolver->getJsAssets($assets, $optimize_js);
