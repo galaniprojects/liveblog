@@ -128,6 +128,19 @@ class LiveblogPostForm extends ContentEntityForm {
           'effect' => 'fade',
         ],
       );
+
+      if (!$entity->isNew()) {
+        $form['actions']['cancel'] = array(
+          '#type' => 'button',
+          '#value' => t('Cancel'),
+          '#weight' => 20,
+          '#ajax' => [
+            'wrapper' => $rebuild_html_id,
+            'callback' => array($this, 'ajaxCancelCallback'),
+            'effect' => 'fade',
+          ],
+        );
+      }
     }
 
     if ($entity->isNew()) {
@@ -201,6 +214,22 @@ class LiveblogPostForm extends ContentEntityForm {
       $form['preview']['content'] = $preview;
     }
     return $form['preview'];
+  }
+
+  /**
+   * Callback for ajax form cancel.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the form.
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state o`f the form.
+   *
+   * @return string
+   *   The callback result.
+   */
+  public function ajaxCancelCallback(array $form, FormStateInterface $form_state) {
+    // Replace form with an empty string to remove it from the page.
+    return ['#markup' => ''];
   }
 
   /**

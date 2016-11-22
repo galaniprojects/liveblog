@@ -1,0 +1,16 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - liveblog
+    - serialization
+    - user
+id: liveblog_post_form
+plugin_id: liveblog_post_form
+granularity: method
+configuration:
+  GET:
+    supported_formats:
+      - json
+    supported_auth:
+      - cookie
