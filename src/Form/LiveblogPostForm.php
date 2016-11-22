@@ -83,12 +83,6 @@ class LiveblogPostForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    // Reloading the form sometimes fails if the form is cached, so disable it.
-    // This seems related to the problem when re-freshing a form with an entity
-    // of a tempstore.
-    // @see https://www.drupal.org/node/2647812#comment-11683961.
-    $form_state->disableCache();
-
     $form = parent::buildForm($form, $form_state);
 
     $rebuild_html_id = "{$this->getFormId()}-wrapper";
