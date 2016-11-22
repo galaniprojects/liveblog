@@ -3,5 +3,5 @@ services:
     class: Drupal\liveblog\NotificationChannel\NotificationChannelManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@config.factory']
   liveblog.renderer:
-    class: Drupal\liveblog\LiveBlogRenderer
+    class: Drupal\liveblog\LiveblogRenderer
     arguments: ['@ajax_response.attachments_processor', '@renderer']

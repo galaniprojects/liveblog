@@ -5,7 +5,7 @@ namespace Drupal\liveblog;
 /**
  * Renders content into an array containing ajax commands and html.
  */
-interface LiveBlogRendererInterface {
+interface LiveblogRendererInterface {
 
   /**
    * Renders a render array into html and ajax commands.

@@ -20,7 +20,7 @@ entity.liveblog_post.edit_form:
 entity.liveblog_post.edit_form_json:
   path: '/liveblog_post/{liveblog_post}/edit'
   defaults:
-    _controller: '\Drupal\liveblog\Controller\LiveBlogController::getFormAsJson'
+    _controller: '\Drupal\liveblog\Controller\LiveblogController::getFormAsJson'
   requirements:
     _entity_access: 'liveblog_post.update'
     _format: json

@@ -10,7 +10,7 @@ use Drupal\Core\Render\RendererInterface;
 /**
  * Renders content in a special way.
  */
-class LiveBlogRenderer implements LiveBlogRendererInterface {
+class LiveblogRenderer implements LiveblogRendererInterface {
 
   /**
    * The ajax attachment processor.

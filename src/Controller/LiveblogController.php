@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 /**
  * Controller providing the resource for the form.
  */
-class LiveBlogController extends ControllerBase {
+class LiveblogController extends ControllerBase {
 
   /**
    * Returns a liveblog post form wrapped in a json response.
@@ -23,7 +23,7 @@ class LiveBlogController extends ControllerBase {
       ->setEntity($liveblog_post);
     $content = $this->formBuilder()->getForm($form_object);
 
-    /** @var \Drupal\liveblog\LiveBlogRendererInterface $renderer */
+    /** @var \Drupal\liveblog\LiveblogRendererInterface $renderer */
     $renderer = \Drupal::service('liveblog.renderer');
     return new JsonResponse($renderer->render($content));
   }
