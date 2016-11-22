@@ -7,7 +7,6 @@ use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Drupal\liveblog\Entity\LiveblogPost;
 use Drupal\liveblog\NotificationChannel\NotificationChannelManager;
-use Drupal\user\PrivateTempStoreFactory;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -17,6 +16,13 @@ use Symfony\Component\HttpFoundation\RequestStack;
  * @ingroup liveblog_post
  */
 class LiveblogPostForm extends ContentEntityForm {
+
+  /**
+   * The entity being used by this form.
+   *
+   * @var \Drupal\Core\Entity\EntityInterface
+   */
+  protected $entity;
 
   /**
    * The current request.
@@ -33,18 +39,6 @@ class LiveblogPostForm extends ContentEntityForm {
   protected $notificationChannelManager;
 
   /**
-   * The tempstore factory.
-   *
-   * @var \Drupal\user\PrivateTempStoreFactory
-   */
-  protected $tempStoreFactory;
-
-  /**
-   * Whether this node has been previewed or not.
-   */
-  protected $hasBeenPreviewed = FALSE;
-
-  /**
    * Constructs a ContentEntityForm object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
@@ -54,11 +48,10 @@ class LiveblogPostForm extends ContentEntityForm {
    * @param \Drupal\liveblog\NotificationChannel\NotificationChannelManager $notification_channel_manager
    *   The notification channel service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_manager, RequestStack $request_stack, NotificationChannelManager $notification_channel_manager, PrivateTempStoreFactory $temp_store_factory) {
+  public function __construct(EntityTypeManagerInterface $entity_manager, RequestStack $request_stack, NotificationChannelManager $notification_channel_manager) {
     parent::__construct($entity_manager);
     $this->request = $request_stack->getCurrentRequest();
     $this->notificationChannelManager = $notification_channel_manager;
-    $this->tempStoreFactory = $temp_store_factory;
   }
 
   /**
@@ -68,87 +61,52 @@ class LiveblogPostForm extends ContentEntityForm {
     return new static(
       $container->get('entity.manager'),
       $container->get('request_stack'),
-      $container->get('plugin.manager.liveblog.notification_channel'),
-      $container->get('user.private_tempstore')
+      $container->get('plugin.manager.liveblog.notification_channel')
     );
   }
 
   /**
    * {@inheritdoc}
    */
+  protected function prepareEntity() {
+    parent::prepareEntity();
+
+    // Pre-populate liveblog reference if we are at the liveblog page.
+    if (!$this->entity->liveblog->entity && $node = $this->request->attributes->get('node')) {
+      if ($node->getType() == 'liveblog') {
+        $this->entity->setLiveblog($node);
+      }
+    }
+  }
+
+  /**
+   * {@inheritdoc}
+   */
   public function buildForm(array $form, FormStateInterface $form_state) {
-    // Managed File element ajax fails when working with PrivateTempStore in a
-    // form. We have to disable form cache.
+    // Reloading the form sometimes fails if the form is cached, so disable it.
+    // This seems related to the problem when re-freshing a form with an entity
+    // of a tempstore.
     // @see https://www.drupal.org/node/2647812#comment-11683961.
     $form_state->disableCache();
 
-    /* @var $entity \Drupal\liveblog\Entity\LiveblogPost */
-    $entity = $this->entity;
-    if ($node = $this->getCurrentLiveblogNode()) {
-      // Pre-populate liveblog reference if we are at the liveblog page.
-      $entity->setLiveblog($node);
-    }
-
     $form = parent::buildForm($form, $form_state);
 
-    if ($node) {
-      $rebuild_html_id = "{$this->getFormId()}-wrapper";
+    $rebuild_html_id = "{$this->getFormId()}-wrapper";
+    $form['#prefix'] = "<div id=\"$rebuild_html_id\">";
+    $form['#suffix'] = '</div>';
 
-      $form['#prefix'] = "<div id=\"$rebuild_html_id\">";
-      $form['#suffix'] = '</div>';
+    // Hide author and liveblog fields, as they are already pre-populated and
+    // should not be changed.
+    $form['uid']['#access'] = FALSE;
+    $form['liveblog']['#access'] = FALSE;
 
-      // Hide author and liveblog fields, as they are already pre-populated and
-      // should not be changed.
-      $form['uid']['#access'] = FALSE;
-      $form['liveblog']['#access'] = FALSE;
-
+    // On the node view page, enable ajax for submitting the form.
+    if ($this->request->attributes->get('node')) {
       $form['actions']['submit']['#ajax'] = [
         'wrapper' => $rebuild_html_id,
         'callback' => array($this, 'ajaxRebuildCallback'),
         'effect' => 'fade',
       ];
-
-      // Show preview button if enabled.
-      $preview_mode = $this->config('liveblog.liveblog_post.settings')->get('preview');
-      if ($preview_mode != FALSE && ($entity->access('create') || $entity->access('update'))) {
-        $preview_html_id = "{$this->getFormId()}-preview";
-        $form['preview'] = [
-          '#type' => 'container',
-          '#attributes' => ['id' => $preview_html_id],
-          '#weight' => -100,
-        ];
-        $form['actions']['preview'] = array(
-          '#type' => 'submit',
-          '#value' => t('Preview'),
-          '#weight' => 20,
-          '#submit' => array('::submitForm', '::preview'),
-          '#ajax' => [
-            'wrapper' => $preview_html_id,
-            'callback' => array($this, 'ajaxPreviewCallback'),
-            'effect' => 'fade',
-          ],
-        );
-      }
-
-      if (!$entity->isNew()) {
-        $form['actions']['cancel'] = array(
-          '#type' => 'button',
-          '#value' => t('Cancel'),
-          '#weight' => 20,
-          '#ajax' => [
-            'wrapper' => $rebuild_html_id,
-            'callback' => array($this, 'ajaxCancelCallback'),
-            'effect' => 'fade',
-          ],
-        );
-      }
-    }
-
-    if ($entity->isNew()) {
-      $form['actions']['submit']['#value'] = t('Create');
-    }
-    else {
-      $form['actions']['submit']['#value'] = t('Update');
     }
 
     // Hide status, source, location fields in a collapsible wrapper.
@@ -162,7 +120,52 @@ class LiveblogPostForm extends ContentEntityForm {
       unset($form[$key]);
     }
 
+    // Show preview div if enabled.
+    if ($this->config('liveblog.liveblog_post.settings')->get('preview')) {
+      $form['preview'] = [
+        '#type' => 'container',
+        '#attributes' => ['id' => "{$this->getFormId()}-preview"],
+        '#weight' => 100,
+      ];
+    }
+
     return $form;
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  protected function actions(array $form, FormStateInterface $form_state) {
+    $actions = parent::actions($form, $form_state);
+
+    if ($this->config('liveblog.liveblog_post.settings')->get('preview')) {
+      $actions['preview'] = array(
+        '#type' => 'submit',
+        '#value' => t('Preview'),
+        '#submit' => array('::submitForm', '::preview'),
+        '#ajax' => [
+          'wrapper' => "{$this->getFormId()}-preview",
+          'callback' => array($this, 'ajaxPreviewCallback'),
+          'effect' => 'fade',
+        ],
+      );
+    }
+
+    // Show a cancel button on the node page.
+    if ($this->request->attributes->get('node')) {
+      $actions['cancel'] = array(
+        '#type' => 'button',
+        '#value' => t('Cancel'),
+        '#ajax' => [
+          'wrapper' => "{$this->getFormId()}-wrapper",
+          'callback' => array($this, 'ajaxCancelCallback'),
+          'effect' => 'fade',
+        ],
+      );
+    }
+
+    $actions['submit']['#value'] = $this->entity->isNew() ? t('Create') : t('Update');
+    return $actions;
   }
 
   /**
@@ -174,19 +177,14 @@ class LiveblogPostForm extends ContentEntityForm {
    *   The current state of the form.
    *
    * @return array
-   *   The rebuilt form.
+   *   The render element to replace the form with.
    */
   public function ajaxRebuildCallback(array $form, FormStateInterface $form_state) {
-    switch ($this->getOperation()) {
-      case 'add':
-        drupal_set_message(t('Liveblog post was successfully created.'));
-        break;
-      case 'edit':
-        drupal_set_message(t('Liveblog post was successfully updated.'));
-        $html_id = "{$this->getFormId()}-wrapper";
-        $element = ['#markup' => "<div id=\"$html_id\"></div>"];
-        return $element;
-        break;
+    // Hide the form after editing on the node page.
+    if ($this->getOperation() == 'edit' && $this->request->attributes->get('node')) {
+      $html_id = "{$this->getFormId()}-wrapper";
+      $element = ['#markup' => "<div id=\"$html_id\"></div>"];
+      return $element;
     }
     return $form;
   }
@@ -204,50 +202,33 @@ class LiveblogPostForm extends ContentEntityForm {
    */
   public function ajaxPreviewCallback(array $form, FormStateInterface $form_state) {
     if (!$form_state->getErrors()) {
-      /* @var $entity LiveblogPost */
-      // @todo We should use $this->getEntity(), but entity does not have the
-      // necessary values if it the $form_state->setRebuild(); was called at
-      // least once (currently is called in ::clearFormInput() on creation).
-      // We have to build it again.
-      $entity = $this->buildEntity($form, $form_state);
-      $preview = $this->entityTypeManager->getViewBuilder('liveblog_post')->view($entity);
-      $preview['#weight'] = -100;
+      $preview = $this->entityTypeManager->getViewBuilder('liveblog_post')->view($this->entity);
       $form['preview']['content'] = $preview;
     }
     return $form['preview'];
   }
 
   /**
-   * Gets liveblog node from the current request.
-   *
-   * Gets the liveblog node from the request if we are at the liveblog page.
-   *
-   * @return \Drupal\node\Entity\Node|null
-   *   The liveblog node, null if not found.
-   */
-  protected function getCurrentLiveblogNode() {
-    /* @var \Drupal\node\Entity\Node $node */
-    $node = $this->request->attributes->get('node');
-    if ($node && $node->getType() == 'liveblog') {
-      return $node;
-    }
-  }
-
-  /**
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $entity = $this->getEntity();
-    $entity->save();
+    $this->entity->save();
+
+    if ($this->getOperation() == 'edit') {
+      drupal_set_message(t('Liveblog post was successfully updated.'));
+    }
+    elseif ($this->getOperation() == 'add') {
+      drupal_set_message(t('Liveblog post was successfully created.'));
+    }
 
     // Trigger an notification channel message.
     if ($plugin = $this->notificationChannelManager->createActiveInstance()) {
-      $plugin->triggerLiveblogPostEvent($entity, $this->getOperation());
+      $plugin->triggerLiveblogPostEvent($this->entity, $this->getOperation());
     }
 
-    if (!$this->getCurrentLiveblogNode()) {
-      $url = $entity->toUrl();
-      // Redirect to the post's full page if we are not at the liveblog page.
+    // Redirect to the post's full page if we are not at the liveblog page.
+    if (!$this->request->attributes->get('node')) {
+      $url = $this->entity->toUrl();
       $form_state->setRedirect($url->getRouteName(), $url->getRouteParameters());
     }
     else if ($this->getOperation() == 'add') {
@@ -265,11 +246,8 @@ class LiveblogPostForm extends ContentEntityForm {
    *   The current state of the form.
    */
   public function preview(array $form, FormStateInterface $form_state) {
-    /*if ($node = $this->getCurrentLiveblogNode()) {
-      $store = $this->tempStoreFactory->get('liveblog_post_preview');
-      $this->entity->in_preview = TRUE;
-      $store->set($node->uuid(), $this->entity);
-    }*/
+    // Rebuild the form.
+    $form_state->setRebuild();
   }
 
   /**
