@@ -3,7 +3,6 @@
 namespace Drupal\liveblog;
 
 use Drupal\Core\Ajax\AjaxResponse;
-use Drupal\Core\Ajax\AjaxResponseAttachmentsProcessor;
 use Drupal\Core\Ajax\PrependCommand;
 use Drupal\Core\Render\RendererInterface;
 
@@ -29,7 +28,7 @@ class LiveblogRenderer implements LiveblogRendererInterface {
   /**
    * Constructs the object.
    */
-  public function __construct(AjaxResponseAttachmentsProcessor $attachmentsProcessor, RendererInterface $renderer) {
+  public function __construct(LiveblogAjaxResponseAttachmentsProcessor $attachmentsProcessor, RendererInterface $renderer) {
     $this->ajaxResponseAttachmentsProcessor = $attachmentsProcessor;
     $this->renderer = $renderer;
   }
@@ -44,11 +43,12 @@ class LiveblogRenderer implements LiveblogRendererInterface {
     return [
       'commands' => isset($content['#attached']) ? $this->getCommandsForAttachments($content['#attached']) : [],
       'html' => $html,
+      'libraries' => $this->ajaxResponseAttachmentsProcessor->getLibraries(),
     ];
   }
 
   /**
-   * Turns render attachements into ajax commands.
+   * Turns render attachments into ajax commands.
    *
    * @param array $attachments
    *   The attachments array, i.e. #attached in a render array.
