@@ -2,8 +2,11 @@
 
 namespace Drupal\liveblog;
 
+use Drupal\Core\Ajax\AddCssCommand;
 use Drupal\Core\Ajax\AjaxResponse;
 use Drupal\Core\Ajax\AjaxResponseAttachmentsProcessor;
+use Drupal\Core\Ajax\AppendCommand;
+use Drupal\Core\Ajax\PrependCommand;
 use Drupal\Core\Ajax\SettingsCommand;
 use Drupal\Core\Asset\AssetCollectionRendererInterface;
 use Drupal\Core\Asset\AttachedAssets;
@@ -100,9 +103,9 @@ class LiveblogAjaxResponseAttachmentsProcessor extends AjaxResponseAttachmentsPr
     }
 
     $libraries = $this->assetResolver->getAllLibrariesToLoad($assets);
-    $this->groupAssetsByLibraries($libraries, $css_assets);
-    $this->groupAssetsByLibraries($libraries, $js_assets_header);
-    $this->groupAssetsByLibraries($libraries, $js_assets_footer);
+    $this->groupAssetsByLibraries($libraries, $css_assets, 'css');
+    $this->groupAssetsByLibraries($libraries, $js_assets_header, 'js');
+    $this->groupAssetsByLibraries($libraries, $js_assets_footer, 'js');
 
     // Prepend a command to merge changes and additions to drupalSettings.
     if (!empty($settings)) {
@@ -134,20 +137,39 @@ class LiveblogAjaxResponseAttachmentsProcessor extends AjaxResponseAttachmentsPr
    *   Libraries array.
    * @param array $assets
    *   Assets array.
+   * @param string $type
+   *   Assets type(css or js).
    */
-  protected function groupAssetsByLibraries($libraries, $assets) {
+  protected function groupAssetsByLibraries($libraries, $assets, $type) {
     foreach ($libraries as $library) {
       list($extension, $name) = explode('/', $library, 2);
       $definition = $this->getLibraryDiscovery()->getLibraryByName($extension, $name);
 
-      foreach (['css', 'js'] as $type) {
-        if (empty($definition[$type])) {
-          continue;
-        }
+      if (empty($definition[$type])) {
+        continue;
+      }
 
-        foreach ($definition[$type] as $options) {
-          if (!empty($options['data']) && empty($assets[$options['data']])) {
-            $this->libraries[$library][$options['data']] = $options['data'];
+      foreach ($definition[$type] as $options) {
+        if (!empty($options['data']) && !empty($assets[$options['data']])) {
+          $asset = $assets[$options['data']];
+
+          // Create commands to add the assets.
+          if ($type == 'css') {
+            $css_render_array = $this->cssCollectionRenderer->render([$asset]);
+            $command = new AddCssCommand($this->renderer->renderPlain($css_render_array));
+          }
+          elseif ($type == 'js') {
+            $js_render_array = $this->jsCollectionRenderer->render([$asset]);
+            if ($asset['scope'] == 'header') {
+              $command = new PrependCommand('head', $this->renderer->renderPlain($js_render_array));
+            }
+            elseif ($asset['scope'] == 'footer') {
+              $command = new AppendCommand('body', $this->renderer->renderPlain($js_render_array));
+            }
+          }
+
+          if (!empty($command)) {
+            $this->libraries[$library][$asset['data']][] = $command->render();
           }
         }
       }
