@@ -189,11 +189,11 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
   /**
    * Returns the render API renderer.
    *
-   * @return \Drupal\Core\Render\RendererInterface
+   * @return \Drupal\liveblog\LiveblogRenderer
    */
   protected function getRenderer() {
     if (!isset($this->renderer)) {
-      $this->renderer = \Drupal::service('renderer');
+      $this->renderer = \Drupal::service('liveblog.renderer');
     }
 
     return $this->renderer;
@@ -443,7 +443,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
     $data['changed'] = $this->changed->value;
     $data['created'] = $this->created->value;
     $data['status'] = $this->status->value;
-    $data['rendered_entity'] = $output;
+    $data += $output;
 
     return $data;
   }
