@@ -25,11 +25,11 @@ class LiveblogPostForm extends ContentEntityForm {
   protected $entity;
 
   /**
-   * The current request.
+   * The request stack.
    *
-   * @var \Symfony\Component\HttpFoundation\Request
+   * @var \Symfony\Component\HttpFoundation\RequestStack
    */
-  protected $request;
+  protected $requestStack;
 
   /**
    * The notification channel manager.
@@ -50,7 +50,7 @@ class LiveblogPostForm extends ContentEntityForm {
    */
   public function __construct(EntityTypeManagerInterface $entity_manager, RequestStack $request_stack, NotificationChannelManager $notification_channel_manager) {
     parent::__construct($entity_manager);
-    $this->request = $request_stack->getCurrentRequest();
+    $this->requestStack = $request_stack;
     $this->notificationChannelManager = $notification_channel_manager;
   }
 
@@ -66,13 +66,23 @@ class LiveblogPostForm extends ContentEntityForm {
   }
 
   /**
+   * Determines whether we are on the liveblog node page.
+   *
+   * @return bool
+   *   Whether we are on the liveblog page.
+   */
+  public function isLiveBlogNodePage() {
+    return $this->requestStack->getCurrentRequest()->attributes->get('node');
+  }
+
+  /**
    * {@inheritdoc}
    */
   protected function prepareEntity() {
     parent::prepareEntity();
 
     // Pre-populate liveblog reference if we are at the liveblog page.
-    if (!$this->entity->liveblog->entity && $node = $this->request->attributes->get('node')) {
+    if (!$this->entity->liveblog->entity && $node = $this->isLiveBlogNodePage()) {
       if ($node->getType() == 'liveblog') {
         $this->entity->setLiveblog($node);
       }
@@ -95,12 +105,12 @@ class LiveblogPostForm extends ContentEntityForm {
     $form['liveblog']['#access'] = FALSE;
 
     // On the node view page, enable ajax for submitting the form.
-    if ($this->request->attributes->get('node')) {
+    if ($this->isLiveBlogNodePage()) {
       $form['#attached']['library'][] = 'liveblog/form_improvements';
 
       $form['actions']['submit']['#ajax'] = [
         'wrapper' => $rebuild_html_id,
-        'callback' => array($this, 'ajaxRebuildCallback'),
+        'callback' => '::ajaxRebuildCallback',
         'effect' => 'fade',
       ];
     }
@@ -141,20 +151,20 @@ class LiveblogPostForm extends ContentEntityForm {
         '#submit' => array('::submitForm', '::preview'),
         '#ajax' => [
           'wrapper' => "{$this->getFormId()}-preview",
-          'callback' => array($this, 'ajaxPreviewCallback'),
+          'callback' => '::ajaxPreviewCallback',
           'effect' => 'fade',
         ],
       );
     }
 
     // Show a cancel button on the node page.
-    if ($this->request->attributes->get('node')) {
+    if ($this->isLiveBlogNodePage()) {
       $actions['cancel'] = array(
         '#type' => 'button',
         '#value' => t('Cancel'),
         '#ajax' => [
           'wrapper' => "{$this->getFormId()}-wrapper",
-          'callback' => array($this, 'ajaxCancelCallback'),
+          'callback' => '::ajaxCancelCallback',
           'effect' => 'fade',
         ],
       );
@@ -177,7 +187,7 @@ class LiveblogPostForm extends ContentEntityForm {
    */
   public function ajaxRebuildCallback(array $form, FormStateInterface $form_state) {
     // Hide the form after editing on the node page.
-    if ($this->getOperation() == 'edit' && $this->request->attributes->get('node')) {
+    if ($this->getOperation() == 'edit' && $this->isLiveBlogNodePage()) {
       $html_id = "{$this->getFormId()}-wrapper";
       $element = ['#markup' => "<div id=\"$html_id\"></div>"];
       return $element;
@@ -223,7 +233,7 @@ class LiveblogPostForm extends ContentEntityForm {
     }
 
     // Redirect to the post's full page if we are not at the liveblog page.
-    if (!$this->request->attributes->get('node')) {
+    if (!$this->isLiveBlogNodePage()) {
       $url = $this->entity->toUrl();
       $form_state->setRedirect($url->getRouteName(), $url->getRouteParameters());
     }
