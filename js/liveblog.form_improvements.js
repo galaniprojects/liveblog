@@ -7,7 +7,7 @@
 
       // Hide success messages after timeout to clean-up the form for editors.
       setTimeout(function() {
-        $('.liveblog-posts', context).find(successMessagesSelector).slideUp();
+        $('.liveblog-posts').find(successMessagesSelector).slideUp();
       }, successMessagesTimeout);
     }
   };
