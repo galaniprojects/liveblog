@@ -253,8 +253,13 @@ class LiveblogPostForm extends ContentEntityForm {
    *   The form state.
    */
   protected function clearFormInput(array $form, FormStateInterface $form_state) {
+    // Rebuild the form.
+    $form_state->setRebuild();
     // Replace the form entity with an empty instance.
-    $this->entity = $this->entityTypeManager->getStorage('liveblog_post')->create([]);
+    $this->entity = $this->entityTypeManager->getStorage('liveblog_post')->create([
+      'liveblog' => $this->entity->liveblog->target_id,
+    ]);
+
     // Clear user input.
     $input = $form_state->getUserInput();
     // We should not clear the system items from the user input.
@@ -266,8 +271,6 @@ class LiveblogPostForm extends ContentEntityForm {
       }
     }
     $form_state->setUserInput($input);
-    // Rebuild the form state values.
-    $form_state->setRebuild();
   }
 
 }
