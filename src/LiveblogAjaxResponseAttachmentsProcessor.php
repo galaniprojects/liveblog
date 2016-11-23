@@ -169,7 +169,7 @@ class LiveblogAjaxResponseAttachmentsProcessor extends AjaxResponseAttachmentsPr
           }
 
           if (!empty($command)) {
-            $this->libraries[$library][$asset['data']][] = $command->render();
+            $this->libraries[$library][$asset['data']] = $command->render();
           }
         }
       }
