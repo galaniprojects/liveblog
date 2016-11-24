@@ -170,7 +170,7 @@ function liveblog_post_get_highlight_options(FieldStorageDefinitionInterface $de
 function liveblog_js_settings_build(&$settings, \Drupal\Core\Asset\AttachedAssetsInterface $assets) {
   // Collects all the loaded libraries with dependencies in js settings.
   // We need this setting to detect new libraries delivered to frontend.
-  // We should to send ajaxPageState settings to the liveblog library if:
+  // We should to send libraries settings to the liveblog library if:
   // - liveblog library is loaded, as all the frontend logic is happening there.
   // - core/drupal.ajax already has been loaded, as we need to handle AJAX
   //   commands.
@@ -180,5 +180,5 @@ function liveblog_js_settings_build(&$settings, \Drupal\Core\Asset\AttachedAsset
   if (!in_array('liveblog/stream', $libraries) || !in_array('core/drupal.ajax', $libraries)) {
     return;
   }
-  $settings['liveblog']['ajaxPageState'] = $libraries;
+  $settings['liveblog']['libraries'] = $libraries;
 }
