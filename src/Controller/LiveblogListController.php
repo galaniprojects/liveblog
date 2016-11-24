@@ -32,10 +32,12 @@ class LiveblogListController extends ControllerBase {
     $request = $this->getRequest();
     $items_per_page = (int) $request->get('items_per_page') ?: 10;
     $created_op = $request->get('created_op') == '<' ? $request->get('created_op') : '>';
-    $sort_order = $request->get('sort_order') == 'DESC' ? ' DESC' : 'ASC';
+    $sort_order = $request->get('sort_order') == 'DESC' ? 'DESC' : 'ASC';
     $timestamp = (int) $request->get('created') ?: 0;
 
-    $query = $this->getEntityQuery('liveblog_post');
+    $storage = $this->getEntityTypeManager()->getStorage('liveblog_post');
+
+    $query = $storage->getQuery();
     $query->condition('status', 1);
     $query->condition('created', $timestamp, $created_op);
     $query->condition('liveblog.entity.nid', $node->id());
@@ -43,7 +45,6 @@ class LiveblogListController extends ControllerBase {
     $query->range(0, $items_per_page);
     $ids = $query->execute();
 
-    $storage = $this->getEntityTypeManager()->getStorage('liveblog_post');
     $entities = $storage->loadMultiple($ids);
 
     if (!$entities) {
@@ -82,18 +83,6 @@ class LiveblogListController extends ControllerBase {
    */
   protected function getRequest() {
     return \Drupal::request();
-  }
-
-  /**
-   * Returns query service.
-   *
-   * @param string $type
-   *   The entity type.
-   * @return \Drupal\Core\Entity\Query\Sql\Query
-   *   Entity query.
-   */
-  protected function getEntityQuery($type) {
-    return \Drupal::service('entity.query')->get($type);
   }
 
   /**
