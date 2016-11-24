@@ -77,6 +77,8 @@ class LiveblogPostForm extends ContentEntityForm {
 
     $html_id = "{$this->getFormId()}-wrapper";
     if ($node) {
+      $form['#attached']['library'][] = 'liveblog/form_improvements';
+
       $form['#prefix'] = "<div id=\"$html_id\">";
       $form['#suffix'] = '</div>';
 
