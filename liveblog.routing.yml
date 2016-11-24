@@ -49,3 +49,12 @@ liveblog.notification_channel_settings:
     _title: 'Liveblog notification channel settings'
   requirements:
     _permission: 'administer liveblog settings'
+
+entity.liveblog_post.list:
+  path: '/liveblog/{node}/posts'
+  defaults:
+    _controller: '\Drupal\liveblog\Controller\LiveblogListController::getList'
+  requirements:
+    _permission: 'access content'
+    _format: json
+    node: \d+
