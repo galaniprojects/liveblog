@@ -415,37 +415,4 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
     return $fields;
   }
 
-  /**
-   * Gets payload from the liveblog post entity.
-   *
-   * @todo Currently the liveblog post has 3 different ways of rendering by REST
-   *   services: 1) views for the list of posts 2) default GET endpoint by the
-   *   REST module 3) this method. Would be good to use this method in all the
-   *   3 cases to follow the same structure, because the frontend library
-   *   should rely on this payload structure in all the cases.
-   *
-   * @return array
-   *   The payload array.
-   */
-  public function getPayload() {
-    $rendered_entity = $this->entityTypeManager()->getViewBuilder('liveblog_post')->view($this);
-    $output = $this->getRenderer()->render($rendered_entity);
-
-    $data['id'] = $this->id();
-    $data['uuid'] = $this->uuid();
-    $data['title'] = $this->get('title')->value;
-    $data['liveblog'] = $this->getLiveblog()->id();
-    $data['body__value'] = $this->body->value;
-    $data['highlight'] = $this->highlight->value;
-    $data['location'] = $this->location->value;
-    $data['source__uri'] = $this->source->first() ? $this->source->first()->getUrl()->toString() : NULL;
-    $data['uid'] = $this->getAuthor() ? $this->getAuthor()->getAccountName() : NULL;
-    $data['changed'] = $this->changed->value;
-    $data['created'] = $this->created->value;
-    $data['status'] = $this->status->value;
-    $data += $output;
-
-    return $data;
-  }
-
 }

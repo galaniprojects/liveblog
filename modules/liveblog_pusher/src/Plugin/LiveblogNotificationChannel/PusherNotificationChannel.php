@@ -5,7 +5,7 @@ namespace Drupal\liveblog_pusher\Plugin\LiveblogNotificationChannel;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\Core\Render\Renderer;
+use Drupal\liveblog\Utility\Payload;
 use Drupal\liveblog\Entity\LiveblogPost;
 use Drupal\liveblog\NotificationChannel\NotificationChannelPluginBase;
 use Drupal\liveblog_pusher\PusherLoggerInterface;
@@ -140,7 +140,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
     $channel = "liveblog-{$liveblog_post->getLiveblog()->id()}";
 
     // Trigger an event by providing event name and payload.
-    $response = $client->trigger($channel, $event, $liveblog_post->getPayload());
+    $response = $client->trigger($channel, $event, Payload::create($liveblog_post)->getRenderedPayload());
     if (!$response) {
       // Log response if there is an error.
       $this->logger->saveLog('error');
