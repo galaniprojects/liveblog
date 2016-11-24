@@ -1,7 +1,3 @@
-# This file brings everything together. Very nifty!
-
-# Route name can be used in several places; e.g. links, redirects, and local
-# actions.
 entity.liveblog_post.canonical:
   path: '/liveblog_post/{liveblog_post}'
   defaults:
@@ -20,6 +16,14 @@ entity.liveblog_post.edit_form:
     _title: 'Edit Liveblog Post'
   requirements:
     _entity_access: 'liveblog_post.update'
+
+entity.liveblog_post.edit_form_json:
+  path: '/liveblog_post/{liveblog_post}/edit'
+  defaults:
+    _controller: '\Drupal\liveblog\Controller\LiveblogController::getFormAsJson'
+  requirements:
+    _entity_access: 'liveblog_post.update'
+    _format: json
 
 entity.liveblog_post.delete_form:
   path: '/liveblog_post/{liveblog_post}/delete'
@@ -45,3 +49,12 @@ liveblog.notification_channel_settings:
     _title: 'Liveblog notification channel settings'
   requirements:
     _permission: 'administer liveblog settings'
+
+entity.liveblog_post.list:
+  path: '/liveblog/{node}/posts'
+  defaults:
+    _controller: '\Drupal\liveblog\Controller\LiveblogListController::getList'
+  requirements:
+    _permission: 'access content'
+    _format: json
+    node: \d+
