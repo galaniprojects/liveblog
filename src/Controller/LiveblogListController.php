@@ -9,7 +9,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
- * Controller providing the resource for the form.
+ * Controller providing the resource for the liveblog posts list.
  */
 class LiveblogListController extends ControllerBase {
 

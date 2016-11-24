@@ -6,6 +6,8 @@ use Drupal\liveblog\Entity\LiveblogPost;
 
 /**
  * Utility for liveblog post payload.
+ *
+ * @todo: Convert to a trait or service.
  */
 class Payload {
 
@@ -36,7 +38,7 @@ class Payload {
    *   Instance of the class.
    */
   public static function create(LiveblogPost $entity) {
-    return new self($entity);
+    return new static($entity);
   }
 
   /**
