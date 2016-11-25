@@ -121,32 +121,21 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
   }
 
   /**
-   * Returns the related liveblog node.
-   *
-   * @return \Drupal\node\NodeInterface
-   *   The related liveblog node.
+   * {@inheritdoc}
    */
   public function getTitle() {
     return $this->get('title')->value;
   }
 
   /**
-   * Returns the related liveblog node.
-   *
-   * @return \Drupal\node\NodeInterface
-   *   The related liveblog node.
+   * {@inheritdoc}
    */
   public function getLiveblog() {
     return $this->get('liveblog')->entity;
   }
 
   /**
-   * Sets the related liveblog node.
-   *
-   * @param \Drupal\node\NodeInterface $node
-   *   The related liveblog node.
-   *
-   * @return $this
+   * {@inheritdoc}
    */
   public function setLiveblog(NodeInterface $node) {
     $this->set('liveblog', $node->id());
@@ -154,22 +143,14 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
   }
 
   /**
-   * Returns the related liveblog author.
-   *
-   * @return \Drupal\user\UserInterface
-   *   The related liveblog author.
+   * {@inheritdoc}
    */
   public function getAuthor() {
     return $this->get('uid')->entity;
   }
 
   /**
-   * Sets the related liveblog author.
-   *
-   * @param \Drupal\user\UserInterface $user
-   *   The related liveblog author.
-   *
-   * @return $this
+   * {@inheritdoc}
    */
   public function setAuthor(UserInterface $user) {
     $this->set('uid', $user->id());
@@ -177,26 +158,10 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
   }
 
   /**
-   * Returns the related liveblog node ID.
-   *
-   * @return int
-   *   The related liveblog node ID.
+   * {@inheritdoc}
    */
   public function getLiveblogId() {
     return $this->get('liveblog')->target_id;
-  }
-
-  /**
-   * Returns the render API renderer.
-   *
-   * @return \Drupal\liveblog\LiveblogRenderer
-   */
-  protected function getRenderer() {
-    if (!isset($this->renderer)) {
-      $this->renderer = \Drupal::service('liveblog.renderer');
-    }
-
-    return $this->renderer;
   }
 
   /**
@@ -214,13 +179,13 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
     // Standard field, used as unique if primary index.
     $fields['id'] = BaseFieldDefinition::create('integer')
       ->setLabel(t('ID'))
-      ->setDescription(t('The ID of the LiveblogPost entity.'))
+      ->setDescription(t('The ID of the liveblog post.'))
       ->setReadOnly(TRUE);
 
     // Standard field, unique outside of the scope of the current project.
     $fields['uuid'] = BaseFieldDefinition::create('uuid')
       ->setLabel(t('UUID'))
-      ->setDescription(t('The UUID of the LiveblogPost entity.'))
+      ->setDescription(t('The UUID of the liveblog post.'))
       ->setReadOnly(TRUE);
 
     // Name field for the liveblog_post.
@@ -228,7 +193,6 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
     // Users with correct privileges can change the view and edit configuration.
     $fields['title'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Title'))
-      ->setDescription(t('The title of the liveblog post.'))
       ->setRequired(TRUE)
       ->setSettings([
         'default_value' => '',
@@ -249,7 +213,6 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
 
     $fields['body'] = BaseFieldDefinition::create('text_long')
       ->setLabel(t('Body'))
-      ->setDescription(t('Body text for the liveblog post.'))
       ->setRequired(TRUE)
       ->setDisplayOptions('form', [
         'type' => 'text_textarea',
@@ -268,7 +231,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
 
     $fields['highlight'] = BaseFieldDefinition::create('list_string')
       ->setLabel(t('Highlight'))
-      ->setDescription(t('Adds the possibility to mark a post as a highlight.'))
+      ->setDescription(t('Adds the possibility to mark the liveblog post as a highlight.'))
       // We can not make this callback as a static method of the LiveblogPost
       // class to support older PHP versions.
       ->setSetting('allowed_values_function','liveblog_post_get_highlight_options')
@@ -286,7 +249,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
 
     $fields['source'] = BaseFieldDefinition::create('link')
       ->setLabel(t('Source'))
-      ->setDescription(t('The first name of the LiveblogPost entity.'))
+      ->setDescription(t('The source of the liveblog post.'))
       ->setSettings([
         'title' => DRUPAL_REQUIRED,
         'link_type' => LinkItemInterface::LINK_GENERIC,
@@ -305,7 +268,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
 
     $fields['location'] = BaseFieldDefinition::create('string')
       ->setLabel(t('Location'))
-      ->setDescription(t('Location address string related to the post.'))
+      ->setDescription(t('Location address string related to the liveblog post.'))
       ->setDisplayOptions('form', [
         'type' => 'string_textfield',
         'weight' => 5,
@@ -371,7 +334,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
 
     $fields['status'] = BaseFieldDefinition::create('boolean')
       ->setLabel(t('Status'))
-      ->setDescription(t('Whether post is published.'))
+      ->setDescription(t('Whether liveblog post is published.'))
       ->setDefaultValue(FALSE)
       ->setDefaultValue(TRUE)
       ->setDisplayOptions('form', [
@@ -384,7 +347,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
-      ->setDescription(t('The time that the entity was created.'))
+      ->setDescription(t('The time that the liveblog post was created.'))
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'timestamp',
@@ -399,7 +362,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
 
     $fields['changed'] = BaseFieldDefinition::create('changed')
       ->setLabel(t('Changed'))
-      ->setDescription(t('The time that the entity was last edited.'))
+      ->setDescription(t('The time that the liveblog post was last edited.'))
       ->setDisplayOptions('view', [
         'label' => 'hidden',
         'type' => 'timestamp',
