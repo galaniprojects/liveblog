@@ -32,13 +32,6 @@ class LiveblogPostForm extends ContentEntityForm {
   protected $requestStack;
 
   /**
-   * The notification channel manager.
-   *
-   * @var \Drupal\liveblog\NotificationChannel\NotificationChannelManager
-   */
-  protected $notificationChannelManager;
-
-  /**
    * Constructs a ContentEntityForm object.
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
@@ -48,10 +41,9 @@ class LiveblogPostForm extends ContentEntityForm {
    * @param \Drupal\liveblog\NotificationChannel\NotificationChannelManager $notification_channel_manager
    *   The notification channel service.
    */
-  public function __construct(EntityTypeManagerInterface $entity_manager, RequestStack $request_stack, NotificationChannelManager $notification_channel_manager) {
+  public function __construct(EntityTypeManagerInterface $entity_manager, RequestStack $request_stack) {
     parent::__construct($entity_manager);
     $this->requestStack = $request_stack;
-    $this->notificationChannelManager = $notification_channel_manager;
   }
 
   /**
@@ -220,11 +212,6 @@ class LiveblogPostForm extends ContentEntityForm {
     }
     elseif ($this->getOperation() == 'add') {
       drupal_set_message(t('Liveblog post was successfully created.'));
-    }
-
-    // Trigger an notification channel message.
-    if ($plugin = $this->notificationChannelManager->createActiveInstance()) {
-      $plugin->triggerLiveblogPostEvent($this->entity, $this->getOperation());
     }
 
     // Redirect to the post's full page if we are not at the liveblog page.
