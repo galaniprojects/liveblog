@@ -16,6 +16,7 @@ export default class Posts extends Component {
       this.setState({
         posts: posts.content
       })
+      this._handleAssets(posts.libraries, posts.commands, document.body)
     })
 
     addEventListener('scroll', this._lazyload.bind(this))
@@ -58,6 +59,7 @@ export default class Posts extends Component {
               ...lazyPosts.content
             ]
           })
+          this._handleAssets(lazyPosts.libraries, lazyPosts.commands, document.body)
         }
         else {
           this.hasReachedEnd = true
@@ -68,6 +70,12 @@ export default class Posts extends Component {
     })
   }
 
+  _handleAssets(libraries, commands, context) {
+    this.props.assetHandler.loadLibraries(libraries)
+    this.props.assetHandler.executeCommands(commands)
+    this.props.assetHandler.afterLoading(context)
+  }
+
   addPost(post) {
     this.setState({
       posts: [
@@ -75,6 +83,7 @@ export default class Posts extends Component {
           ...this.state.posts
       ]
     })
+    this._handleAssets(post.libraries, post.commands, document.body)
   }
 
   editPost(editedPost) {
@@ -90,6 +99,8 @@ export default class Posts extends Component {
     this.setState({
       posts: posts
     })
+
+    this._handleAssets(post.libraries, post.commands, document.body)
   }
 
   render() {
