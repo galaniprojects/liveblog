@@ -208,10 +208,10 @@ class LiveblogPostForm extends ContentEntityForm {
     $this->entity->save();
 
     if ($this->getOperation() == 'edit') {
-      drupal_set_message(t('Liveblog post was successfully updated.'));
+      drupal_set_message(t('Liveblog post was successfully updated.'), 'status', TRUE);
     }
     elseif ($this->getOperation() == 'add') {
-      drupal_set_message(t('Liveblog post was successfully created.'));
+      drupal_set_message(t('Liveblog post was successfully created.'), 'status', TRUE);
     }
 
     // Redirect to the post's full page if we are not at the liveblog page.
