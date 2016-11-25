@@ -99,11 +99,6 @@ class LiveblogPostForm extends ContentEntityForm {
     $form['#prefix'] = "<div id=\"$rebuild_html_id\">";
     $form['#suffix'] = '</div>';
 
-    // Hide author and liveblog fields, as they are already pre-populated and
-    // should not be changed.
-    $form['uid']['#access'] = FALSE;
-    $form['liveblog']['#access'] = FALSE;
-
     // On the node view page, enable ajax for submitting the form.
     if ($this->isLiveBlogNodePage()) {
       $form['#attached']['library'][] = 'liveblog/form_improvements';

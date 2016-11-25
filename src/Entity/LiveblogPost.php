@@ -292,14 +292,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
         ],
       ])
       ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 8,
-        'settings' => [
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'autocomplete_type' => 'tags',
-          'placeholder' => '',
-        ],
+        'type' => 'hidden',
       ])
       ->setDisplayOptions('view', [
         'label' => 'inline',
@@ -316,13 +309,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
       ->setSetting('target_type', 'user')
       ->setDefaultValueCallback('Drupal\node\Entity\Node::getCurrentUserId')
       ->setDisplayOptions('form', [
-        'type' => 'entity_reference_autocomplete',
-        'weight' => 6,
-        'settings' => [
-          'match_operator' => 'CONTAINS',
-          'size' => '60',
-          'placeholder' => '',
-        ],
+        'type' => 'hidden',
       ])
       ->setDisplayOptions('view', [
         'label' => 'hidden',
