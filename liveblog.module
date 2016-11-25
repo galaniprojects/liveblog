@@ -33,8 +33,8 @@ function liveblog_node_view(array &$build, Node $node, EntityViewDisplayInterfac
     $initial_number = $node->field_posts_number_initial->value;
     $load_more_number = $node->field_posts_load_limit->value;
     $javascriptSettings = [
-      'getURL'      => '/liveblog/' . $node->id() . '/posts?items_per_page=' . $initial_number,
-      'getNextURL'  => '/liveblog/' . $node->id() . '/posts?items_per_page=' . $load_more_number . '&created_op=<&created[value]=@%s',
+      'getURL'      => '/liveblog/' . $node->id() . '/posts?_format=json&sort_order=DESC&items_per_page=' . $initial_number,
+      'getNextURL'  => '/liveblog/' . $node->id() . '/posts?_format=json&sort_order=DESC&items_per_page=' . $load_more_number . '&created_op=<&created=%s',
     ];
     $build['liveblog_posts'] = [
       '#theme' => 'liveblog_posts',

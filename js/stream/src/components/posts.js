@@ -11,9 +11,10 @@ export default class Posts extends Component {
   }
 
   componentWillMount() {
+    // TODO Handle errors
     jQuery.getJSON(this.props.getURL, (posts) => {
       this.setState({
-        posts: posts
+        posts: posts.content
       })
     })
 
@@ -49,12 +50,12 @@ export default class Posts extends Component {
     var url = this.props.getNextURL.replace('%s', lastPost.created)
     // TODO: error handling
     jQuery.getJSON(url, (lazyPosts) => {
-      if (lazyPosts && Array.isArray(lazyPosts)) {
-        if (lazyPosts.length != 0) {
+      if (lazyPosts && Array.isArray(lazyPosts.content)) {
+        if (lazyPosts.content.length != 0) {
           this.setState({
             posts: [
               ...this.state.posts,
-              ...lazyPosts
+              ...lazyPosts.content
             ]
           })
         }
@@ -97,7 +98,7 @@ export default class Posts extends Component {
         { this.state.posts.map((post) => {
           return (
             <div className="liveblog-post" key={post.id}>
-              <div dangerouslySetInnerHTML={{ __html: post.rendered_entity }} />
+              <div dangerouslySetInnerHTML={{ __html: post.content }} />
             </div>
           )
         })}
