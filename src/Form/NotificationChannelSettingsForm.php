@@ -104,7 +104,7 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
 
       $form['plugin_wrapper']['plugin'] = [
         '#type' => 'select',
-        '#title' => t('Provider plugin'),
+        '#title' => t('Notification channel plugin'),
         '#limit_validation_errors' => [['plugin']],
         '#executes_submit_callback' => TRUE,
         '#description' => isset($definition['description']) ? Xss::filter($definition['description']) : '',
