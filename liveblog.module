@@ -81,9 +81,6 @@ function template_preprocess_liveblog_posts(&$variables) {
   $node = $variables['node'];
 
   if ($node->field_status->value) {
-    // Embed related posts of the active liveblog.
-    $views_content = views_embed_view('liveblog_posts', 'liveblog_posts', $node->id());
-
     $account = \Drupal::currentUser();
     // Embed liveblog post add form.
     if ($account->hasPermission('add liveblog_post entity')) {
@@ -103,9 +100,9 @@ function template_preprocess_liveblog_posts(&$variables) {
   else {
     // Embed archive of related posts if the liveblog is not active anymore.
     $views_content = views_embed_view('liveblog_posts', 'liveblog_posts_archive', $node->id());
+    // Embed liveblog posts views.
+    $variables['posts'] = \Drupal::service('renderer')->render($views_content);
   }
-  // Embed liveblog posts views.
-  $variables['posts'] = \Drupal::service('renderer')->render($views_content);
 }
 
 /**
