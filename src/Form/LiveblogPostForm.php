@@ -75,6 +75,12 @@ class LiveblogPostForm extends ContentEntityForm {
     return $this->requestStack->getCurrentRequest()->attributes->get('node');
   }
 
+  /**
+   * Determines whether the JSON edit-form was requested.
+   *
+   * @return bool
+   *   Whether the JSON edit-form was requested.
+   */
   public function isJSONEditForm() {
     return $this->requestStack->getCurrentRequest()->attributes->get('_route') == 'entity.liveblog_post.edit_form_json';
   }
