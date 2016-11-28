@@ -15,7 +15,12 @@
                                 var url = settings.liveblog.editFormURL.replace('%d', postID)
                                 // TODO: error handling
                                 $.getJSON(url, function(data) {
-                              target.append(data.content)
+                                    target.append(data.content)
+
+                                    var assetHandler = new drupalSettings.liveblog.AssetHandler(target, url)
+                                    assetHandler.loadLibraries(data.libraries)
+                                    assetHandler.executeCommands(data.commands)
+                                    assetHandler.afterLoading(target[0])
                                 })
                             }
                         }

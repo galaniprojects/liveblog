@@ -30,6 +30,7 @@ editor:
   js:
     js/liveblog.editor.js: {}
   dependencies:
+    - liveblog/assets
     - liveblog/stream
     - core/jquery
     - core/jquery.once
