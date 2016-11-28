@@ -208,6 +208,12 @@ class LiveblogPostForm extends ContentEntityForm {
    */
   public function ajaxPreviewCallback(array $form, FormStateInterface $form_state) {
     if (!$form_state->getErrors()) {
+      // There is a bug which triggers nested entity values (embeded tweet urls)
+      // are lost, during serialization of the form cache in
+      // \Drupal\Core\Form\FormCache::setCache(). To work-a-round this bug, we
+      // have to build a recent entity again.
+      // @todo: Link core issue here.
+      $this->entity = $this->buildEntity($form, $form_state);
       $preview = $this->entityTypeManager->getViewBuilder('liveblog_post')->view($this->entity);
       $form['preview']['content'] = $preview;
     }
