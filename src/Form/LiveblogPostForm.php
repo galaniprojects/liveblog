@@ -75,6 +75,10 @@ class LiveblogPostForm extends ContentEntityForm {
     return $this->requestStack->getCurrentRequest()->attributes->get('node');
   }
 
+  public function isJSONEditForm() {
+    return $this->requestStack->getCurrentRequest()->attributes->get('_route') == 'entity.liveblog_post.edit_form_json';
+  }
+
   /**
    * {@inheritdoc}
    */
@@ -105,7 +109,7 @@ class LiveblogPostForm extends ContentEntityForm {
     $form['liveblog']['#access'] = FALSE;
 
     // On the node view page, enable ajax for submitting the form.
-    if ($this->isLiveBlogNodePage()) {
+    if ($this->isLiveBlogNodePage() || $this->isJSONEditForm()) {
       $form['#attached']['library'][] = 'liveblog/form_improvements';
 
       $form['actions']['submit']['#ajax'] = [
@@ -187,7 +191,7 @@ class LiveblogPostForm extends ContentEntityForm {
    */
   public function ajaxRebuildCallback(array $form, FormStateInterface $form_state) {
     // Hide the form after editing on the node page.
-    if ($this->getOperation() == 'edit' && $this->isLiveBlogNodePage()) {
+    if ($this->getOperation() == 'edit' && ($this->isLiveBlogNodePage() || $this->isJSONEditForm())) {
       $html_id = "{$this->getFormId()}-wrapper";
       $element = ['#markup' => "<div id=\"$html_id\"></div>"];
       return $element;
@@ -233,7 +237,7 @@ class LiveblogPostForm extends ContentEntityForm {
     }
 
     // Redirect to the post's full page if we are not at the liveblog page.
-    if (!$this->isLiveBlogNodePage()) {
+    if (!($this->isLiveBlogNodePage() || $this->isJSONEditForm())) {
       $url = $this->entity->toUrl();
       $form_state->setRedirect($url->getRouteName(), $url->getRouteParameters());
     }
