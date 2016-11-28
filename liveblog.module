@@ -35,7 +35,7 @@ function liveblog_node_view(array &$build, Node $node, EntityViewDisplayInterfac
     $javascriptSettings = [
       'getURL'      => '/liveblog/' . $node->id() . '/posts?_format=json&sort_order=DESC&items_per_page=' . $initial_number,
       'getNextURL'  => '/liveblog/' . $node->id() . '/posts?_format=json&sort_order=DESC&items_per_page=' . $load_more_number . '&created_op=<&created=%s',
-      'editFormURL' => '/liveblog_post/%d/form?_format=json',
+      'editFormURL' => '/liveblog_post/%d/edit?_format=json',
     ];
     $build['liveblog_posts'] = [
       '#theme' => 'liveblog_posts',
