@@ -11,10 +11,12 @@ export default class Posts extends Component {
   }
 
   componentWillMount() {
+    // TODO Handle errors
     jQuery.getJSON(this.props.getURL, (posts) => {
       this.setState({
-        posts: posts
+        posts: posts.content
       })
+      this._handleAssets(posts.libraries, posts.commands, document.body)
     })
 
     addEventListener('scroll', this._lazyload.bind(this))
@@ -49,14 +51,15 @@ export default class Posts extends Component {
     var url = this.props.getNextURL.replace('%s', lastPost.created)
     // TODO: error handling
     jQuery.getJSON(url, (lazyPosts) => {
-      if (lazyPosts && Array.isArray(lazyPosts)) {
-        if (lazyPosts.length != 0) {
+      if (lazyPosts && Array.isArray(lazyPosts.content)) {
+        if (lazyPosts.content.length != 0) {
           this.setState({
             posts: [
               ...this.state.posts,
-              ...lazyPosts
+              ...lazyPosts.content
             ]
           })
+          this._handleAssets(lazyPosts.libraries, lazyPosts.commands, document.body)
         }
         else {
           this.hasReachedEnd = true
@@ -67,6 +70,12 @@ export default class Posts extends Component {
     })
   }
 
+  _handleAssets(libraries, commands, context) {
+    this.props.assetHandler.loadLibraries(libraries)
+    this.props.assetHandler.executeCommands(commands)
+    this.props.assetHandler.afterLoading(context)
+  }
+
   addPost(post) {
     this.setState({
       posts: [
@@ -74,6 +83,7 @@ export default class Posts extends Component {
           ...this.state.posts
       ]
     })
+    this._handleAssets(post.libraries, post.commands, document.body)
   }
 
   editPost(editedPost) {
@@ -89,6 +99,8 @@ export default class Posts extends Component {
     this.setState({
       posts: posts
     })
+
+    this._handleAssets(post.libraries, post.commands, document.body)
   }
 
   render() {
@@ -97,7 +109,7 @@ export default class Posts extends Component {
         { this.state.posts.map((post) => {
           return (
             <div className="liveblog-post" key={post.id}>
-              <div dangerouslySetInnerHTML={{ __html: post.rendered_entity }} />
+              <div dangerouslySetInnerHTML={{ __html: post.content }} />
             </div>
           )
         })}
