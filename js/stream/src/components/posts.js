@@ -111,7 +111,7 @@ export default class Posts extends Component {
         posts: posts
       })
 
-      this._handleAssets(post.libraries, post.commands, document.body)
+      this._handleAssets(editedPost.libraries, editedPost.commands, document.body)
       scrollPosition.restore()
     }
   }
