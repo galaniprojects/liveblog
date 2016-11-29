@@ -1,3 +1,4 @@
-<article class="liveblog-post{% if highlight %} liveblog-post--highlight-{{ highlight }}{% endif %}">
-  {{ elements }}
+<article class="liveblog-post{% if highlight %} liveblog-post--highlight-{{ highlight }}{% endif %}" data-postid="{{ id }}">
+    <div class="liveblog-post--edit-button">EDIT</div>
+    {{ elements }}
 </article>
