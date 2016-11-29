@@ -2,16 +2,12 @@
 
 namespace Drupal\liveblog\Entity;
 
-use Drupal\Component\Utility\Html;
 use Drupal\Core\Entity\EntityStorageInterface;
-use Drupal\Core\Entity\FieldableEntityInterface;
 use Drupal\Core\Field\BaseFieldDefinition;
 use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
-use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\liveblog\LiveblogPostInterface;
 use Drupal\node\NodeInterface;
-use Drupal\taxonomy\Entity\Term;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\link\LinkItemInterface;
@@ -363,6 +359,30 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
       ->setDisplayConfigurable('view', TRUE);
 
     return $fields;
+  }
+
+  /**
+   * {@inheritdoc}
+   *
+   * Triggers an notification channel event for the liveblog post.
+   */
+  function postSave(EntityStorageInterface $storage, $update = TRUE) {
+    parent::postSave($storage, $update);
+
+    if ($plugin = $this->getNotificationChannelManager()->createActiveInstance()) {
+      $event_name = $update ? 'edit' : 'add';
+      $plugin->triggerLiveblogPostEvent($this, $event_name);
+    }
+  }
+
+  /**
+   * Gets the notification channel plugin manager.
+   *
+   * @return \Drupal\liveblog\NotificationChannel\NotificationChannelManager
+   *   Notification channel plugin manager.
+   */
+  protected function getNotificationChannelManager() {
+    return \Drupal::service('plugin.manager.liveblog.notification_channel');
   }
 
 }

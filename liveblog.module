@@ -179,33 +179,3 @@ function liveblog_js_settings_build(&$settings, \Drupal\Core\Asset\AttachedAsset
   }
   $settings['liveblog']['libraries'] = $libraries;
 }
-
-/**
- * Implements hook_ENTITY_TYPE_insert().
- */
-function liveblog_liveblog_post_insert(\Drupal\liveblog\Entity\LiveblogPost $entity) {
-  liveblog_trigger_notification_channel_liveblog_post_event($entity, 'add');
-}
-
-/**
- * Implements hook_ENTITY_TYPE_update().
- */
-function liveblog_liveblog_post_update(\Drupal\liveblog\Entity\LiveblogPost $entity) {
-  liveblog_trigger_notification_channel_liveblog_post_event($entity, 'edit');
-}
-
-/**
- * Triggers an notification channel event for liveblog post.
- *
- * @param \Drupal\liveblog\Entity\LiveblogPost $entity
- *   The liveblog post.
- * @param $event_name
- *   The event name. E.g. 'add', 'edit'.
- */
-function liveblog_trigger_notification_channel_liveblog_post_event(\Drupal\liveblog\Entity\LiveblogPost $entity, $event_name) {
-  /* @var \Drupal\liveblog\NotificationChannel\NotificationChannelManager $service */
-  $service = \Drupal::service('plugin.manager.liveblog.notification_channel');
-  if ($plugin = $service->createActiveInstance()) {
-    $plugin->triggerLiveblogPostEvent($entity, $event_name);
-  }
-}
