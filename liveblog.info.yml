@@ -10,7 +10,6 @@ dependencies:
   - node
   - path
   - rest
-  - scheduler
   - serialization
   - taxonomy
   - text
