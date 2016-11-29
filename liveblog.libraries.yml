@@ -24,6 +24,7 @@ assets:
     js/liveblog.assets.js: {}
   dependencies:
     - core/drupalSettings
+    - core/drupal.ajax
 
 editor:
   title: 'Liveblog Editor'
