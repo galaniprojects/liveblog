@@ -28,6 +28,7 @@ use Drupal\link\LinkItemInterface;
  *     },
  *     "access" = "Drupal\liveblog\LiveblogPostAccessControlHandler",
  *     "views_data" = "Drupal\views\EntityViewsData",
+ *     "storage_schema" = "Drupal\liveblog\LiveblogPostStorageSchema",
  *   },
  *   list_cache_contexts = { "user" },
  *   base_table = "liveblog_post",
