@@ -5,6 +5,7 @@ namespace Drupal\liveblog\Controller;
 use Drupal\Core\Controller\ControllerBase;
 use Drupal\liveblog\Entity\LiveblogPost;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Drupal\Component\Utility\Html;
 
 /**
  * Controller providing the resource for the form.
@@ -18,6 +19,8 @@ class LiveblogController extends ControllerBase {
    *   The response containing the liveblog post form.
    */
   public function getFormAsJson(LiveblogPost $liveblog_post) {
+    Html::setIsAjax(true);
+
     $form_object = $this->entityTypeManager()
       ->getFormObject('liveblog_post', 'edit')
       ->setEntity($liveblog_post);
