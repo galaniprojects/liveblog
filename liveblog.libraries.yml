@@ -13,6 +13,14 @@ stream:
     js/stream/dist/bundle.js: {}
     js/liveblog.stream.js: {}
   dependencies:
+    - liveblog/assets
     - core/jquery
     - core/jquery.once
+    - core/drupalSettings
+
+assets:
+  title: 'Liveblog AssetHandler'
+  js:
+    js/liveblog.assets.js: {}
+  dependencies:
     - core/drupalSettings

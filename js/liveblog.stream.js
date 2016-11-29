@@ -1,8 +1,10 @@
 (function ($, Drupal, drupalSettings) {
   Drupal.behaviors.liveblogStream = {
     attach: function(context, settings) {
+      var self = this
       this.getContainer(context).once('liveblog-stream-initialised').each(function(index, element) {
-        var liveblogStream = new LiveblogStream(element, {
+        var assetHandler = new settings.liveblog.AssetHandler(self.getContainer(context), '')
+        var liveblogStream = new LiveblogStream(element, assetHandler, {
           getURL: settings.liveblog.getURL,
           getNextURL: settings.liveblog.getNextURL
         })

@@ -5,11 +5,12 @@ import ReactDOM from 'react-dom'
 import Posts from './components/posts'
 
 class LiveblogStream {
-  constructor(element, urls = {getURL, getNextURL}) {
+  constructor(element, assetHandler, urls = {getURL, getNextURL}) {
     const App = (
         <Posts
           getURL={urls.getURL}
           getNextURL={urls.getNextURL}
+          assetHandler={assetHandler}
           ref={(postsComponent) => this._postComponent = postsComponent}
         />
     )

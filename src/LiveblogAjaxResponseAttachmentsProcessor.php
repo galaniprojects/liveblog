@@ -73,9 +73,12 @@ class LiveblogAjaxResponseAttachmentsProcessor extends AjaxResponseAttachmentsPr
    * {@inheritdoc}
    */
   protected function buildAttachmentsCommands(AjaxResponse $response, Request $request) {
-    // Aggregate CSS/JS if necessary, but only during normal site operation.
-    $optimize_css = !defined('MAINTENANCE_MODE') && $this->config->get('css.preprocess');
-    $optimize_js = !defined('MAINTENANCE_MODE') && $this->config->get('js.preprocess');
+    // @todo Aggregate CSS/JS if necessary, during normal site operation.
+    //   We should optimize every file separately, else it will be not possible
+    //   to distinguish between them.
+    //$optimize_css = !defined('MAINTENANCE_MODE') && $this->config->get('css.preprocess');
+    //$optimize_js = !defined('MAINTENANCE_MODE') && $this->config->get('js.preprocess');
+    $optimize_css = $optimize_js = FALSE;
 
     $attachments = $response->getAttachments();
 
