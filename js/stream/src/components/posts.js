@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import ScrollPosition from '../helper/ScrollPosition'
 
 export default class Posts extends Component {
   constructor() {
@@ -8,6 +9,7 @@ export default class Posts extends Component {
     }
     this.isloading = false
     this.hasReachedEnd = false
+    this.postNodes = {}
   }
 
   componentWillMount() {
@@ -77,6 +79,8 @@ export default class Posts extends Component {
   }
 
   addPost(post) {
+    var scrollPosition = new ScrollPosition(document.body, this.postsWrapper)
+    scrollPosition.prepareFor('up')
     this.setState({
       posts: [
           post,
@@ -84,11 +88,14 @@ export default class Posts extends Component {
       ]
     })
     this._handleAssets(post.libraries, post.commands, document.body)
+    scrollPosition.restore()
   }
 
   editPost(editedPost) {
+    var found = false
     var posts = this.state.posts.map((post) => {
       if (post.id == editedPost.id) {
+        found = true
         return editedPost
       }
       else {
@@ -96,11 +103,17 @@ export default class Posts extends Component {
       }
     })
 
-    this.setState({
-      posts: posts
-    })
+    if (found) {
+      var scrollPosition = new ScrollPosition(document.body, this.postNodes[editedPost.id])
+      scrollPosition.prepareFor('up')
 
-    this._handleAssets(post.libraries, post.commands, document.body)
+      this.setState({
+        posts: posts
+      })
+
+      this._handleAssets(post.libraries, post.commands, document.body)
+      scrollPosition.restore()
+    }
   }
 
   render() {
@@ -108,7 +121,7 @@ export default class Posts extends Component {
       <div className="liveblog-posts-wrapper" ref={(wrapper) => this.postsWrapper = wrapper}>
         { this.state.posts.map((post) => {
           return (
-            <div className="liveblog-post" key={post.id}>
+            <div className="liveblog-post" key={post.id} ref={(node) => { this.postNodes[post.id] = node }}>
               <div dangerouslySetInnerHTML={{ __html: post.content }} />
             </div>
           )
