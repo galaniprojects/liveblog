@@ -32,7 +32,7 @@ class LiveblogListController extends ControllerBase {
     $request = $this->getRequest();
     $items_per_page = (int) $request->get('items_per_page') ?: 10;
     $created_op = $request->get('created_op') == '<' ? $request->get('created_op') : '>';
-    $sort_order = $request->get('sort_order') == 'DESC' ? 'DESC' : 'ASC';
+    $sort_order = $request->get('sort_order') == 'ASC' ? 'ASC' : 'DESC';
     $timestamp = (int) $request->get('created') ?: 0;
 
     $storage = $this->getEntityTypeManager()->getStorage('liveblog_post');
