@@ -8,8 +8,7 @@
                     var $this = $(element)
                     $this.on('click','.liveblog-post--edit-button', function (e) {
                         var target = $(e.currentTarget)
-                        if (!target.hasClass('is-editing')) {
-                            target.addClass('is-editing')
+                        if (target.has('.liveblog_post_edit_form-wrapper').length == 0) {
                             var postID = target.parent().data('postid')
                             if(postID && typeof postID != "undefined") {
                                 var url = settings.liveblog.editFormURL.replace('%d', postID)

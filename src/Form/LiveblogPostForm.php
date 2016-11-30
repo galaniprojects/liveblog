@@ -185,9 +185,7 @@ class LiveblogPostForm extends ContentEntityForm {
   public function ajaxRebuildCallback(array $form, FormStateInterface $form_state) {
     // Hide the form after editing on the node page.
     if ($this->getOperation() == 'edit' && $this->isJSONEditForm()) {
-      $html_id = "{$this->getFormId()}-wrapper";
-      $element = ['#markup' => "<div id=\"$html_id\"></div>"];
-      return $element;
+      return ['#markup' => ''];
     }
     return $form;
   }
