@@ -155,13 +155,13 @@ class LiveblogPostForm extends ContentEntityForm {
     }
 
     // Show a cancel button on the node page.
-    if ($this->isLiveBlogNodePage()) {
+    if ($this->isJSONEditForm() && $this->getOperation() == 'edit') {
       $actions['cancel'] = array(
         '#type' => 'button',
         '#value' => t('Cancel'),
         '#ajax' => [
           'wrapper' => "{$this->getFormId()}-wrapper",
-          'callback' => '::ajaxCancelCallback',
+          'callback' => '::ajaxRebuildCallback',
           'effect' => 'fade',
         ],
       );
@@ -184,7 +184,7 @@ class LiveblogPostForm extends ContentEntityForm {
    */
   public function ajaxRebuildCallback(array $form, FormStateInterface $form_state) {
     // Hide the form after editing on the node page.
-    if ($this->getOperation() == 'edit' && ($this->isLiveBlogNodePage() || $this->isJSONEditForm())) {
+    if ($this->getOperation() == 'edit' && $this->isJSONEditForm()) {
       $html_id = "{$this->getFormId()}-wrapper";
       $element = ['#markup' => "<div id=\"$html_id\"></div>"];
       return $element;
