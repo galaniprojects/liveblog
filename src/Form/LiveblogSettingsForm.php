@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @see \Drupal\Core\Form\FormBase
  */
-class NotificationChannelSettingsForm extends ConfigFormBase  {
+class LiveblogSettingsForm extends ConfigFormBase  {
 
   /**
    * The notification channel manager.
@@ -50,7 +50,7 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
    * {@inheritdoc}
    */
   public function getFormId() {
-    return 'liveblog_notification_channel_settings_form';
+    return 'liveblog_settings_form';
   }
 
   /**
@@ -58,7 +58,7 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
    */
   protected function getEditableConfigNames() {
     return [
-      'liveblog.notification_channel',
+      'liveblog.settings',
     ];
   }
 
@@ -69,7 +69,7 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
    *   Notification channel config.
    */
   protected function getConfig() {
-    return $this->config('liveblog.notification_channel');
+    return $this->config('liveblog.settings');
   }
 
   /**
@@ -81,7 +81,7 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
    *   The config variable value.
    */
   protected function setConfig($name, $value) {
-    $config = $this->configFactory()->getEditable('liveblog.notification_channel');
+    $config = $this->configFactory()->getEditable('liveblog.settings');
     $config->set($name, $value)->save();
   }
 
@@ -102,7 +102,7 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
       $plugin_id = $config->get('plugin') ?: key($available);
       $definition = $this->notificationChannelManager->getDefinition($plugin_id);
 
-      $form['plugin_wrapper']['plugin'] = [
+      $form['plugin_wrapper']['notification_channel'] = [
         '#type' => 'select',
         '#title' => t('Notification channel plugin'),
         '#limit_validation_errors' => [['plugin']],
@@ -135,6 +135,12 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
         ];
       }
     }
+    else {
+      $form['plugin_wrapper']['no_plugins'] = [
+        '#type' => 'markup',
+        '#markup' => t('There are no liveblog notification plugins to choose from. Please enable a respective module providing a plugin.'),
+      ];
+    }
 
     $form['actions'] = [
       '#type' => 'actions',
@@ -152,8 +158,8 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
    */
   public function validateForm(array &$form, FormStateInterface $form_state) {
     parent::validateForm($form, $form_state);
-    if (!$plugin = $form_state->getValue('plugin')) {
-      $form_state->setErrorByName('plugin', $this->t('You have to select a liveblog notification channel plugin.'));
+    if (!$plugin = $form_state->getValue('notification_channel')) {
+      $form_state->setErrorByName('notification_channel', $this->t('You have to select a liveblog notification channel plugin.'));
     }
     $plugin = $this->notificationChannelManager->createInstance($plugin);
     $plugin->validateConfigurationForm($form, $form_state);
@@ -163,13 +169,13 @@ class NotificationChannelSettingsForm extends ConfigFormBase  {
    * {@inheritdoc}
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
-    $this->setConfig('plugin', $form_state->getValue('plugin'));
+    $this->setConfig('notification_channel', $form_state->getValue('notification_channel'));
 
-    $plugin = $form_state->getValue('plugin');
+    $plugin = $form_state->getValue('notification_channel');
     $plugin = $this->notificationChannelManager->createInstance($plugin);
     $plugin->submitConfigurationForm($form, $form_state);
 
-    drupal_set_message(t('Liveblog notification settings have been updated.'));
+    drupal_set_message(t('Liveblog settings have been updated.'));
   }
 
   /**

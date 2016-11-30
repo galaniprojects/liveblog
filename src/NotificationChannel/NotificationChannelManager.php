@@ -56,7 +56,7 @@ class NotificationChannelManager extends DefaultPluginManager {
     $this->alterInfo('liveblog_notification_channel_info');
     $this->setCacheBackend($cache_backend, 'liveblog_notification_channel_info_plugins');
     $this->factory = new ContainerFactory($this, '\Drupal\liveblog\NotificationChannel\NotificationChannelInterface');
-    $this->config = $config_factory->get('liveblog.notification_channel');
+    $this->config = $config_factory->get('liveblog.settings');
   }
 
   /**
@@ -80,8 +80,8 @@ class NotificationChannelManager extends DefaultPluginManager {
    *   The instance of the current active plugin, null if not set.
    */
   public function createActiveInstance() {
-    if (empty($this->plugin) || $this->plugin->getPluginId() != $this->config->get('plugin')) {
-      if ($plugin_id = $this->config->get('plugin')) {
+    if (empty($this->plugin) || $this->plugin->getPluginId() != $this->config->get('notification_channel')) {
+      if ($plugin_id = $this->config->get('notification_channel')) {
         $this->plugin = $this->createInstance($plugin_id);
       }
     }

@@ -1,4 +1,10 @@
 <?php
+
+/**
+ * @file
+ * Liveblog pusher module file.
+ */
+
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\node\Entity\Node;
 
@@ -8,7 +14,7 @@ use Drupal\node\Entity\Node;
 function liveblog_pusher_node_view(array &$build, Node $node, EntityViewDisplayInterface $display, $view_mode) {
   // TODO: abstract this to the parent liveblog module.
   if ($display->getComponent('liveblog_posts')
-        && Drupal::config('liveblog.notification_channel')->get('plugin') == 'liveblog_pusher') {
+        && Drupal::config('liveblog.settings')->get('notification_channel') == 'liveblog_pusher') {
 
     $config = Drupal::config('liveblog.notification_channel.liveblog_pusher');
     $key = $config->get('key');

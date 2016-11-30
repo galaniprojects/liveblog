@@ -42,11 +42,11 @@ liveblog_post.liveblog_post_settings:
   requirements:
     _permission: 'administer liveblog_post entity'
 
-liveblog.notification_channel_settings:
-  path: '/admin/config/liveblog-notification-channel'
+liveblog.admin.settings:
+  path: '/admin/config/content/liveblog'
   defaults:
-    _form:  '\Drupal\liveblog\Form\NotificationChannelSettingsForm'
-    _title: 'Liveblog'
+    _form:  '\Drupal\liveblog\Form\LiveblogSettingsForm'
+    _title: 'Liveblog settings'
   requirements:
     _permission: 'administer liveblog settings'
 

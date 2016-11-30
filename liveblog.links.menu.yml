@@ -6,8 +6,8 @@ liveblog_post.admin.structure.settings:
   route_name:  liveblog_post.liveblog_post_settings
   parent: system.admin_structure
 
-liveblog.notification_channel_settings:
+liveblog.admin.settings:
   title: 'Liveblog'
   description: 'Configure notification channel settings'
-  parent: system.admin_config
-  route_name: liveblog.notification_channel_settings
+  parent: system.admin_config_content
+  route_name: liveblog.admin.settings
