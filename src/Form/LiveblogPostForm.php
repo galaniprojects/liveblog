@@ -38,8 +38,6 @@ class LiveblogPostForm extends ContentEntityForm {
    *   The entity manager.
    * @param \Symfony\Component\HttpFoundation\RequestStack
    *   The current request.
-   * @param \Drupal\liveblog\NotificationChannel\NotificationChannelManager $notification_channel_manager
-   *   The notification channel service.
    */
   public function __construct(EntityTypeManagerInterface $entity_manager, RequestStack $request_stack) {
     parent::__construct($entity_manager);
@@ -52,8 +50,7 @@ class LiveblogPostForm extends ContentEntityForm {
   public static function create(ContainerInterface $container) {
     return new static(
       $container->get('entity.manager'),
-      $container->get('request_stack'),
-      $container->get('plugin.manager.liveblog.notification_channel')
+      $container->get('request_stack')
     );
   }
 
@@ -97,8 +94,7 @@ class LiveblogPostForm extends ContentEntityForm {
   public function buildForm(array $form, FormStateInterface $form_state) {
     $form = parent::buildForm($form, $form_state);
 
-    $rebuild_html_id = "{$this->getFormId()}-wrapper";
-    $form['#prefix'] = "<div id=\"$rebuild_html_id\">";
+    $form['#prefix'] = "<div id=\"{$this->getFormRebuildWrapperId()}\">";
     $form['#suffix'] = '</div>';
 
     // On the node view page, enable ajax for submitting the form.
@@ -106,7 +102,7 @@ class LiveblogPostForm extends ContentEntityForm {
       $form['#attached']['library'][] = 'liveblog/form_improvements';
 
       $form['actions']['submit']['#ajax'] = [
-        'wrapper' => $rebuild_html_id,
+        'wrapper' => $this->getFormRebuildWrapperId(),
         'callback' => '::ajaxRebuildCallback',
         'effect' => 'fade',
       ];
@@ -127,7 +123,7 @@ class LiveblogPostForm extends ContentEntityForm {
     if ($this->config('liveblog.liveblog_post.settings')->get('preview')) {
       $form['preview'] = [
         '#type' => 'container',
-        '#attributes' => ['id' => "{$this->getFormId()}-preview"],
+        '#attributes' => ['id' => $this->getFormPreviewWrapperId()],
         '#weight' => 100,
       ];
     }
@@ -147,7 +143,7 @@ class LiveblogPostForm extends ContentEntityForm {
         '#value' => t('Preview'),
         '#submit' => array('::submitForm', '::preview'),
         '#ajax' => [
-          'wrapper' => "{$this->getFormId()}-preview",
+          'wrapper' => $this->getFormPreviewWrapperId(),
           'callback' => '::ajaxPreviewCallback',
           'effect' => 'fade',
         ],
@@ -160,7 +156,7 @@ class LiveblogPostForm extends ContentEntityForm {
         '#type' => 'button',
         '#value' => t('Cancel'),
         '#ajax' => [
-          'wrapper' => "{$this->getFormId()}-wrapper",
+          'wrapper' => $this->getFormRebuildWrapperId(),
           'callback' => '::ajaxRebuildCallback',
           'effect' => 'fade',
         ],
@@ -280,6 +276,43 @@ class LiveblogPostForm extends ContentEntityForm {
     }
     $form_state->setUserInput($input);
     $form_state->setStorage([]);
+  }
+
+
+  /**
+   * Gets wrapper id for the rebuild form ajax callback.
+   *
+   * @return string
+   *   Wrapper id.
+   */
+  protected function getFormRebuildWrapperId() {
+    $wrapper = [];
+    $wrapper[] = $this->getFormId();
+    if ($id = $this->getEntity()->id()) {
+      $wrapper[] = "id-{$id}";
+    }
+    $wrapper[] = 'wrapper';
+    $result = implode('-', $wrapper);
+
+    return $result;
+  }
+
+  /**
+   * Gets wrapper id for the preview form ajax callback.
+   *
+   * @return string
+   *   Wrapper id.
+   */
+  protected function getFormPreviewWrapperId() {
+    $wrapper = [];
+    $wrapper[] = $this->getFormId();
+    if ($id = $this->getEntity()->id()) {
+      $wrapper[] = "id-{$id}";
+    }
+    $wrapper[] = 'preview';
+    $result = implode('-', $wrapper);
+
+    return $result;
   }
 
 }
