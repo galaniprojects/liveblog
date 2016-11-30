@@ -8,11 +8,11 @@ use Drupal\node\Entity\Node;
 use Drupal\Tests\BrowserTestBase;
 
 /**
- * Functional tests for the liveblog list service.
+ * Functional tests for the liveblog post edit form service.
  *
  * @group Liveblog
  */
-class LiveBlogListTest extends BrowserTestBase  {
+class LiveBlogEditFormTest extends BrowserTestBase  {
 
   /**
    * Ignore some config schema errors of modules used.
@@ -40,6 +40,13 @@ class LiveBlogListTest extends BrowserTestBase  {
   protected $node;
 
   /**
+   * A liveblog post.
+   *
+   * @var \Drupal\liveblog\LiveblogPostInterface
+   */
+  protected $post;
+
+  /**
    * {@inheritdoc}
    */
   protected function setUp() {
@@ -51,18 +58,30 @@ class LiveBlogListTest extends BrowserTestBase  {
     ]);
     $this->node->save();
 
-    LiveblogPost::create([
+    $this->post = LiveblogPost::create([
       'liveblog' => $this->node->id(),
       'title' => 'Title post 1',
       'body' => 'Body post 1',
-    ])->save();
+    ]);
+    $this->post->save();
   }
 
   /**
-   * Tests using the liveblog-list route.
+   * Tests using the liveblog-edit-form route.
    */
-  public function testLiveBlogListRoute() {
-    $content = $this->drupalGet("liveblog/{$this->node->id()}/posts", ['query' => ['_format' => 'json']]);
+  public function testLiveBlogEditFormRoute() {
+    // Make sure things do not work as anonymous user.
+    $this->drupalGet("liveblog_post/{$this->post->id()}/edit", ['query' => ['_format' => 'json']]);
+    $this->assertSession()->statusCodeEquals(403);
+
+    // Login an make sure things work.
+    $this->account = $this->drupalCreateUser([
+      'bypass node access',
+      'edit liveblog_post entity',
+    ]);
+    $this->drupalLogin($this->account);
+
+    $content = $this->drupalGet("liveblog_post/{$this->post->id()}/edit", ['query' => ['_format' => 'json']]);
     $this->assertSession()->statusCodeEquals(200);
 
     $this->assertJson($content, 'Response is json');
@@ -73,9 +92,9 @@ class LiveBlogListTest extends BrowserTestBase  {
     $this->assertArrayHasKey('content', $result);
     $this->assertArrayHasKey('libraries', $result);
 
-    $this->assertEquals('Title post 1', $result['content'][0]['title']);
-    $this->assertContains('Title post 1', $result['content'][0]['content']);
-    $this->assertContains('Body post 1', $result['content'][0]['content']);
+    $this->assertContains('</form>', $result['content']);
+    $this->assertContains('Title post 1', $result['content']);
+    $this->assertContains('Body post 1', $result['content']);
   }
 
 }
