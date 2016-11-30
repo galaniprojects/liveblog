@@ -2,12 +2,12 @@
 
 liveblog_post.admin.structure.settings:
   title: 'Liveblog Posts'
-  description: 'Configure Liveblog Post entity'
+  description: 'Configure liveblog post entity'
   route_name:  liveblog_post.liveblog_post_settings
   parent: system.admin_structure
 
 liveblog.notification_channel_settings:
-  title: 'Liveblog Notification Channel'
+  title: 'Liveblog'
   description: 'Configure notification channel settings'
-  parent: system.admin_config_services
+  parent: system.admin_config
   route_name: liveblog.notification_channel_settings

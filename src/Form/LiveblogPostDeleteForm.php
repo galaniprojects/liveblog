@@ -16,7 +16,7 @@ class LiveblogPostDeleteForm extends ContentEntityConfirmFormBase {
    * {@inheritdoc}
    */
   public function getQuestion() {
-    return $this->t('Are you sure you want to delete the post "%title"?', ['%title' => $this->entity->label()]);
+    return $this->t('Are you sure you want to delete the liveblog post "%title"?', ['%title' => $this->entity->label()]);
   }
 
   /**
@@ -51,6 +51,8 @@ class LiveblogPostDeleteForm extends ContentEntityConfirmFormBase {
 
     // Redirect to the posts list.
     $form_state->setRedirect('view.liveblog_posts.liveblog_posts_admin');
+
+    drupal_set_message(t('Liveblog post was successfully deleted.'));
   }
 
 }
