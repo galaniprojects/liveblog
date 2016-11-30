@@ -1373,7 +1373,7 @@ display:
         operator: AND
         groups:
           1: AND
-      title: 'Liveblog Posts'
+      title: 'Liveblog posts'
     cache_metadata:
       max-age: 0
       contexts:
@@ -1421,7 +1421,7 @@ display:
   liveblog_posts_archive:
     display_plugin: embed
     id: liveblog_posts_archive
-    display_title: 'Liveblog Posts (Archive)'
+    display_title: 'Liveblog posts (Archive)'
     position: 2
     display_options:
       display_extenders: {  }

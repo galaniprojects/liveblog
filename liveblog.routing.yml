@@ -3,7 +3,7 @@ entity.liveblog_post.canonical:
   defaults:
   # Calls the view controller, defined in the annotation of the liveblog_post entity
     _entity_view: 'liveblog_post'
-    _title: 'Liveblog Post Content'
+    _title: 'Liveblog post content'
   requirements:
   # Calls the access controller of the entity, $operation 'view'
     _entity_access: 'liveblog_post.view'
@@ -13,7 +13,7 @@ entity.liveblog_post.edit_form:
   defaults:
   # Calls the form.edit controller, defined in the liveblog_post entity.
     _entity_form: liveblog_post.edit
-    _title: 'Edit Liveblog Post'
+    _title: 'Edit liveblog post'
   requirements:
     _entity_access: 'liveblog_post.update'
 
@@ -30,7 +30,7 @@ entity.liveblog_post.delete_form:
   defaults:
     # Calls the form.delete controller, defined in the liveblog_post entity.
     _entity_form: liveblog_post.delete
-    _title: 'Delete Liveblog Post'
+    _title: 'Delete liveblog post'
   requirements:
     _entity_access: 'liveblog_post.delete'
 
@@ -38,7 +38,7 @@ liveblog_post.liveblog_post_settings:
   path: '/admin/structure/liveblog_post_settings'
   defaults:
     _form: '\Drupal\liveblog\Form\LiveblogPostSettingsForm'
-    _title: 'Liveblog Post Settings'
+    _title: 'Liveblog post settings'
   requirements:
     _permission: 'administer liveblog_post entity'
 

@@ -17,7 +17,7 @@ use Drupal\link\LinkItemInterface;
  *
  * @ContentEntityType(
  *   id = "liveblog_post",
- *   label = @Translation("Liveblog Post"),
+ *   label = @Translation("Liveblog post"),
  *   handlers = {
  *     "view_builder" = "Drupal\Core\Entity\EntityViewBuilder",
  *     "list_builder" = "Drupal\liveblog\Entity\Controller\LiveblogPostListBuilder",
