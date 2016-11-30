@@ -69,7 +69,7 @@ class LiveblogPostSettingsForm extends ConfigFormBase {
     $form['settings']['preview'] = [
       '#type' => 'checkbox',
       '#title' => t('Enable preview'),
-      '#default_value' => $config->get('preview') ?: TRUE,
+      '#default_value' => $config->get('preview'),
       '#description' => t('Enables preview of liveblog posts before publishing.'),
     ];
 

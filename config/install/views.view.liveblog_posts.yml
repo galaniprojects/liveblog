@@ -3,7 +3,6 @@ status: true
 dependencies:
   config:
     - node.type.liveblog
-    - system.menu.admin
   module:
     - link
     - liveblog
@@ -1392,13 +1391,13 @@ display:
     position: 1
     display_options:
       display_extenders: {  }
-      path: admin/structure/liveblog_post_settings/list
+      path: admin/content/liveblog_posts
       menu:
-        type: normal
-        title: 'Posts list'
+        type: tab
+        title: 'Liveblog posts'
         description: ''
         expanded: false
-        parent: liveblog_post.admin.structure.settings
+        parent: ''
         weight: 0
         context: '0'
         menu_name: admin

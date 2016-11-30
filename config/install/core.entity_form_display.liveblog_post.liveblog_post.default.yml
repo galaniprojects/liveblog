@@ -1,12 +1,9 @@
 langcode: en
 status: true
 dependencies:
-  config:
-    - field.field.liveblog_post.liveblog_post.field_embed_media
   module:
     - link
     - liveblog
-    - paragraphs
     - text
 id: liveblog_post.liveblog_post.default
 targetEntityType: liveblog_post
@@ -15,46 +12,36 @@ mode: default
 content:
   body:
     type: text_textarea
-    weight: 2
+    weight: 1
     settings:
       rows: 3
       placeholder: ''
     third_party_settings: {  }
-  field_embed_media:
-    type: entity_reference_paragraphs
-    weight: 1
-    settings:
-      title: Paragraph
-      title_plural: Paragraphs
-      edit_mode: open
-      add_mode: dropdown
-      form_display_mode: default
-    third_party_settings: {  }
   highlight:
     type: options_select
-    weight: 3
+    weight: 2
     settings: {  }
     third_party_settings: {  }
   location:
     type: string_textfield
-    weight: 5
+    weight: 4
     settings:
       size: 60
       placeholder: ''
     third_party_settings: {  }
   source:
     type: link_default
-    weight: 4
+    weight: 3
     settings:
       placeholder_url: ''
       placeholder_title: ''
     third_party_settings: {  }
   status:
+    type: boolean_checkbox
+    weight: 5
     settings:
       display_label: true
-    weight: 6
     third_party_settings: {  }
-    type: boolean_checkbox
   title:
     type: string_textfield
     weight: 0
