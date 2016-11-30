@@ -9,6 +9,9 @@ form_improvements:
     js/liveblog.form_improvements.js: {}
 stream:
   title: 'Liveblog Stream'
+  css:
+    theme:
+      css/liveblog.stream.css: {}
   js:
     js/stream/dist/bundle.js: {}
     js/liveblog.stream.js: {}
