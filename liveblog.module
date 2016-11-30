@@ -72,6 +72,7 @@ function template_preprocess_liveblog_post(&$variables) {
   /* @var \Drupal\liveblog\Entity\LiveblogPost $post */
   $post = $variables['elements']['#liveblog_post'];
   $variables['highlight'] = $post->highlight->value;
+  $variables['edit_access'] = \Drupal::currentUser()->hasPermission('edit liveblog_post entity');
   $variables['id'] = $post->id();
 }
 
