@@ -6,8 +6,10 @@ dependencies:
   - field
   - hal
   - language
+  - link
   - menu_ui
   - node
+  - options
   - path
   - rest
   - serialization

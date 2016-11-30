@@ -2,7 +2,6 @@ langcode: en
 status: true
 dependencies:
   module:
-    - entity_reference_revisions
     - link
     - liveblog
     - simple_gmap

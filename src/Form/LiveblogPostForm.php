@@ -281,6 +281,7 @@ class LiveblogPostForm extends ContentEntityForm {
       }
     }
     $form_state->setUserInput($input);
+    $form_state->setStorage([]);
   }
 
 }
