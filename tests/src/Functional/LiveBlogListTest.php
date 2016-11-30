@@ -10,7 +10,7 @@ use Drupal\Tests\BrowserTestBase;
 /**
  * Functional tests for the liveblog list.
  *
- * @group serialization
+ * @group Liveblog
  */
 class LiveBlogListTest extends BrowserTestBase  {
 
