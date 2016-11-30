@@ -1,0 +1,9 @@
+langcode: en
+status: false
+dependencies:
+  module:
+    - liveblog
+id: liveblog_post.full
+label: 'Full content'
+targetEntityType: liveblog_post
+cache: true
