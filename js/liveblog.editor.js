@@ -6,9 +6,11 @@
                 .once('liveblog-editor-initialised')
                 .each(function(index, element) {
                     var $this = $(element)
+                    var isLoading = false
                     $this.on('click','.liveblog-post--edit-button', function (e) {
                         var target = $(e.currentTarget)
-                        if (target.has('form.liveblog-post-form').length == 0) {
+                        if (target.has('form.liveblog-post-form').length == 0 && !isLoading) {
+                            isLoading = true
                             var postID = target.parent().data('postid')
                             if(postID && typeof postID != "undefined") {
                                 var url = settings.liveblog.editFormURL.replace('%d', postID)
@@ -20,6 +22,8 @@
                                     assetHandler.loadLibraries(data.libraries)
                                     assetHandler.executeCommands(data.commands)
                                     assetHandler.afterLoading(target[0])
+
+                                    isLoading = false
                                 })
                             }
                         }
