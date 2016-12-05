@@ -42,10 +42,14 @@ function liveblog_node_view(array &$build, Node $node, EntityViewDisplayInterfac
       '#node' => $node,
       // @todo: Add js, css assets.
       '#attached' => [
-        'library' => ['liveblog/stream', 'liveblog/editor'],
+        'library' => ['liveblog/stream'],
         'drupalSettings' => ['liveblog' => $javascriptSettings],
       ],
     ];
+    $account = \Drupal::currentUser();
+    if ($account->hasPermission('edit liveblog_post entity')) {
+      $build['liveblog_post']['#attached']['library'][] = 'liveblog/editor';
+    }
   }
 }
 

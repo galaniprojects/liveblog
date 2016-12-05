@@ -32,6 +32,8 @@
                         }
                     })
                 })
+            // Show edit buttons on new/lazyloaded posts
+            Drupal.behaviors.liveblogStream.getContainer(context).find('.liveblog-post--edit-button').show()
         },
     }
 })(jQuery, Drupal, drupalSettings)
