@@ -15,10 +15,15 @@ export default class Posts extends Component {
   componentWillMount() {
     // TODO Handle errors
     jQuery.getJSON(this.props.getURL, (posts) => {
-      this.setState({
-        posts: posts.content
-      })
-      this._handleAssets(posts.libraries, posts.commands, document.body)
+      if (Array.isArray(posts.content)) {
+        this.setState({
+          posts: posts.content
+        })
+        this._handleAssets(posts.libraries, posts.commands, document.body)
+      }
+      else {
+        // TODO Handle empty
+      }
     })
 
     addEventListener('scroll', this._lazyload.bind(this))
