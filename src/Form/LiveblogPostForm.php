@@ -2,6 +2,8 @@
 
 namespace Drupal\liveblog\Form;
 
+use Drupal\Core\Ajax\AjaxResponse;
+use Drupal\Core\Ajax\InvokeCommand;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -181,7 +183,17 @@ class LiveblogPostForm extends ContentEntityForm {
   public function ajaxRebuildCallback(array $form, FormStateInterface $form_state) {
     // Hide the form after editing on the node page.
     if ($this->getOperation() == 'edit' && $this->isJSONEditForm()) {
-      return ['#markup' => ''];
+      $response = new AjaxResponse();
+      $response->addCommand(new InvokeCommand(
+        '#' . $this->getFormRebuildWrapperId(),
+        'trigger',
+        array('liveblog-post--edit-form--removed')
+      ));
+      $response->addCommand(new InvokeCommand(
+        '#' . $this->getFormRebuildWrapperId(),
+        'remove'
+      ));
+      return $response;
     }
     return $form;
   }
