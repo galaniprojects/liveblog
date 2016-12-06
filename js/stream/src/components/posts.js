@@ -5,7 +5,8 @@ export default class Posts extends Component {
   constructor() {
     super()
     this.state = {
-      posts: []
+      posts: [],
+      newPosts: []
     }
     this.isloading = false
     this.hasReachedEnd = false
@@ -84,16 +85,12 @@ export default class Posts extends Component {
   }
 
   addPost(post) {
-    var scrollPosition = new ScrollPosition(document.body, this.postsWrapper)
-    scrollPosition.prepareFor('up')
     this.setState({
-      posts: [
+      newPosts: [
           post,
-          ...this.state.posts
+          ...this.state.newPosts
       ]
     })
-    this._handleAssets(post.libraries, post.commands, document.body)
-    scrollPosition.restore()
   }
 
   editPost(editedPost) {
@@ -121,9 +118,31 @@ export default class Posts extends Component {
     }
   }
 
+  _loadNewPosts() {
+    let newPosts = this.state.newPosts
+    this.setState({
+      posts: [
+          ...newPosts,
+          ...this.state.posts
+      ],
+      newPosts: []
+    })
+
+    for (let i=0; i<newPosts.length; i++) {
+      let newPost = newPosts[i]
+      this._handleAssets(newPost.libraries, newPost.commands, document.body)
+    }
+  }
+
   render() {
     return (
       <div className="liveblog-posts-wrapper" ref={(wrapper) => this.postsWrapper = wrapper}>
+        <div className="liveblog-posts-new">
+          { this.state.newPosts.length > 0 &&
+            <span>{ this.state.newPosts.length } new posts.
+              <button className="link" onClick={this._loadNewPosts.bind(this)}>Click here</button> to load them.</span>
+          }
+        </div>
         { this.state.posts.map((post) => {
           return (
             <div className="liveblog-post" key={post.id} ref={(node) => { this.postNodes[post.id] = node }}>
