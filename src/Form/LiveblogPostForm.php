@@ -190,7 +190,7 @@ class LiveblogPostForm extends ContentEntityForm {
         array('liveblog-post--edit-form--removed')
       ));
       $response->addCommand(new InvokeCommand(
-        '#' . $this->getFormRebuildWrapperId(),
+        '#' . $this->getFormRebuildWrapperId() . ' form.liveblog-post-form',
         'remove'
       ));
       return $response;
