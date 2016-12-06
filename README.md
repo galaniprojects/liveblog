@@ -54,3 +54,9 @@ your local Drupal installation for SIMPLETEST_BASE_URL.
    
 See https://www.drupal.org/docs/8/phpunit/running-phpunit-tests (Section:
 Run kernel test and browser tests) for more details.
+
+### Installation instructions
+
+It is recommended to apply a patch for the [Inline Entity Form](https://www.drupal.org/project/inline_entity_form) module:
+- Issue: [Entities are not updated during buildEntity() phase](https://www.drupal.org/node/2830829)
+- Patch https://www.drupal.org/files/issues/ief_building.patch
