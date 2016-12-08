@@ -86,12 +86,19 @@ export default class Posts extends Component {
   }
 
   addPost(post) {
-    this.setState({
-      newPosts: [
+    let rect = this.postsWrapper.getBoundingClientRect()
+
+    if (rect.top < 0 || this.state.newPosts.length > 0) {
+      this.setState({
+        newPosts: [
           post,
           ...this.state.newPosts
-      ]
-    })
+        ]
+      })
+    }
+    else {
+      this._loadPosts([post])
+    }
   }
 
   editPost(editedPost) {
@@ -120,25 +127,28 @@ export default class Posts extends Component {
   }
 
   _loadNewPosts() {
-    let newPosts = this.state.newPosts
-    this.setState({
-      posts: [
-          ...newPosts,
-          ...this.state.posts
-      ],
-      newPosts: []
-    })
-
-    for (let i=0; i<newPosts.length; i++) {
-      let newPost = newPosts[i]
-      this._handleAssets(newPost.libraries, newPost.commands, document.body)
-    }
-
     let rect = this.postsWrapper.getBoundingClientRect()
     let bodyRect = document.body.getBoundingClientRect()
     jQuery("html, body").animate({
       scrollTop: rect.top - bodyRect.top - 90
+    }, () => {
+      this._loadPosts(this.state.newPosts)
     })
+  }
+
+  _loadPosts(posts) {
+    this.setState({
+      posts: [
+        ...posts,
+        ...this.state.posts
+      ],
+      newPosts: []
+    })
+
+    for (let i=0; i<posts.length; i++) {
+      let newPost = posts[i]
+      this._handleAssets(newPost.libraries, newPost.commands, document.body)
+    }
   }
 
   render() {
