@@ -1,5 +1,6 @@
 import React, { Component } from 'react'
 import ScrollPosition from '../helper/ScrollPosition'
+import Notification from './notification'
 
 export default class Posts extends Component {
   constructor() {
@@ -132,17 +133,18 @@ export default class Posts extends Component {
       let newPost = newPosts[i]
       this._handleAssets(newPost.libraries, newPost.commands, document.body)
     }
+
+    let rect = this.postsWrapper.getBoundingClientRect()
+    let bodyRect = document.body.getBoundingClientRect()
+    jQuery("html, body").animate({
+      scrollTop: rect.top - bodyRect.top - 90
+    })
   }
 
   render() {
     return (
       <div className="liveblog-posts-wrapper" ref={(wrapper) => this.postsWrapper = wrapper}>
-        <div className="liveblog-posts-new">
-          { this.state.newPosts.length > 0 &&
-            <span>{ this.state.newPosts.length } new posts.
-              <button className="link" onClick={this._loadNewPosts.bind(this)}>Click here</button> to load them.</span>
-          }
-        </div>
+        <Notification newPosts={this.state.newPosts} loadNewPosts={this._loadNewPosts.bind(this)} />
         { this.state.posts.map((post) => {
           return (
             <div className="liveblog-post" key={post.id} ref={(node) => { this.postNodes[post.id] = node }}>
