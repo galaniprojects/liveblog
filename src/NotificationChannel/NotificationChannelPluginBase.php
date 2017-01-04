@@ -132,17 +132,7 @@ abstract class NotificationChannelPluginBase extends PluginBase implements Notif
   }
 
   /**
-   * Custom validation of the liveblog post.
-   *
-   * @param array $form
-   *   An associative array containing the structure of the plugin form as built
-   *   by static::buildConfigurationForm().
-   * @param \Drupal\Core\Form\FormStateInterface $form_state
-   *   The current state of the form. Calling code should pass on a subform
-   *   state created through
-   *   \Drupal\Core\Form\SubformState::createForSubform().
-   * @param LiveblogPost $liveblog_post
-   *   The liveblog post entity.
+   * {@inheritdoc}
    */
   public function validateLiveblogPostForm(array &$form, FormStateInterface $form_state, LiveblogPost $liveblog_post) {
     // Nothing to do here by default.
