@@ -2,6 +2,7 @@
 
 namespace Drupal\liveblog\NotificationChannel;
 
+use Drupal\liveblog\Entity\LiveblogPost;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -127,6 +128,23 @@ abstract class NotificationChannelPluginBase extends PluginBase implements Notif
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    // Nothing to do here by default.
+  }
+
+  /**
+   * Custom validation of the liveblog post.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the plugin form as built
+   *   by static::buildConfigurationForm().
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
+   *   The current state of the form. Calling code should pass on a subform
+   *   state created through
+   *   \Drupal\Core\Form\SubformState::createForSubform().
+   * @param LiveblogPost $liveblog_post
+   *   The liveblog post entity.
+   */
+  public function validateLiveblogPostForm(array &$form, FormStateInterface $form_state, LiveblogPost $liveblog_post) {
     // Nothing to do here by default.
   }
 

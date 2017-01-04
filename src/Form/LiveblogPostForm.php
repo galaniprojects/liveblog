@@ -5,8 +5,6 @@ namespace Drupal\liveblog\Form;
 use Drupal\Core\Entity\ContentEntityForm;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\liveblog\Entity\LiveblogPost;
-use Drupal\liveblog\NotificationChannel\NotificationChannelManager;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
@@ -236,6 +234,17 @@ class LiveblogPostForm extends ContentEntityForm {
   }
 
   /**
+   * {@inheritdoc}
+   */
+  public function validateForm(array &$form, FormStateInterface $form_state) {
+    parent::validateForm($form, $form_state);
+    /** @var \Drupal\liveblog\NotificationChannel\NotificationChannelPluginBase $plugin */
+    if ($plugin = $this->getNotificationChannelManager()->createActiveInstance()) {
+      $plugin->validateLiveblogPostForm($form, $form_state, $this->buildEntity($form, $form_state));
+    }
+  }
+
+  /**
    * Form submission handler for the 'preview' action.
    *
    * @param $form
@@ -278,7 +287,6 @@ class LiveblogPostForm extends ContentEntityForm {
     $form_state->setStorage([]);
   }
 
-
   /**
    * Gets wrapper id for the rebuild form ajax callback.
    *
@@ -313,6 +321,16 @@ class LiveblogPostForm extends ContentEntityForm {
     $result = implode('-', $wrapper);
 
     return $result;
+  }
+
+  /**
+   * Gets the notification channel plugin manager.
+   *
+   * @return \Drupal\liveblog\NotificationChannel\NotificationChannelManager
+   *   Notification channel plugin manager.
+   */
+  protected function getNotificationChannelManager() {
+    return \Drupal::service('plugin.manager.liveblog.notification_channel');
   }
 
 }
