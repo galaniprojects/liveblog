@@ -6,6 +6,7 @@ use Drupal\Component\Plugin\ConfigurablePluginInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
+use Drupal\Core\Form\FormStateInterface;
 use Drupal\liveblog\Entity\LiveblogPost;
 
 /**
@@ -32,5 +33,20 @@ interface NotificationChannelInterface extends PluginInspectionInterface, Plugin
    *   The event name.
    */
   public function triggerLiveblogPostEvent(LiveblogPost $liveblog_post, $event);
+
+  /**
+   * Custom validation of the liveblog post.
+   *
+   * @param array $form
+   *   An associative array containing the structure of the plugin form as built
+   *   by static::buildConfigurationForm().
+   * @param FormStateInterface $form_state
+   *   The current state of the form. Calling code should pass on a subform
+   *   state created through
+   *   \Drupal\Core\Form\SubformState::createForSubform().
+   * @param LiveblogPost $liveblog_post
+   *   The liveblog post entity.
+   */
+  public function validateLiveblogPostForm(array &$form, FormStateInterface $form_state, LiveblogPost $liveblog_post);
 
 }

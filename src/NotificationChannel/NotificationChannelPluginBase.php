@@ -2,6 +2,7 @@
 
 namespace Drupal\liveblog\NotificationChannel;
 
+use Drupal\liveblog\Entity\LiveblogPost;
 use Drupal\Component\Plugin\PluginBase;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -127,6 +128,13 @@ abstract class NotificationChannelPluginBase extends PluginBase implements Notif
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
+    // Nothing to do here by default.
+  }
+
+  /**
+   * {@inheritdoc}
+   */
+  public function validateLiveblogPostForm(array &$form, FormStateInterface $form_state, LiveblogPost $liveblog_post) {
     // Nothing to do here by default.
   }
 
