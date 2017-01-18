@@ -9,7 +9,8 @@
   ],
   "require": {
     "drupal/core": "~8.1",
-    "drupal/simple_gmap": "~1.0 || ~8.1.0"
+    "drupal/simple_gmap": "~1.0 || ~8.1.0",
+    "pusher/pusher-php-server": "^2.2"
   },
   "autoload": {
     "psr-4": {
