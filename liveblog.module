@@ -186,3 +186,23 @@ function liveblog_js_settings_build(&$settings, \Drupal\Core\Asset\AttachedAsset
   }
   $settings['liveblog']['libraries'] = $libraries;
 }
+
+/**
+ * Implements hook_inline_entity_form_entity_form_alter().
+ */
+function liveblog_inline_entity_form_entity_form_alter(&$entity_form, &$form_state) {
+  if ($entity_form['#entity_type'] = 'node' && $entity_form['#bundle'] == '#bundle') {
+    // Hide the unnecessary fields from an inline entity form for liveblog node.
+    $entity_form['created']['#access'] = FALSE;
+    $entity_form['field_status']['#access'] = FALSE;
+    $entity_form['langcode']['#access'] = FALSE;
+    $entity_form['moderation_state']['#access'] = FALSE;
+    $entity_form['path']['#access'] = FALSE;
+    $entity_form['promote']['#access'] = FALSE;
+    $entity_form['publish_on']['#access'] = FALSE;
+    $entity_form['revision_log']['#access'] = FALSE;
+    $entity_form['sticky']['#access'] = FALSE;
+    $entity_form['uid']['#access'] = FALSE;
+    $entity_form['unpublish_on']['#access'] = FALSE;
+  }
+}
