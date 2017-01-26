@@ -1,0 +1,19 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - node
+id: node.field_posts_load_limit
+field_name: field_posts_load_limit
+entity_type: node
+type: integer
+settings:
+  unsigned: false
+  size: normal
+module: core
+locked: true
+cardinality: 1
+translatable: true
+indexes: {  }
+persist_with_no_fields: false
+custom_storage: false

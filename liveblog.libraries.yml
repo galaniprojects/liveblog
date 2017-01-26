@@ -1,0 +1,41 @@
+taxonomy_tree:
+  css:
+    theme:
+      css/liveblog.taxonomy_tree.css: {}
+  js:
+    js/liveblog.taxonomy_tree.js: {}
+form_improvements:
+  js:
+    js/liveblog.form_improvements.js: {}
+stream:
+  title: 'Liveblog Stream'
+  css:
+    theme:
+      css/liveblog.stream.css: {}
+  js:
+    js/stream/dist/bundle.js: {}
+    js/liveblog.stream.js: {}
+  dependencies:
+    - liveblog/assets
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings
+
+assets:
+  title: 'Liveblog AssetHandler'
+  js:
+    js/liveblog.assets.js: {}
+  dependencies:
+    - core/drupalSettings
+    - core/drupal.ajax
+
+editor:
+  title: 'Liveblog Editor'
+  js:
+    js/liveblog.editor.js: {}
+  dependencies:
+    - liveblog/assets
+    - liveblog/stream
+    - core/jquery
+    - core/jquery.once
+    - core/drupalSettings

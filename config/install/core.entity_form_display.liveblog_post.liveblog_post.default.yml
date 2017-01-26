@@ -1,0 +1,54 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - link
+    - liveblog
+    - text
+id: liveblog_post.liveblog_post.default
+targetEntityType: liveblog_post
+bundle: liveblog_post
+mode: default
+content:
+  body:
+    type: text_textarea
+    weight: 1
+    settings:
+      rows: 3
+      placeholder: ''
+    third_party_settings: {  }
+  highlight:
+    type: options_select
+    weight: 2
+    settings: {  }
+    third_party_settings: {  }
+  location:
+    type: string_textfield
+    weight: 4
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+  source:
+    type: link_default
+    weight: 3
+    settings:
+      placeholder_url: ''
+      placeholder_title: ''
+    third_party_settings: {  }
+  status:
+    type: boolean_checkbox
+    weight: 5
+    settings:
+      display_label: true
+    third_party_settings: {  }
+  title:
+    type: string_textfield
+    weight: 0
+    settings:
+      size: 60
+      placeholder: ''
+    third_party_settings: {  }
+hidden:
+  liveblog: true
+  uid: true

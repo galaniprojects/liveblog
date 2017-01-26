@@ -1,0 +1,60 @@
+entity.liveblog_post.canonical:
+  path: '/liveblog_post/{liveblog_post}'
+  defaults:
+  # Calls the view controller, defined in the annotation of the liveblog_post entity
+    _entity_view: 'liveblog_post'
+    _title: 'Liveblog post content'
+  requirements:
+  # Calls the access controller of the entity, $operation 'view'
+    _entity_access: 'liveblog_post.view'
+
+entity.liveblog_post.edit_form:
+  path: '/liveblog_post/{liveblog_post}/edit'
+  defaults:
+  # Calls the form.edit controller, defined in the liveblog_post entity.
+    _entity_form: liveblog_post.edit
+    _title: 'Edit liveblog post'
+  requirements:
+    _entity_access: 'liveblog_post.update'
+
+entity.liveblog_post.edit_form_json:
+  path: '/liveblog_post/{liveblog_post}/edit'
+  defaults:
+    _controller: '\Drupal\liveblog\Controller\LiveblogController::getFormAsJson'
+  requirements:
+    _entity_access: 'liveblog_post.update'
+    _format: json
+
+entity.liveblog_post.delete_form:
+  path: '/liveblog_post/{liveblog_post}/delete'
+  defaults:
+    # Calls the form.delete controller, defined in the liveblog_post entity.
+    _entity_form: liveblog_post.delete
+    _title: 'Delete liveblog post'
+  requirements:
+    _entity_access: 'liveblog_post.delete'
+
+liveblog_post.liveblog_post_settings:
+  path: '/admin/structure/liveblog_post_settings'
+  defaults:
+    _form: '\Drupal\liveblog\Form\LiveblogPostSettingsForm'
+    _title: 'Liveblog post settings'
+  requirements:
+    _permission: 'administer liveblog_post entity'
+
+liveblog.admin.settings:
+  path: '/admin/config/content/liveblog'
+  defaults:
+    _form:  '\Drupal\liveblog\Form\LiveblogSettingsForm'
+    _title: 'Liveblog settings'
+  requirements:
+    _permission: 'administer liveblog settings'
+
+entity.liveblog_post.list:
+  path: '/liveblog/{node}/posts'
+  defaults:
+    _controller: '\Drupal\liveblog\Controller\LiveblogListController::getList'
+  requirements:
+    _permission: 'access content'
+    _format: json
+    node: \d+

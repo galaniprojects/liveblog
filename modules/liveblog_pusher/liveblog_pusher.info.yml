@@ -1,0 +1,6 @@
+name: Liveblog Pusher
+description: Provides a liveblog notification channel via Pusher.com
+type: module
+core: 8.x
+dependencies:
+  - liveblog

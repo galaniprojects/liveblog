@@ -1,0 +1,34 @@
+langcode: en
+status: true
+dependencies:
+  module:
+    - hal
+    - serialization
+id: entity.liveblog_post
+plugin_id: 'entity:liveblog_post'
+granularity: method
+configuration:
+  GET:
+    supported_formats:
+      - hal_json
+      - json
+    supported_auth:
+      - cookie
+  POST:
+    supported_formats:
+      - hal_json
+      - json
+    supported_auth:
+      - cookie
+  DELETE:
+    supported_formats:
+      - hal_json
+      - json
+    supported_auth:
+      - cookie
+  PATCH:
+    supported_formats:
+      - hal_json
+      - json
+    supported_auth:
+      - cookie

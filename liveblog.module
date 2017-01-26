@@ -1,0 +1,188 @@
+<?php
+
+/**
+ * @file
+ * The module file.
+ */
+
+use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
+use Drupal\node\Entity\Node;
+use Drupal\taxonomy\Entity\Term;
+use Drupal\Core\Field\FieldStorageDefinitionInterface;
+use Drupal\Core\Entity\FieldableEntityInterface;
+use \Drupal\Component\Utility\Html;
+
+/**
+ * Implements hook_entity_extra_field_info().
+ */
+function liveblog_entity_extra_field_info() {
+  $fields['node']['liveblog']['display']['liveblog_posts'] = [
+    'label' => t('Liveblog posts'),
+    'description' => t('List of the related liveblog posts.'),
+    'weight' => 4,
+  ];
+
+  return $fields;
+}
+
+/**
+ * Implements hook_ENTITY_TYPE_view() for user entities.
+ */
+function liveblog_node_view(array &$build, Node $node, EntityViewDisplayInterface $display) {
+  if ($display->getComponent('liveblog_posts')) {
+    $initial_number = $node->field_posts_number_initial->value;
+    $load_more_number = $node->field_posts_load_limit->value;
+    $javascriptSettings = [
+      'getURL'      => '/liveblog/' . $node->id() . '/posts?_format=json&items_per_page=' . $initial_number,
+      'getNextURL'  => '/liveblog/' . $node->id() . '/posts?_format=json&items_per_page=' . $load_more_number . '&created_op=<&created=%s',
+      'editFormURL' => '/liveblog_post/%d/edit?_format=json',
+    ];
+    $build['liveblog_posts'] = [
+      '#theme' => 'liveblog_posts',
+      '#node' => $node,
+      // @todo: Add js, css assets.
+      '#attached' => [
+        'library' => ['liveblog/stream'],
+        'drupalSettings' => ['liveblog' => $javascriptSettings],
+      ],
+    ];
+    $account = \Drupal::currentUser();
+    if ($account->hasPermission('edit liveblog_post entity')) {
+      $build['liveblog_post']['#attached']['library'][] = 'liveblog/editor';
+    }
+  }
+}
+
+/**
+ * Implements hook_theme().
+ */
+function liveblog_theme() {
+  return [
+    'liveblog_post' => [
+      'render element' => 'elements',
+    ],
+    'liveblog_posts' => [
+      'variables' => [
+        'node' => NULL,
+      ],
+    ],
+  ];
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function template_preprocess_liveblog_post(&$variables) {
+  /* @var \Drupal\liveblog\Entity\LiveblogPost $post */
+  $post = $variables['elements']['#liveblog_post'];
+  $variables['highlight'] = $post->highlight->value;
+  $variables['edit_access'] = \Drupal::currentUser()->hasPermission('edit liveblog_post entity');
+  $variables['id'] = $post->id();
+}
+
+/**
+ * Implements hook_preprocess_HOOK().
+ */
+function template_preprocess_liveblog_posts(&$variables) {
+  /* @var $node Drupal\node\Entity\Node */
+  $node = $variables['node'];
+
+  if ($node->field_status->value) {
+    $account = \Drupal::currentUser();
+    // Embed liveblog post add form.
+    if ($account->hasPermission('add liveblog_post entity')) {
+      $entity = \Drupal::entityTypeManager()->getStorage('liveblog_post')->create([]);
+      $form_object = \Drupal::entityTypeManager()
+        ->getFormObject('liveblog_post', 'add')
+        ->setEntity($entity);
+      $form = \Drupal::formBuilder()->getForm($form_object);
+      $variables['form'] = array(
+        '#type' => 'details',
+        '#title' => t('Create liveblog post'),
+        '#open' => TRUE,
+      );
+      $variables['form'][] = $form;
+    }
+  }
+  else {
+    // Embed archive of related posts if the liveblog is not active anymore.
+    $views_content = views_embed_view('liveblog_posts', 'liveblog_posts_archive', $node->id());
+    // Embed liveblog posts views.
+    $variables['posts'] = \Drupal::service('renderer')->render($views_content);
+  }
+}
+
+/**
+ * Gets highlight options from the liveblog.
+ *
+ * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $definition
+ *   The field storage definition.
+ * @param \Drupal\Core\Entity\FieldableEntityInterface|NULL $entity
+ *   The entity.
+ * @param null $cacheable
+ *   If $cacheable is FALSE, then the allowed values are not statically
+ *   cached. See options_test_dynamic_values_callback() for an example of
+ *   generating dynamic and uncached values.
+ *
+ * @return string[]
+ *   Highlight options.
+ *
+ * @see options_allowed_values()
+ */
+function liveblog_post_get_highlight_options(FieldStorageDefinitionInterface $definition, FieldableEntityInterface $entity = NULL, &$cacheable = NULL) {
+  $options = [];
+
+  // Get the liveblog node from the URL.
+  $node = \Drupal::request()->attributes->get('node');
+
+  // Get terms from the liveblog node, if we are at the liveblog page.
+  if ($node && $node->getType() == 'liveblog') {
+    $ids = [];
+    foreach ($node->field_highlights as $highlight) {
+      $ids[] = $highlight->target_id;
+    }
+  }
+  else {
+    // Fallback to all the highlight terms.
+    $ids = \Drupal::entityQuery('taxonomy_term')
+      ->condition('vid', 'highlights')
+      ->execute();
+  }
+
+  if (!empty($ids)) {
+    $terms = Term::loadMultiple($ids);
+    foreach ($terms as $term) {
+      $name = $term->name->value;
+      // Convert term name to a machine name, which will be used as a CSS class
+      // in templates.
+      $key = strtolower(Html::cleanCssIdentifier($name));
+      $options[$key] = $name;
+    }
+  }
+
+  return $options;
+}
+
+/**
+ * Implements hook_js_settings_build().
+ *
+ * Collects all the loaded libraries with dependencies in js settings.
+ *
+ * @see \Drupal\liveblog\LiveblogRenderer::render()
+ * @see \Drupal\liveblog\LiveblogAjaxResponseAttachmentsProcessor::groupAssetsByLibraries()
+ */
+function liveblog_js_settings_build(&$settings, \Drupal\Core\Asset\AttachedAssetsInterface $assets) {
+  // Collects all the loaded libraries with dependencies in js settings.
+  // We need this setting to detect new libraries delivered to frontend.
+  // We should to send libraries settings to the liveblog library if:
+  // - liveblog library is loaded, as all the frontend logic is happening there.
+  // - core/drupal.ajax already has been loaded, as we need to handle AJAX
+  //   commands.
+  /** @var \Drupal\Core\Asset\LibraryDependencyResolver $library_dependency_resolver */
+  $library_dependency_resolver = \Drupal::service('library.dependency_resolver');
+  $libraries = $library_dependency_resolver->getLibrariesWithDependencies($assets->getLibraries());
+  if (!in_array('liveblog/stream', $libraries) || !in_array('core/drupal.ajax', $libraries)) {
+    return;
+  }
+  $settings['liveblog']['libraries'] = $libraries;
+}

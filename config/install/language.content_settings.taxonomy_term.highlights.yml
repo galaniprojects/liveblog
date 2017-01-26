@@ -1,0 +1,10 @@
+langcode: en
+status: true
+dependencies:
+  config:
+    - taxonomy.vocabulary.highlights
+id: taxonomy_term.highlights
+target_entity_type_id: taxonomy_term
+target_bundle: highlights
+default_langcode: site_default
+language_alterable: false

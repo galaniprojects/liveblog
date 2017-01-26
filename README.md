@@ -38,3 +38,25 @@ The drupal module handles
 - persisting items in the database
 - providing previews for embedded data
 - caching
+
+
+## Development
+
+### Running tests
+
+Make sure to use your DB connection details for the SIMPLETEST_DB and the URL to
+your local Drupal installation for SIMPLETEST_BASE_URL.
+
+    cd /path/to/drupal-8/core
+    export SIMPLETEST_DB=mysql://drupal-8:password@localhost/drupal-8
+    export SIMPLETEST_BASE_URL=http://drupal-8.localhost
+    ../vendor/bin/phpunit ../modules/liveblog
+   
+See https://www.drupal.org/docs/8/phpunit/running-phpunit-tests (Section:
+Run kernel test and browser tests) for more details.
+
+### Installation instructions
+
+It is recommended to apply a patch for the [Inline Entity Form](https://www.drupal.org/project/inline_entity_form) module:
+- Issue: [Entities are not updated during buildEntity() phase](https://www.drupal.org/node/2830829)
+- Patch https://www.drupal.org/files/issues/ief_building.patch

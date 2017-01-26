@@ -1,0 +1,18 @@
+.liveblog-posts-container {
+    max-width: 500px;
+}
+
+div.liveblog-post {
+    border-bottom: 1px solid #000;
+    margin-bottom: 20px;
+}
+
+.liveblog-post--top > *,
+.liveblog-post--bottom > * {
+    display: inline-block;
+}
+
+.liveblog-post--top > *:last-child,
+.liveblog-post--bottom > *:last-child {
+    float: right;
+}
