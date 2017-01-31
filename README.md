@@ -1,44 +1,64 @@
 # Liveblog
 
-This repository is the base for a new liveblogging module for the Drupal distribution Thunder.  
+This is a new liveblogging module for the Drupal distribution Thunder.  
 This module concentrates on providing the best User Experience for the editor as possible.
 
 ## Overall Structure
-The Liveblog will consist of following structure:
+The Liveblog consists of following structure:
 - A lead article at the top
 - Followed by the liveblog, which consists of
   - individual entries/items,
   - with different content types (Text/Image/Twitter...),
   - which updates automatically
+  
+## Installation instructions
 
-## Components
-It will be splitted into different components.
+### Preparation
+#### Inline Entity Form
+It is recommended to apply a patch for the [Inline Entity Form](https://www.drupal.org/project/inline_entity_form) module:
+- Issue: [Entities are not updated during buildEntity() phase](https://www.drupal.org/node/2830829)
+- Patch https://www.drupal.org/files/issues/ief_building.patch
 
-1. A UI component
-2. A Drupal module
+#### Pusher
+The default method to push new posts to your users is via the _Pusher_ service.
+You have to register an account for it here: https://pusher.com/. Please note down 
+the App ID, Key and Secret.  
+You also need the pusher library. See here for instructions: https://github.com/pusher/pusher-http-php
 
-These components should talk with each other over a defined API.  
-The API and the UI component should be as flexible as possible, so that new content-types can be added easily later.
+### Installation
+1. Activate the _Liveblog_ and the _Liveblog Pusher_ modules.
+    - optionally activate _Liveblog Paragraphs_ for a preconfigured 
+     paragraphs integration
+2. Navigate to http://example.com/admin/config/content/liveblog
+    - configure the pusher service with the information given by Pusher
+     
+## Usage
+### General
+1. Create a new Liveblog content type. 
+    1. Select which default highlights the editors can choose
+    2. Set how much posts should be loaded on initial load and on lazyloading.
+    3. Click on save.
+2. When you are logged in and view the liveblog, you will see a form and below that,
+the stream.
+3. Fill out the form
+    1. Preview it
+    2. Save it
+4. The post appears in the stream immediately
 
-### UI component
-The UI should consist of a JavaScript library, which also consists of two components:
+You can view all posts on your site by navigating to http://example.com/admin/content/liveblog_posts
 
-The feed display, which handles 
-- updating the feed
-- displaying of new blogging items
-- updating modified items
+### Configuration
+You can manage the fields of the liveblog posts at 
+http://example.com/admin/structure/liveblog_post_settings/fields 
+(in menu: Structure -> Liveblog posts)
 
-and the editorial view, where editors can
-- publish different content
-- edit content
-- see a live preview of their content
-
-### Drupal Module
-The drupal module handles
-- persisting items in the database
-- providing previews for embedded data
-- caching
-
+### Highlights
+Highlights add a class to the post, according to the selected one, e.g. when you
+select _Breaking News_, the class 
+`liveblog-post--highlight-breaking-news` will be added to the post in the DOM.  
+They can then be styled via css in your theme.
+ 
+You can add your own highlights to the _Highlight_ taxonomy. 
 
 ## Development
 
@@ -55,8 +75,4 @@ your local Drupal installation for SIMPLETEST_BASE_URL.
 See https://www.drupal.org/docs/8/phpunit/running-phpunit-tests (Section:
 Run kernel test and browser tests) for more details.
 
-### Installation instructions
 
-It is recommended to apply a patch for the [Inline Entity Form](https://www.drupal.org/project/inline_entity_form) module:
-- Issue: [Entities are not updated during buildEntity() phase](https://www.drupal.org/node/2830829)
-- Patch https://www.drupal.org/files/issues/ief_building.patch
