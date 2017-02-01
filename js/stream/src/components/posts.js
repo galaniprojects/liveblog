@@ -1,6 +1,7 @@
 import React, { Component } from 'react'
 import ScrollPosition from '../helper/ScrollPosition'
 import Notification from './notification'
+import Post from './Post'
 
 export default class Posts extends Component {
   constructor() {
@@ -158,7 +159,7 @@ export default class Posts extends Component {
         { this.state.posts.map((post) => {
           return (
             <div className="liveblog-post" key={post.id} ref={(node) => { this.postNodes[post.id] = node }}>
-              <div dangerouslySetInnerHTML={{ __html: post.content }} />
+              <Post content={post.content} />
             </div>
           )
         })}
