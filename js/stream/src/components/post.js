@@ -8,6 +8,11 @@ export default class Post extends Component {
 
   /**
    * Code taken and modified from jQuery domManip function in /src/manipulation.js
+   *
+   * Alternative implementations:
+   *  http://stackoverflow.com/questions/35614809/react-script-tag-not-working-when-inserted-using-dangerouslysetinnerhtml
+   *  http://stackoverflow.com/questions/37803559/react-js-how-to-get-script-inside-dangerouslysetinnerhtml-executed
+   *
    * @param html - The html as string which includes scripts to be executed
    */
   static executeScripts(html) {
