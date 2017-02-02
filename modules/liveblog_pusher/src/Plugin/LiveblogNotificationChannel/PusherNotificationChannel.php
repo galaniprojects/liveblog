@@ -95,6 +95,13 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
       '#default_value' => !empty($this->configuration['secret']) ? $this->configuration['secret'] : '',
       '#description' => t('Please enter your Pusher secret.'),
     ];
+    $form['cluster'] = [
+      '#type' => 'textfield',
+      '#title' => t('Cluster'),
+      '#required' => FALSE,
+      '#default_value' => !empty($this->configuration['cluster']) ? $this->configuration['cluster'] : '',
+      '#description' => t('The cluster name to connect to. Leave emty for the default cluster: mt1 (US east coast)'),
+    ];
 
     return $form;
   }
@@ -121,6 +128,12 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
       $options = [
         'encrypted' => true
       ];
+
+      $cluster = $this->getConfigurationValue('cluster');
+      if (!empty($cluster)) {
+        $options['cluster'] = $cluster;
+      }
+
       $this->client = new \Pusher(
         $this->getConfigurationValue('key'),
         $this->getConfigurationValue('secret'),

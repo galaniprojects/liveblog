@@ -8,9 +8,15 @@
           // TODO: add a setting for "Debugging mode"
           Pusher.logToConsole = true;
 
-          var pusher = new Pusher(drupalSettings.liveblog_pusher.key, {
+          var options = {
             encrypted: true
-          });
+          }
+
+          if (drupalSettings.liveblog_pusher.cluster) {
+            options.cluster = drupalSettings.liveblog_pusher.cluster
+          }
+
+          var pusher = new Pusher(drupalSettings.liveblog_pusher.key, options);
           var liveblogStream = Drupal.behaviors.liveblogStream.getInstance(context)
 
           var channel = pusher.subscribe(drupalSettings.liveblog_pusher.channel);
