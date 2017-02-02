@@ -23,6 +23,7 @@ function liveblog_pusher_node_view(array &$build, Node $node, EntityViewDisplayI
     $build['liveblog_posts']['#attached']['drupalSettings']['liveblog_pusher'] = [
       'key' => $key,
       'channel' => "liveblog-{$node->id()}",
+      'cluster' => $config->get('cluster'),
     ];
   }
 }

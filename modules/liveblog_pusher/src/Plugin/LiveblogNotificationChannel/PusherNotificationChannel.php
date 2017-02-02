@@ -100,7 +100,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
       '#title' => t('Cluster'),
       '#required' => FALSE,
       '#default_value' => !empty($this->configuration['cluster']) ? $this->configuration['cluster'] : '',
-      '#description' => t('The cluster name to connect to.'),
+      '#description' => t('The cluster name to connect to. Leave emty for the default cluster: mt1 (US east coast)'),
     ];
 
     return $form;
