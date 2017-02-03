@@ -14,7 +14,7 @@
   },
   "autoload": {
     "psr-4": {
-      "Drupal\\liveblog": "src/"
+      "Drupal\\liveblog\\": "src/"
     }
   }
 }
