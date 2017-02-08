@@ -26,7 +26,7 @@ the App ID, Key and Secret.
 You also need the pusher library. See here for instructions: https://github.com/pusher/pusher-http-php
 
 If you are not using a composer workflow, you can download the library here: https://github.com/pusher/pusher-http-php/releases.  
-Extract it into your libraries folder (`libraries`, `sites/all/libraries` or `sites/<domain>/libraries`) and rename it to `pusher`.
+Extract it into your libraries folder (`libraries` or `sites/<domain>/libraries`) and rename it to `pusher`.
 The library should contain the path `lib/Pusher.php`
 
 ### Installation
