@@ -107,10 +107,22 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
   }
 
   /**
+   * Try to load Pusher library, if it wasn't autoloaded.
+   */
+  private function loadPusherLibrary() {
+    if (!class_exists('\Pusher') && function_exists('libraries_get_path')) {
+      include_once (DRUPAL_ROOT.'/'.libraries_get_path('pusher') . '/lib/Pusher.php');
+    }
+  }
+
+  /**
    * {@inheritdoc}
    */
   public function validateConfigurationForm(array &$form, FormStateInterface $form_state) {
     parent::validateConfigurationForm($form, $form_state);
+
+    $this->loadPusherLibrary();
+
     // Check the required dependency on the Pusher library.
     if (!class_exists('\Pusher')) {
       $form_state->setErrorByName('plugin', t('The "\Pusher" class was not found. Please make sure you have included the <a href="https://github.com/pusher/pusher-http-php">Pusher PHP Library</a>.'));
@@ -125,6 +137,9 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
    */
   public function getClient() {
     if (!$this->client) {
+
+      $this->loadPusherLibrary();
+
       $options = [
         'encrypted' => true
       ];
