@@ -1,0 +1,12 @@
+liveblog.notification_channel.liveblog_pusher:
+  type: config_object
+  label: 'Liveblog notification channel: Pusher'
+  mapping:
+    app_id:
+      type: string
+    key:
+      type: string
+    secret:
+      type: string
+    cluster:
+      type: string
