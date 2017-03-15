@@ -213,7 +213,14 @@ class LiveblogPostForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $this->entity->save();
+    try {
+      $this->entity->save();
+    }
+    catch (\Exception $e) {
+      drupal_set_message($e->getMessage(), 'error');
+      $form_state->disableRedirect();
+      return;
+    }
 
     if ($this->getOperation() == 'edit') {
       drupal_set_message(t('Liveblog post was successfully updated.'));

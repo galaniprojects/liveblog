@@ -141,7 +141,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
       $this->loadPusherLibrary();
 
       $options = [
-        'encrypted' => true
+        'encrypted' => TRUE,
       ];
 
       $cluster = $this->getConfigurationValue('cluster');
@@ -163,15 +163,17 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
   /**
    * {@inheritdoc}
    */
-  function triggerLiveblogPostEvent(LiveblogPost $liveblog_post, $event) {
+  public function triggerLiveblogPostEvent(LiveblogPost $liveblog_post, $event) {
     $client = $this->getClient();
     $channel = "liveblog-{$liveblog_post->getLiveblog()->id()}";
 
     // Trigger an event by providing event name and payload.
     $response = $client->trigger($channel, $event, Payload::create($liveblog_post)->getRenderedPayload());
-    if (!$response) {
+    if ($response['status'] !== 200) {
       // Log response if there is an error.
       $this->logger->saveLog('error');
+      // Throw error.
+      throw new \Exception($response['body']);
     }
   }
 
