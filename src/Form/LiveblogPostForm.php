@@ -219,6 +219,7 @@ class LiveblogPostForm extends ContentEntityForm {
     catch (\Exception $e) {
       drupal_set_message($e->getMessage(), 'error');
       $form_state->disableRedirect();
+      $this->clearEntity();
       return;
     }
 
@@ -275,10 +276,8 @@ class LiveblogPostForm extends ContentEntityForm {
   protected function clearFormInput(array $form, FormStateInterface $form_state) {
     // Rebuild the form.
     $form_state->setRebuild();
-    // Replace the form entity with an empty instance.
-    $this->entity = $this->entityTypeManager->getStorage('liveblog_post')->create([
-      'liveblog' => $this->entity->liveblog->target_id,
-    ]);
+
+    $this->clearEntity();
 
     // Clear user input.
     $input = $form_state->getUserInput();
@@ -292,6 +291,15 @@ class LiveblogPostForm extends ContentEntityForm {
     }
     $form_state->setUserInput($input);
     $form_state->setStorage([]);
+  }
+
+  /**
+   * Replaces the form entity with an empty instance.
+   */
+  protected function clearEntity() {
+    $this->entity = $this->entityTypeManager->getStorage('liveblog_post')->create([
+      'liveblog' => $this->entity->liveblog->target_id,
+    ]);
   }
 
   /**
