@@ -3,6 +3,8 @@ import ScrollPosition from '../helper/ScrollPosition'
 import Notification from './notification'
 import Post from './Post'
 
+import pako from 'pako'
+
 export default class Posts extends Component {
   constructor() {
     super()
@@ -88,6 +90,14 @@ export default class Posts extends Component {
 
   addPost(post) {
     let rect = this.postsWrapper.getBoundingClientRect()
+
+    if (post.compressed) {
+      let decoded = atob(post.compressed)
+      let uncompressed = pako.inflate(decoded, {to: 'string'})
+      let json = JSON.parse(uncompressed)
+
+      post = json
+    }
 
     if (rect.top < 0 || this.state.newPosts.length > 0) {
       this.setState({

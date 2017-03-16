@@ -44,10 +44,13 @@ class Payload {
   /**
    * Gets a rendered payload from the liveblog post entity.
    *
+   * @param bool $compressed
+   *   If the payload should be compressed.
+   *
    * @return array
    *   The payload array.
    */
-  public function getRenderedPayload() {
+  public function getRenderedPayload($compressed = FALSE) {
     $entity = $this->entity;
 
     $rendered_entity = $this->entityTypeManager()->getViewBuilder('liveblog_post')->view($entity);
@@ -66,6 +69,10 @@ class Payload {
     $data['created'] = $entity->created->value;
     $data['status'] = $entity->status->value;
     $data += $output;
+
+    if ($compressed) {
+      $data = $this->compress($data);
+    }
 
     return $data;
   }
@@ -114,6 +121,23 @@ class Payload {
    */
   protected function entityTypeManager() {
     return \Drupal::entityTypeManager();
+  }
+
+  /**
+   * Compresses and encodes a payload.
+   *
+   * @param array $data
+   *   The uncompressed payload.
+   *
+   * @return array
+   *   The compressed payload.
+   */
+  private function compress(array $data) {
+    $data = json_encode($data);
+    $data = gzencode($data, -1, FORCE_DEFLATE);
+    $data = base64_encode($data);
+
+    return ['compressed' => $data];
   }
 
 }

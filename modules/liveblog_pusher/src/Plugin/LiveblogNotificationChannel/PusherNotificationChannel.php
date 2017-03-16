@@ -167,8 +167,10 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
     $client = $this->getClient();
     $channel = "liveblog-{$liveblog_post->getLiveblog()->id()}";
 
+    $payload = Payload::create($liveblog_post)->getRenderedPayload(TRUE);
+
     // Trigger an event by providing event name and payload.
-    $response = $client->trigger($channel, $event, Payload::create($liveblog_post)->getRenderedPayload());
+    $response = $client->trigger($channel, $event, $payload);
     if (!$response) {
       // Log response if there is an error.
       $this->logger->saveLog('error');
