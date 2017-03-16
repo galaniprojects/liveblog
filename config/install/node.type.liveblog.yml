@@ -9,7 +9,7 @@ third_party_settings:
     parent: ''
 name: Liveblog
 type: liveblog
-description: ''
+description: 'Use <em>liveblogs</em> for short realtime posts.'
 help: ''
 new_revision: false
 preview_mode: 1
