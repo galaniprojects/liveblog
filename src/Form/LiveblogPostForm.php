@@ -213,7 +213,15 @@ class LiveblogPostForm extends ContentEntityForm {
    * {@inheritdoc}
    */
   public function save(array $form, FormStateInterface $form_state) {
-    $this->entity->save();
+    try {
+      $this->entity->save();
+    }
+    catch (\Exception $e) {
+      drupal_set_message($e->getMessage(), 'error');
+      $form_state->disableRedirect();
+      $this->clearEntity();
+      return;
+    }
 
     if ($this->getOperation() == 'edit') {
       drupal_set_message(t('Liveblog post was successfully updated.'));
@@ -268,10 +276,8 @@ class LiveblogPostForm extends ContentEntityForm {
   protected function clearFormInput(array $form, FormStateInterface $form_state) {
     // Rebuild the form.
     $form_state->setRebuild();
-    // Replace the form entity with an empty instance.
-    $this->entity = $this->entityTypeManager->getStorage('liveblog_post')->create([
-      'liveblog' => $this->entity->liveblog->target_id,
-    ]);
+
+    $this->clearEntity();
 
     // Clear user input.
     $input = $form_state->getUserInput();
@@ -285,6 +291,15 @@ class LiveblogPostForm extends ContentEntityForm {
     }
     $form_state->setUserInput($input);
     $form_state->setStorage([]);
+  }
+
+  /**
+   * Replaces the form entity with an empty instance.
+   */
+  protected function clearEntity() {
+    $this->entity = $this->entityTypeManager->getStorage('liveblog_post')->create([
+      'liveblog' => $this->entity->liveblog->target_id,
+    ]);
   }
 
   /**
