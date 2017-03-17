@@ -1,0 +1,21 @@
+language: php
+sudo: false
+php: 7
+
+branches:
+  only:
+  - /8\.x-[0-9]+\.x/
+
+  cache:
+    apt: true
+
+  before_install:
+    - composer global require drush/drush:^8.1 drupal/coder
+    - export PATH="$HOME/.composer/vendor/bin:$PATH"
+    - phpcs --config-set installed_paths ~/.composer/vendor/drupal/coder/coder_sniffer
+
+  install: TRUE
+
+  script:
+    - phpcs --standard=Drupal --extensions=php,module,inc,install,test,profile,theme --ignore=css/* -p .
+    - phpcs --standard=DrupalPractice --extensions=php,module,inc,install,test,profile,theme -p .
