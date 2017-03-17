@@ -48,7 +48,7 @@ export default class Post extends Component {
   static DOMEval(code, doc) {
     doc = doc || document
 
-    var script = doc.createElement('script')
+    const script = doc.createElement('script')
     script.text = code
     doc.head.appendChild(script).parentNode.removeChild(script)
   }
