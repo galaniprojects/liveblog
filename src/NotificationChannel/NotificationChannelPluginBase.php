@@ -41,6 +41,8 @@ abstract class NotificationChannelPluginBase extends PluginBase implements Notif
    *   The plugin implementation definition.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    */
   public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager) {
     parent::__construct($configuration, $plugin_id, $plugin_definition);
@@ -92,6 +94,7 @@ abstract class NotificationChannelPluginBase extends PluginBase implements Notif
    *
    * @param string $name
    *   The variable name.
+   *
    * @return mixed
    *   The variable value, null if not set.
    */

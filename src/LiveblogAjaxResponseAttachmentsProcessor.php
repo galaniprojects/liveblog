@@ -37,9 +37,9 @@ class LiveblogAjaxResponseAttachmentsProcessor extends AjaxResponseAttachmentsPr
   /**
    * All the css, js assets grouped by libraries.
    *
-   * @todo Cache this. @see \Drupal\Core\Asset\AssetResolver::getCssAssets().
-   *
    * @var array
+   *
+   * @todo Cache this. @see \Drupal\Core\Asset\AssetResolver::getCssAssets().
    */
   protected $libraries;
 
@@ -65,6 +65,12 @@ class LiveblogAjaxResponseAttachmentsProcessor extends AjaxResponseAttachmentsPr
     parent::__construct($asset_resolver, $config_factory, $css_collection_renderer, $js_collection_renderer, $request_stack, $renderer, $module_handler);
   }
 
+  /**
+   * Returns all the css, js assets grouped by libraries.
+   *
+   * @return array
+   *   The libraries.
+   */
   public function getLibraries() {
     return $this->libraries;
   }
@@ -76,8 +82,8 @@ class LiveblogAjaxResponseAttachmentsProcessor extends AjaxResponseAttachmentsPr
     // @todo Aggregate CSS/JS if necessary, during normal site operation.
     //   We should optimize every file separately, else it will be not possible
     //   to distinguish between them.
-    //$optimize_css = !defined('MAINTENANCE_MODE') && $this->config->get('css.preprocess');
-    //$optimize_js = !defined('MAINTENANCE_MODE') && $this->config->get('js.preprocess');
+    // $optimize_css = !defined('MAINTENANCE_MODE') && $this->config->get('css.preprocess');
+    // $optimize_js = !defined('MAINTENANCE_MODE') && $this->config->get('js.preprocess');
     $optimize_css = $optimize_js = FALSE;
 
     $attachments = $response->getAttachments();
@@ -143,7 +149,7 @@ class LiveblogAjaxResponseAttachmentsProcessor extends AjaxResponseAttachmentsPr
    * @param string $type
    *   Assets type(css or js).
    */
-  protected function groupAssetsByLibraries($libraries, $assets, $type) {
+  protected function groupAssetsByLibraries(array $libraries, array $assets, $type) {
     foreach ($libraries as $library) {
       list($extension, $name) = explode('/', $library, 2);
       $definition = $this->getLibraryDiscovery()->getLibraryByName($extension, $name);
@@ -185,7 +191,7 @@ class LiveblogAjaxResponseAttachmentsProcessor extends AjaxResponseAttachmentsPr
    * @return \Drupal\Core\Asset\LibraryDiscoveryInterface
    *   The library discovery service.
    */
-  function getLibraryDiscovery() {
+  public function getLibraryDiscovery() {
     return \Drupal::service('library.discovery');
   }
 

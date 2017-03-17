@@ -13,6 +13,7 @@ use Drupal\Core\Form\FormStateInterface;
  * @ingroup liveblog_post
  */
 class LiveblogPostSettingsForm extends ConfigFormBase {
+
   /**
    * Returns a unique string identifying the form.
    *

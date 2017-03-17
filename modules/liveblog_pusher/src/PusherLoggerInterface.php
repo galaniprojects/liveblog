@@ -2,6 +2,11 @@
 
 namespace Drupal\liveblog_pusher;
 
+/**
+ * Interface for the PusherLogger.
+ *
+ * @package Drupal\liveblog_pusher
+ */
 interface PusherLoggerInterface {
 
   /**

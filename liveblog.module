@@ -5,12 +5,13 @@
  * The module file.
  */
 
+use Drupal\Core\Asset\AttachedAssetsInterface;
 use Drupal\Core\Entity\Display\EntityViewDisplayInterface;
 use Drupal\node\Entity\Node;
 use Drupal\taxonomy\Entity\Term;
 use Drupal\Core\Field\FieldStorageDefinitionInterface;
 use Drupal\Core\Entity\FieldableEntityInterface;
-use \Drupal\Component\Utility\Html;
+use Drupal\Component\Utility\Html;
 
 /**
  * Implements hook_entity_extra_field_info().
@@ -117,9 +118,9 @@ function template_preprocess_liveblog_posts(&$variables) {
  *
  * @param \Drupal\Core\Field\FieldStorageDefinitionInterface $definition
  *   The field storage definition.
- * @param \Drupal\Core\Entity\FieldableEntityInterface|NULL $entity
+ * @param \Drupal\Core\Entity\FieldableEntityInterface|null $entity
  *   The entity.
- * @param null $cacheable
+ * @param bool|null $cacheable
  *   If $cacheable is FALSE, then the allowed values are not statically
  *   cached. See options_test_dynamic_values_callback() for an example of
  *   generating dynamic and uncached values.
@@ -171,7 +172,7 @@ function liveblog_post_get_highlight_options(FieldStorageDefinitionInterface $de
  * @see \Drupal\liveblog\LiveblogRenderer::render()
  * @see \Drupal\liveblog\LiveblogAjaxResponseAttachmentsProcessor::groupAssetsByLibraries()
  */
-function liveblog_js_settings_build(&$settings, \Drupal\Core\Asset\AttachedAssetsInterface $assets) {
+function liveblog_js_settings_build(&$settings, AttachedAssetsInterface $assets) {
   // Collects all the loaded libraries with dependencies in js settings.
   // We need this setting to detect new libraries delivered to frontend.
   // We should to send libraries settings to the liveblog library if:

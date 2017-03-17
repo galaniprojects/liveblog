@@ -14,7 +14,7 @@ class Payload {
   /**
    * The liveblog post entity.
    *
-   * @var \Drupal\liveblog\Entity\LiveblogPost $entity
+   * @var \Drupal\liveblog\Entity\LiveblogPost
    */
   protected $entity;
 
@@ -102,6 +102,7 @@ class Payload {
    * Returns the render API renderer.
    *
    * @return \Drupal\liveblog\LiveblogRenderer
+   *   The liveblog renderer service
    */
   protected function getRenderer() {
     return \Drupal::service('liveblog.renderer');
@@ -111,6 +112,7 @@ class Payload {
    * Gets the entity type manager.
    *
    * @return \Drupal\Core\Entity\EntityTypeManagerInterface
+   *   The entity type manager
    */
   protected function entityTypeManager() {
     return \Drupal::entityTypeManager();

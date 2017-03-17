@@ -52,7 +52,7 @@ interface LiveblogPostInterface extends ContentEntityInterface, EntityOwnerInter
   /**
    * Sets the ID of liveblog post author(owner).
    *
-   * @param int
+   * @param int $uid
    *   The related liveblog node.
    *
    * @return $this
@@ -62,7 +62,7 @@ interface LiveblogPostInterface extends ContentEntityInterface, EntityOwnerInter
   /**
    * Sets the liveblog post author(owner).
    *
-   * @param \Drupal\user\UserInterface
+   * @param \Drupal\user\UserInterface $account
    *   The liveblog post author(owner).
    *
    * @return $this
