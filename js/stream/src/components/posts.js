@@ -110,7 +110,7 @@ export default class Posts extends Component {
         return editedPost
       }
       else {
-        return post;
+        return post
       }
     })
 
@@ -130,7 +130,7 @@ export default class Posts extends Component {
   _loadNewPosts() {
     let rect = this.postsWrapper.getBoundingClientRect()
     let bodyRect = document.body.getBoundingClientRect()
-    jQuery("html, body").animate({
+    jQuery('html, body').animate({
       scrollTop: rect.top - bodyRect.top - 90
     }, () => {
       this._loadPosts(this.state.newPosts)

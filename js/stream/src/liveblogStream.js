@@ -5,7 +5,7 @@ import ReactDOM from 'react-dom'
 import Posts from './components/posts'
 
 class LiveblogStream {
-  constructor(element, assetHandler, urls = {getURL, getNextURL}) {
+  constructor(element, assetHandler, urls = {getURL: '', getNextURL: ''}) {
     const App = (
         <Posts
           getURL={urls.getURL}
