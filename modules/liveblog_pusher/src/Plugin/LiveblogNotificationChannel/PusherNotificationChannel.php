@@ -5,9 +5,9 @@ namespace Drupal\liveblog_pusher\Plugin\LiveblogNotificationChannel;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
-use Drupal\liveblog\Utility\Payload;
 use Drupal\liveblog\Entity\LiveblogPost;
 use Drupal\liveblog\NotificationChannel\NotificationChannelPluginBase;
+use Drupal\liveblog\PusherPayloadRendererProvider;
 use Drupal\liveblog_pusher\PusherLoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
@@ -37,6 +37,11 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
   protected $logger;
 
   /**
+   * @var \Drupal\liveblog\PusherPayloadRendererProvider
+   */
+  private $payloadRendererProvider;
+
+  /**
    * Constructs an EntityForm object.
    *
    * @param array $configuration
@@ -45,14 +50,19 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
    *   The plugin_id for the plugin instance.
    * @param mixed $plugin_definition
    *   The plugin implementation definition.
+   * @param EntityTypeManagerInterface $entity_type_manager
+   *   Entity type manager.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
    * @param \Drupal\liveblog_pusher\PusherLoggerInterface $logger
    *   The logger.
+   * @param \Drupal\liveblog\PusherPayloadRendererProvider $payloadRendererProvider
+   *   Payload provider.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, PusherLoggerInterface $logger) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, PusherLoggerInterface $logger, PusherPayloadRendererProvider $payloadRendererProvider) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $config_factory, $entity_type_manager);
     $this->logger = $logger;
+    $this->payloadRendererProvider = $payloadRendererProvider;
   }
 
   /**
@@ -65,7 +75,8 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
       $plugin_definition,
       $container->get('config.factory'),
       $container->get('entity_type.manager'),
-      $container->get('liveblog_pusher.notification_channel.log')
+      $container->get('liveblog_pusher.notification_channel.log'),
+      $container->get('pusher.payload_renderer.provider')
     );
   }
 
@@ -85,7 +96,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
       '#type' => 'textfield',
       '#title' => t('Key'),
       '#required' => TRUE,
-      '#default_value' => !empty($this->configuration['key']) ? $this->configuration['key']: '',
+      '#default_value' => !empty($this->configuration['key']) ? $this->configuration['key'] : '',
       '#description' => t('Please enter your Pusher key.'),
     ];
     $form['secret'] = [
@@ -111,7 +122,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
    */
   private function loadPusherLibrary() {
     if (!class_exists('\Pusher') && function_exists('libraries_get_path')) {
-      include_once (DRUPAL_ROOT.'/'.libraries_get_path('pusher') . '/lib/Pusher.php');
+      include_once(DRUPAL_ROOT . '/' . libraries_get_path('pusher') . '/lib/Pusher.php');
     }
   }
 
@@ -167,8 +178,10 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
     $client = $this->getClient();
     $channel = "liveblog-{$liveblog_post->getLiveblog()->id()}";
 
+    /** @var \Drupal\liveblog\PusherPayloadRendererInterface $payloadRenderer */
+    $payloadRenderer = $this->payloadRendererProvider->getPayloadRenderer();
     // Trigger an event by providing event name and payload.
-    $response = $client->trigger($channel, $event, Payload::create($liveblog_post)->getRenderedPayload(), null, true);
+    $response = $client->trigger($channel, $event, $payloadRenderer->getRenderedPayload($liveblog_post), NULL, TRUE);
     if ($response['status'] !== 200) {
       // Log response if there is an error.
       $this->logger->saveLog('error');

@@ -52,9 +52,11 @@ class LiveblogListController extends ControllerBase {
     }
 
     $content = $render_array = [];
+    /** @var \Drupal\liveblog\PusherPayloadRendererInterface $payloadRenderer */
+    $payloadRenderer = $this->getPayloadRenderer();
     /* @var \Drupal\liveblog\Entity\LiveblogPost[] $entities */
     foreach ($entities as $entity) {
-      $result = Payload::create($entity)->getPayload();
+      $result = $payloadRenderer->getPayload($entity);
 
       // Collect all the render arrays. Will be used later to get the libraries
       // and commands needed for the frontend.
@@ -103,6 +105,18 @@ class LiveblogListController extends ControllerBase {
    */
   protected function getRenderer() {
     return \Drupal::service('renderer');
+  }
+
+  /**
+   * Returns payload renderer.
+   *
+   * @return \Drupal\liveblog\PusherPayloadRendererInterface
+   *   Payload renderer.
+   */
+  protected function getPayloadRenderer() {
+    /** @var \Drupal\liveblog\PusherPayloadRendererProvider $payloadProvider */
+    $payloadProvider = \Drupal::service('pusher.payload_renderer.provider');
+    return $payloadProvider->getPayloadRenderer();
   }
 
 }
