@@ -14,7 +14,7 @@ function ScrollPosition(node, element) {
   this.previousScrollHeightMinusTop = 0
   this.readyFor = 'up'
 
-  var rect = element.getBoundingClientRect()
+  const rect = element.getBoundingClientRect()
   if (rect.top >= 0) {
     this.restore = function(){}
     this.prepareFor = function(){}
