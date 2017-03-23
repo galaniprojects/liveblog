@@ -34,7 +34,7 @@ class LiveblogRenderer implements LiveblogRendererInterface {
   }
 
   /**
-   * {@inheritdoc]
+   * {@inheritdoc}
    */
   public function render(array &$content) {
     // Render the form and convert attachments into ajax commands.

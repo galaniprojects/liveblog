@@ -19,7 +19,7 @@ class LiveblogController extends ControllerBase {
    *   The response containing the liveblog post form.
    */
   public function getFormAsJson(LiveblogPost $liveblog_post) {
-    Html::setIsAjax(true);
+    Html::setIsAjax(TRUE);
 
     $form_object = $this->entityTypeManager()
       ->getFormObject('liveblog_post', 'edit')

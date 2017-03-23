@@ -7,7 +7,7 @@ use Drupal\Component\Annotation\Plugin;
 /**
  * Defines an Liveblog Notification Channel annotation object.
  *
- * Plugin Namespace: Plugin\LiveblogNotificationChannel
+ * Plugin Namespace: Plugin\LiveblogNotificationChannel.
  *
  * @see plugin_api
  *
@@ -25,18 +25,18 @@ class LiveblogNotificationChannel extends Plugin {
   /**
    * The human-readable name of the plugin.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $title;
 
   /**
    * The description of the plugin.
    *
-   * @ingroup plugin_translatable
-   *
    * @var \Drupal\Core\Annotation\Translation
+   *
+   * @ingroup plugin_translatable
    */
   public $description;
 

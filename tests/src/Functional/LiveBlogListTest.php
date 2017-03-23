@@ -12,7 +12,7 @@ use Drupal\Tests\BrowserTestBase;
  *
  * @group Liveblog
  */
-class LiveBlogListTest extends BrowserTestBase  {
+class LiveBlogListTest extends BrowserTestBase {
 
   /**
    * Ignore some config schema errors of modules used.
@@ -47,7 +47,7 @@ class LiveBlogListTest extends BrowserTestBase  {
 
     $this->node = Node::create([
       'title' => 'Test blog',
-      'type' => 'liveblog'
+      'type' => 'liveblog',
     ]);
     $this->node->save();
 

@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @see \Drupal\Core\Form\FormBase
  */
-class LiveblogSettingsForm extends ConfigFormBase  {
+class LiveblogSettingsForm extends ConfigFormBase {
 
   /**
    * The notification channel manager.

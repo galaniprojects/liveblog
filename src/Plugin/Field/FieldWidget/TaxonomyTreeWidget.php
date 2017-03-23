@@ -2,8 +2,6 @@
 
 namespace Drupal\liveblog\Plugin\Field\FieldWidget;
 
-use Drupal\Component\Utility\NestedArray;
-use Drupal\Component\Utility\SortArray;
 use Drupal\Core\Field\FieldDefinitionInterface;
 use Drupal\Core\Field\FieldItemListInterface;
 use Drupal\Core\Field\Plugin\Field\FieldWidget\OptionsWidgetBase;
@@ -96,7 +94,7 @@ class TaxonomyTreeWidget extends OptionsWidgetBase {
   protected function mapTree(array &$data, $level = 0) {
     $tree = [];
 
-    $get_level = function($a) {
+    $get_level = function ($a) {
       $level = 0;
       if (preg_match('/^-+/', $a, $m)) {
         $level = strlen($m[0]);
@@ -210,6 +208,5 @@ class TaxonomyTreeWidget extends OptionsWidgetBase {
     // This widget is only available for multivalued taxonomy term references.
     return $storage->getCardinality() != 1 && $storage->getSetting('target_type') == 'taxonomy_term';
   }
-
 
 }

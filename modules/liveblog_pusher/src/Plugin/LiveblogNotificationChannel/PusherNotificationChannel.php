@@ -47,6 +47,8 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
    *   The plugin implementation definition.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager.
    * @param \Drupal\liveblog_pusher\PusherLoggerInterface $logger
    *   The logger.
    */
@@ -85,7 +87,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
       '#type' => 'textfield',
       '#title' => t('Key'),
       '#required' => TRUE,
-      '#default_value' => !empty($this->configuration['key']) ? $this->configuration['key']: '',
+      '#default_value' => !empty($this->configuration['key']) ? $this->configuration['key'] : '',
       '#description' => t('Please enter your Pusher key.'),
     ];
     $form['secret'] = [
@@ -111,7 +113,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
    */
   private function loadPusherLibrary() {
     if (!class_exists('\Pusher') && function_exists('libraries_get_path')) {
-      include_once (DRUPAL_ROOT.'/'.libraries_get_path('pusher') . '/lib/Pusher.php');
+      include_once DRUPAL_ROOT . '/' . libraries_get_path('pusher') . '/lib/Pusher.php';
     }
   }
 
@@ -168,7 +170,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
     $channel = "liveblog-{$liveblog_post->getLiveblog()->id()}";
 
     // Trigger an event by providing event name and payload.
-    $response = $client->trigger($channel, $event, Payload::create($liveblog_post)->getRenderedPayload(), null, true);
+    $response = $client->trigger($channel, $event, Payload::create($liveblog_post)->getRenderedPayload(), NULL, TRUE);
     if ($response['status'] !== 200) {
       // Log response if there is an error.
       $this->logger->saveLog('error');

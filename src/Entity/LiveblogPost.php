@@ -231,7 +231,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
       ->setDescription(t('Adds the possibility to mark the liveblog post as a highlight.'))
       // We can not make this callback as a static method of the LiveblogPost
       // class to support older PHP versions.
-      ->setSetting('allowed_values_function','liveblog_post_get_highlight_options')
+      ->setSetting('allowed_values_function', 'liveblog_post_get_highlight_options')
       ->setDefaultValue('')
       ->setDisplayOptions('form', [
         'type' => 'select',
@@ -323,11 +323,11 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
       ->setDefaultValue(TRUE)
       ->setDisplayOptions('form', [
         'settings' => [
-          'display_label' => TRUE
+          'display_label' => TRUE,
         ],
         'weight' => 8,
       ])
-     ->setDisplayConfigurable('form', TRUE);
+      ->setDisplayConfigurable('form', TRUE);
 
     $fields['created'] = BaseFieldDefinition::create('created')
       ->setLabel(t('Created'))
@@ -367,7 +367,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
    *
    * Triggers an notification channel event for the liveblog post.
    */
-  function postSave(EntityStorageInterface $storage, $update = TRUE) {
+  public function postSave(EntityStorageInterface $storage, $update = TRUE) {
     parent::postSave($storage, $update);
 
     if ($plugin = $this->getNotificationChannelManager()->createActiveInstance()) {

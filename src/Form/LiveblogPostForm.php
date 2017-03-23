@@ -34,7 +34,7 @@ class LiveblogPostForm extends ContentEntityForm {
    *
    * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
    *   The entity manager.
-   * @param \Symfony\Component\HttpFoundation\RequestStack
+   * @param \Symfony\Component\HttpFoundation\RequestStack $request_stack
    *   The current request.
    */
   public function __construct(EntityTypeManagerInterface $entity_manager, RequestStack $request_stack) {
@@ -235,7 +235,7 @@ class LiveblogPostForm extends ContentEntityForm {
       $url = $this->entity->toUrl();
       $form_state->setRedirect($url->getRouteName(), $url->getRouteParameters());
     }
-    else if ($this->getOperation() == 'add') {
+    elseif ($this->getOperation() == 'add') {
       // Clear form input fields for the add form, as we stay on the same page.
       $this->clearFormInput($form, $form_state);
     }
@@ -255,9 +255,9 @@ class LiveblogPostForm extends ContentEntityForm {
   /**
    * Form submission handler for the 'preview' action.
    *
-   * @param $form
+   * @param array $form
    *   An associative array containing the structure of the form.
-   * @param $form_state
+   * @param \Drupal\Core\Form\FormStateInterface $form_state
    *   The current state of the form.
    */
   public function preview(array $form, FormStateInterface $form_state) {
