@@ -1,15 +1,22 @@
 import React, { Component } from 'react'
 import ScrollPosition from '../helper/ScrollPosition'
+import Notification from './notification'
+import Post from './Post'
+
+import _ from 'lodash'
 
 export default class Posts extends Component {
   constructor() {
     super()
     this.state = {
-      posts: []
+      posts: [],
+      newPosts: []
     }
     this.isloading = false
     this.hasReachedEnd = false
     this.postNodes = {}
+
+    this.lazyloadListener = _.throttle(this._lazyload.bind(this), 100)
   }
 
   componentWillMount() {
@@ -26,15 +33,15 @@ export default class Posts extends Component {
       }
     })
 
-    addEventListener('scroll', this._lazyload.bind(this))
+    addEventListener('scroll', this.lazyloadListener)
   }
 
   componentWillUnmount() {
-    removeEventListener('scroll', this._lazyload.bind(this))
+    removeEventListener('scroll', this.lazyloadListener)
   }
 
   _lazyload() {
-    var el = this._getLastElement()
+    const el = this._getLastElement()
     if (!this.isloading && !this.hasReachedEnd && el && this._elementInViewport(el)) {
       this.isloading = true
       this._loadNextPosts()
@@ -44,7 +51,7 @@ export default class Posts extends Component {
     return this.postsWrapper.querySelector('div.liveblog-post:last-child')
   }
   _elementInViewport(el) {
-    var rect = el.getBoundingClientRect()
+    const rect = el.getBoundingClientRect()
 
     return (
          rect.top   >= 0
@@ -53,9 +60,9 @@ export default class Posts extends Component {
     )
   }
   _loadNextPosts() {
-    var posts = this.state.posts
-    var lastPost = posts[posts.length-1]
-    var url = this.props.getNextURL.replace('%s', lastPost.created)
+    const posts = this.state.posts
+    const lastPost = posts[posts.length - 1]
+    const url = this.props.getNextURL.replace('%s', lastPost.created)
     // TODO: error handling
     jQuery.getJSON(url, (lazyPosts) => {
       if (lazyPosts && Array.isArray(lazyPosts.content)) {
@@ -84,32 +91,35 @@ export default class Posts extends Component {
   }
 
   addPost(post) {
-    var scrollPosition = new ScrollPosition(document.body, this.postsWrapper)
-    scrollPosition.prepareFor('up')
-    this.setState({
-      posts: [
+    const rect = this.postsWrapper.getBoundingClientRect()
+
+    if (rect.top < 0 || this.state.newPosts.length > 0) {
+      this.setState({
+        newPosts: [
           post,
-          ...this.state.posts
-      ]
-    })
-    this._handleAssets(post.libraries, post.commands, document.body)
-    scrollPosition.restore()
+          ...this.state.newPosts
+        ]
+      })
+    }
+    else {
+      this._loadPosts([post])
+    }
   }
 
   editPost(editedPost) {
-    var found = false
-    var posts = this.state.posts.map((post) => {
+    let found = false
+    const posts = this.state.posts.map((post) => {
       if (post.id == editedPost.id) {
         found = true
         return editedPost
       }
       else {
-        return post;
+        return post
       }
     })
 
     if (found) {
-      var scrollPosition = new ScrollPosition(document.body, this.postNodes[editedPost.id])
+      const scrollPosition = new ScrollPosition(document.body, this.postNodes[editedPost.id])
       scrollPosition.prepareFor('up')
 
       this.setState({
@@ -121,13 +131,39 @@ export default class Posts extends Component {
     }
   }
 
+  _loadNewPosts() {
+    const rect = this.postsWrapper.getBoundingClientRect()
+    const bodyRect = document.body.getBoundingClientRect()
+    jQuery('html, body').animate({
+      scrollTop: rect.top - bodyRect.top - 90
+    }, () => {
+      this._loadPosts(this.state.newPosts)
+    })
+  }
+
+  _loadPosts(posts) {
+    this.setState({
+      posts: [
+        ...posts,
+        ...this.state.posts
+      ],
+      newPosts: []
+    })
+
+    for (let i=0; i<posts.length; i++) {
+      const newPost = posts[i]
+      this._handleAssets(newPost.libraries, newPost.commands, document.body)
+    }
+  }
+
   render() {
     return (
       <div className="liveblog-posts-wrapper" ref={(wrapper) => this.postsWrapper = wrapper}>
+        <Notification newPosts={this.state.newPosts} loadNewPosts={this._loadNewPosts.bind(this)} />
         { this.state.posts.map((post) => {
           return (
             <div className="liveblog-post" key={post.id} ref={(node) => { this.postNodes[post.id] = node }}>
-              <div dangerouslySetInnerHTML={{ __html: post.content }} />
+              <Post content={post.content} />
             </div>
           )
         })}

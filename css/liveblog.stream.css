@@ -16,3 +16,33 @@ div.liveblog-post {
 .liveblog-post--bottom > *:last-child {
     float: right;
 }
+
+.liveblog-notification-wrapper {
+    height: 20px;
+}
+
+.liveblog-posts--notification--sticky {
+    position: fixed;
+    top: 0;
+    z-index: 999;
+    left: 0;
+    right: 0;
+    text-align: center;
+}
+
+.liveblog-posts--notification--sticky .liveblog-posts-new {
+    background: #EEE;
+    padding: 5px;
+    border: 2px solid #2d2d2d;
+    border-radius: 0 0 5px 5px;
+    border-top: 0;
+    display: inline-block;
+}
+
+body.toolbar-fixed.toolbar-horizontal .liveblog-posts--notification--sticky {
+    top: 40px;
+}
+
+body.toolbar-fixed.toolbar-horizontal.toolbar-tray-open .liveblog-posts--notification--sticky {
+    top: 80px;
+}
