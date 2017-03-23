@@ -33,7 +33,7 @@ export default class Posts extends Component {
       }
     })
 
-    addEventListener('scroll', this._lazyload.bind(this))
+    addEventListener('scroll', this.lazyloadListener)
   }
 
   componentWillUnmount() {

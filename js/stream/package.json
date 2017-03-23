@@ -5,7 +5,7 @@
   "scripts": {
     "build": "webpack",
     "build-production": "env NODE_ENV=production webpack -p --progress  ",
-    "lint": "eslint .",
+    "lint": "eslint ."
   },
   "author": "",
   "license": "ISC",
