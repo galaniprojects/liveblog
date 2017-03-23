@@ -11,7 +11,7 @@ export default class Notification extends Component {
   }
 
   _stickyNotification() {
-    let rect = this.notificationWrapper.getBoundingClientRect()
+    const rect = this.notificationWrapper.getBoundingClientRect()
 
     if (rect.top < 0) {
       this.notification.classList.add('liveblog-posts--notification--sticky')
@@ -22,7 +22,7 @@ export default class Notification extends Component {
   }
 
   render() {
-    var newPostText = ''
+    let newPostText = ''
     if (this.props.newPosts.length == 1) {
       newPostText = (<span>1 new post. <button className="link" onClick={this.props.loadNewPosts}>Click here</button> to load it.</span>)
     }
