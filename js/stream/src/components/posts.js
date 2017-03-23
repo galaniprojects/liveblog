@@ -37,7 +37,7 @@ export default class Posts extends Component {
   }
 
   _lazyload() {
-    var el = this._getLastElement()
+    const el = this._getLastElement()
     if (!this.isloading && !this.hasReachedEnd && el && this._elementInViewport(el)) {
       this.isloading = true
       this._loadNextPosts()
@@ -47,7 +47,7 @@ export default class Posts extends Component {
     return this.postsWrapper.querySelector('div.liveblog-post:last-child')
   }
   _elementInViewport(el) {
-    var rect = el.getBoundingClientRect()
+    const rect = el.getBoundingClientRect()
 
     return (
          rect.top   >= 0
@@ -56,9 +56,9 @@ export default class Posts extends Component {
     )
   }
   _loadNextPosts() {
-    var posts = this.state.posts
-    var lastPost = posts[posts.length-1]
-    var url = this.props.getNextURL.replace('%s', lastPost.created)
+    const posts = this.state.posts
+    const lastPost = posts[posts.length - 1]
+    const url = this.props.getNextURL.replace('%s', lastPost.created)
     // TODO: error handling
     jQuery.getJSON(url, (lazyPosts) => {
       if (lazyPosts && Array.isArray(lazyPosts.content)) {
@@ -87,7 +87,7 @@ export default class Posts extends Component {
   }
 
   addPost(post) {
-    let rect = this.postsWrapper.getBoundingClientRect()
+    const rect = this.postsWrapper.getBoundingClientRect()
 
     if (rect.top < 0 || this.state.newPosts.length > 0) {
       this.setState({
@@ -103,19 +103,19 @@ export default class Posts extends Component {
   }
 
   editPost(editedPost) {
-    var found = false
-    var posts = this.state.posts.map((post) => {
+    let found = false
+    const posts = this.state.posts.map((post) => {
       if (post.id == editedPost.id) {
         found = true
         return editedPost
       }
       else {
-        return post;
+        return post
       }
     })
 
     if (found) {
-      var scrollPosition = new ScrollPosition(document.body, this.postNodes[editedPost.id])
+      const scrollPosition = new ScrollPosition(document.body, this.postNodes[editedPost.id])
       scrollPosition.prepareFor('up')
 
       this.setState({
@@ -128,9 +128,9 @@ export default class Posts extends Component {
   }
 
   _loadNewPosts() {
-    let rect = this.postsWrapper.getBoundingClientRect()
-    let bodyRect = document.body.getBoundingClientRect()
-    jQuery("html, body").animate({
+    const rect = this.postsWrapper.getBoundingClientRect()
+    const bodyRect = document.body.getBoundingClientRect()
+    jQuery('html, body').animate({
       scrollTop: rect.top - bodyRect.top - 90
     }, () => {
       this._loadPosts(this.state.newPosts)
@@ -147,7 +147,7 @@ export default class Posts extends Component {
     })
 
     for (let i=0; i<posts.length; i++) {
-      let newPost = posts[i]
+      const newPost = posts[i]
       this._handleAssets(newPost.libraries, newPost.commands, document.body)
     }
   }

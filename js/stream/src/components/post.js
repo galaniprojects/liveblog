@@ -16,21 +16,21 @@ export default class Post extends Component {
    * @param html - The html as string which includes scripts to be executed
    */
   static executeScripts(html) {
-    const scripts = jQuery('<div>' + html + '</div>').find('script');
+    const scripts = jQuery('<div>' + html + '</div>').find('script')
 
-    let node;
+    let node
     if (scripts.length) {
       for (let i = 0; i < scripts.length; i++) {
         node = scripts[i]
-        if (Post.rscriptType().test(node.type || "")) {
+        if (Post.rscriptType().test(node.type || '')) {
           if (node.src) {
 
             // Optional AJAX dependency, but won't run scripts if not present
             if (jQuery._evalUrl) {
-              jQuery._evalUrl(node.src);
+              jQuery._evalUrl(node.src)
             }
           } else {
-            Post.DOMEval(node.textContent.replace(Post.rcleanScript(), ""));
+            Post.DOMEval(node.textContent.replace(Post.rcleanScript(), ''))
           }
         }
       }
@@ -38,17 +38,17 @@ export default class Post extends Component {
   }
 
   static rscriptType() {
-    return ( /^$|\/(?:java|ecma)script/i );
+    return ( /^$|\/(?:java|ecma)script/i )
   }
 
   static rcleanScript() {
-    return /^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g;
+    return /^\s*<!(?:\[CDATA\[|--)|(?:\]\]|--)>\s*$/g
   }
 
   static DOMEval(code, doc) {
     doc = doc || document
 
-    var script = doc.createElement("script")
+    const script = doc.createElement('script')
     script.text = code
     doc.head.appendChild(script).parentNode.removeChild(script)
   }
