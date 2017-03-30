@@ -3,7 +3,7 @@ import ScrollPosition from '../helper/ScrollPosition'
 import Notification from './Notification'
 import Post from './Post'
 
-import _ from 'lodash'
+import lodash from 'lodash'
 
 export default class Posts extends Component {
   constructor() {
@@ -16,7 +16,7 @@ export default class Posts extends Component {
     this.hasReachedEnd = false
     this.postNodes = {}
 
-    this.lazyloadListener = _.throttle(this._lazyload.bind(this), 100)
+    this.lazyloadListener = lodash.throttle(this._lazyload.bind(this), 100)
   }
 
   componentWillMount() {
