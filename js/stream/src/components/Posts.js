@@ -1,6 +1,6 @@
 import React, { Component } from 'react'
 import ScrollPosition from '../helper/ScrollPosition'
-import Notification from './notification'
+import Notification from './Notification'
 import Post from './Post'
 
 import _ from 'lodash'

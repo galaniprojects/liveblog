@@ -2,7 +2,7 @@
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import Posts from './components/posts'
+import Posts from './components/Posts'
 
 class LiveblogStream {
   constructor(element, assetHandler, urls = {getURL: '', getNextURL: ''}) {
