@@ -24,22 +24,20 @@ export default class Notification extends Component {
   render() {
     let newPostText = ''
     if (this.props.newPosts.length == 1) {
-      newPostText = (<span>1 new post. <button className="link" onClick={this.props.loadNewPosts}>Click here</button> to load it.</span>)
+      newPostText = '1 new post. Click here to load it.'
     }
     else if (this.props.newPosts.length > 1) {
-      newPostText = (
-        <span>{ this.props.newPosts.length } new posts.&nbsp;
-          <button className="link" onClick={this.props.loadNewPosts}>Click here</button> to load them.
-          </span>
-      )
+      newPostText = this.props.newPosts.length + ' new posts. Click here to load them.'
     }
+
+    const newPostButton = (<span><button className="link" onClick={this.props.loadNewPosts}>{newPostText}</button></span>)
 
     return (
       <div className="liveblog-notification-wrapper" ref={(wrapper) => {this.notificationWrapper = wrapper}}>
         <div ref={(notifications) => this.notification = notifications}>
-          { newPostText &&
+          { this.props.newPosts.length >= 1 &&
             <div className="liveblog-posts-new">
-              { newPostText }
+              { newPostButton }
             </div>
           }
         </div>
