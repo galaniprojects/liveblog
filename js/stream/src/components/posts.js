@@ -158,15 +158,13 @@ export default class Posts extends Component {
 
   render() {
     return (
-      <div className="liveblog-posts-wrapper" ref={(wrapper) => this.postsWrapper = wrapper}>
+      <div className="liveblog-posts-wrapper" ref={(wrapper) => {this.postsWrapper = wrapper}}>
         <Notification newPosts={this.state.newPosts} loadNewPosts={this._loadNewPosts.bind(this)} />
-        { this.state.posts.map((post) => {
-          return (
+        { this.state.posts.map((post) => (
             <div className="liveblog-post" key={post.id} ref={(node) => { this.postNodes[post.id] = node }}>
               <Post content={post.content} />
             </div>
-          )
-        })}
+          ))}
       </div>
     )
   }

@@ -35,7 +35,7 @@ export default class Notification extends Component {
     }
 
     return (
-      <div className="liveblog-notification-wrapper" ref={wrapper => this.notificationWrapper = wrapper}>
+      <div className="liveblog-notification-wrapper" ref={(wrapper) => {this.notificationWrapper = wrapper}}>
         <div ref={(notifications) => this.notification = notifications}>
           { newPostText &&
             <div className="liveblog-posts-new">

@@ -33,6 +33,14 @@
       "warn",
       "never"
     ],
+    "arrow-parens": [
+      "error",
+      "always"
+    ],
+    "arrow-body-style": [
+      "error",
+      "as-needed"
+    ],
     "no-var": "warn",
     "prefer-const": "warn",
     "no-unused-vars": [
