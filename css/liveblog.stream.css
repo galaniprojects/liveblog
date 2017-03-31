@@ -39,7 +39,8 @@ div.liveblog-post {
     display: inline-block;
 }
 
-body.toolbar-fixed.toolbar-horizontal .liveblog-posts--notification--sticky {
+body.toolbar-fixed.toolbar-horizontal .liveblog-posts--notification--sticky,
+body.toolbar-fixed.toolbar-vertical .liveblog-posts--notification--sticky {
     top: 40px;
 }
 

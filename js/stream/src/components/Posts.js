@@ -1,9 +1,9 @@
 import React, { Component } from 'react'
 import ScrollPosition from '../helper/ScrollPosition'
-import Notification from './notification'
+import Notification from './Notification'
 import Post from './Post'
 
-import _ from 'lodash'
+import lodash from 'lodash'
 
 export default class Posts extends Component {
   constructor() {
@@ -16,7 +16,7 @@ export default class Posts extends Component {
     this.hasReachedEnd = false
     this.postNodes = {}
 
-    this.lazyloadListener = _.throttle(this._lazyload.bind(this), 100)
+    this.lazyloadListener = lodash.throttle(this._lazyload.bind(this), 100)
   }
 
   componentWillMount() {
@@ -26,7 +26,7 @@ export default class Posts extends Component {
         this.setState({
           posts: posts.content
         })
-        this._handleAssets(posts.libraries, posts.commands, document.body)
+        this.props.onPostLoad(posts, document.body)
       }
       else {
         // TODO Handle empty
@@ -73,7 +73,7 @@ export default class Posts extends Component {
               ...lazyPosts.content
             ]
           })
-          this._handleAssets(lazyPosts.libraries, lazyPosts.commands, document.body)
+          this.props.onPostLoad(lazyPosts, document.body)
         }
         else {
           this.hasReachedEnd = true
@@ -82,12 +82,6 @@ export default class Posts extends Component {
 
       this.isloading = false
     })
-  }
-
-  _handleAssets(libraries, commands, context) {
-    this.props.assetHandler.loadLibraries(libraries)
-    this.props.assetHandler.executeCommands(commands)
-    this.props.assetHandler.afterLoading(context)
   }
 
   addPost(post) {
@@ -126,7 +120,7 @@ export default class Posts extends Component {
         posts: posts
       })
 
-      this._handleAssets(editedPost.libraries, editedPost.commands, document.body)
+      this.props.onPostLoad(editedPost, document.body)
       scrollPosition.restore()
     }
   }
@@ -152,21 +146,19 @@ export default class Posts extends Component {
 
     for (let i=0; i<posts.length; i++) {
       const newPost = posts[i]
-      this._handleAssets(newPost.libraries, newPost.commands, document.body)
+      this.props.onPostLoad(newPost, document.body)
     }
   }
 
   render() {
     return (
-      <div className="liveblog-posts-wrapper" ref={(wrapper) => this.postsWrapper = wrapper}>
+      <div className="liveblog-posts-wrapper" ref={(wrapper) => {this.postsWrapper = wrapper}}>
         <Notification newPosts={this.state.newPosts} loadNewPosts={this._loadNewPosts.bind(this)} />
-        { this.state.posts.map((post) => {
-          return (
+        { this.state.posts.map((post) => (
             <div className="liveblog-post" key={post.id} ref={(node) => { this.postNodes[post.id] = node }}>
               <Post content={post.content} />
             </div>
-          )
-        })}
+          ))}
       </div>
     )
   }

@@ -1,7 +1,5 @@
 const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
 
-const isProd = (process.env.NODE_ENV === 'production')
-
 module.exports = {
   entry: './src/liveblogStream.js',
   output: {
@@ -22,7 +20,7 @@ module.exports = {
       }
     ]
   },
-  devtool: isProd ? false : 'source-map',
+  devtool: 'source-map',
   plugins: [
     new LodashModuleReplacementPlugin
   ]
