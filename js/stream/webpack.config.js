@@ -1,12 +1,10 @@
-const webpack = require('webpack')
-
-const isProd = (process.env.NODE_ENV === 'production')
+const LodashModuleReplacementPlugin = require('lodash-webpack-plugin')
 
 module.exports = {
-  entry: "./src/liveblogStream.js",
+  entry: './src/liveblogStream.js',
   output: {
     path: './dist',
-    filename: isProd ? "bundle.min.js" : "bundle.js"
+    filename: 'bundle.js'
   },
   module: {
     loaders: [
@@ -22,15 +20,8 @@ module.exports = {
       }
     ]
   },
-  devtool: isProd ? false : 'source-map',
-  plugins: isProd ? [
-    new webpack.optimize.UglifyJsPlugin({
-      compress: {
-        warnings: false,
-      },
-      output: {
-        comments: false,
-      }
-    })
-  ] : []
+  devtool: 'source-map',
+  plugins: [
+    new LodashModuleReplacementPlugin
+  ]
 }

@@ -10,21 +10,21 @@
  */
 
 function ScrollPosition(node, element) {
-    this.node = node;
-    this.previousScrollHeightMinusTop = 0;
-    this.readyFor = 'up';
+  this.node = node
+  this.previousScrollHeightMinusTop = 0
+  this.readyFor = 'up'
 
-    var rect = element.getBoundingClientRect()
-    if (rect.top >= 0) {
-        this.restore = function(){}
-        this.prepareFor = function(){}
-    }
+  const rect = element.getBoundingClientRect()
+  if (rect.top >= 0) {
+    this.restore = function(){}
+    this.prepareFor = function(){}
+  }
 }
 
 ScrollPosition.prototype.restore = function () {
-    if (this.readyFor === 'up') {
-        this.node.scrollTop = this.node.scrollHeight - this.previousScrollHeightMinusTop;
-    }
+  if (this.readyFor === 'up') {
+    this.node.scrollTop = this.node.scrollHeight - this.previousScrollHeightMinusTop
+  }
 
     // 'down' doesn't need to be special cased unless the
     // content was flowing upwards, which would only happen
@@ -33,8 +33,8 @@ ScrollPosition.prototype.restore = function () {
 }
 
 ScrollPosition.prototype.prepareFor = function (direction) {
-    this.readyFor = direction || 'up';
-    this.previousScrollHeightMinusTop = this.node.scrollHeight - this.node.scrollTop;
+  this.readyFor = direction || 'up'
+  this.previousScrollHeightMinusTop = this.node.scrollHeight - this.node.scrollTop
 }
 
 export default ScrollPosition

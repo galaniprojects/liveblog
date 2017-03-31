@@ -33,5 +33,11 @@
         Drupal.attachBehaviors(context, drupalSettings)
     }
 
+    AssetHandler.prototype.handleAssets = function(post, context) {
+      this.loadLibraries(post.libraries)
+      this.executeCommands(post.commands)
+      this.afterLoading(context)
+    }
+
     drupalSettings.liveblog.AssetHandler = AssetHandler
 })(Drupal, drupalSettings)
