@@ -3,25 +3,6 @@ import Language from '../util/Language'
 
 export default class Notification extends Component {
 
-  componentWillMount() {
-    addEventListener('scroll', this._stickyNotification.bind(this))
-  }
-
-  componentWillUnmount() {
-    removeEventListener('scroll', this._stickyNotification.bind(this))
-  }
-
-  _stickyNotification() {
-    const rect = this.notificationWrapper.getBoundingClientRect()
-
-    if (rect.top < 0) {
-      this.notification.classList.add('liveblog-posts--notification--sticky')
-    }
-    else if (rect.top >= 0) {
-      this.notification.classList.remove('liveblog-posts--notification--sticky')
-    }
-  }
-
   render() {
     let newPostText = ''
     if (this.props.newPosts.length == 1) {
@@ -35,7 +16,7 @@ export default class Notification extends Component {
 
     return (
       <div className="liveblog-notification-wrapper" ref={(wrapper) => {this.notificationWrapper = wrapper}}>
-        <div ref={(notifications) => this.notification = notifications}>
+        <div className="liveblog-posts--notification--sticky">
           { this.props.newPosts.length >= 1 &&
             <div className="liveblog-posts-new">
               { newPostButton }
