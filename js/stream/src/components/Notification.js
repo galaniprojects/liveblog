@@ -15,7 +15,7 @@ export default class Notification extends Component {
     const newPostButton = (<span><button className="link" onClick={this.props.loadNewPosts}>{newPostText}</button></span>)
 
     return (
-      <div className="liveblog-notification-wrapper" ref={(wrapper) => {this.notificationWrapper = wrapper}}>
+      <div className="liveblog-notification-wrapper">
         <div className="liveblog-posts--notification--sticky">
           { this.props.newPosts.length >= 1 &&
             <div className="liveblog-posts-new">
