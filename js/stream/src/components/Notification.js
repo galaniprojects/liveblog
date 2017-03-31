@@ -1,4 +1,5 @@
 import React, { Component } from 'react'
+import Language from '../util/Language'
 
 export default class Notification extends Component {
 
@@ -24,10 +25,10 @@ export default class Notification extends Component {
   render() {
     let newPostText = ''
     if (this.props.newPosts.length == 1) {
-      newPostText = '1 new post. Click here to load it.'
+      newPostText = Language.t('1 new post. Click here to load it.')
     }
     else if (this.props.newPosts.length > 1) {
-      newPostText = this.props.newPosts.length + ' new posts. Click here to load them.'
+      newPostText = this.props.newPosts.length + Language.t(' new posts. Click here to load them.')
     }
 
     const newPostButton = (<span><button className="link" onClick={this.props.loadNewPosts}>{newPostText}</button></span>)

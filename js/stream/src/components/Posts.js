@@ -26,7 +26,7 @@ export default class Posts extends Component {
         this.setState({
           posts: posts.content
         })
-        this._handleAssets(posts.libraries, posts.commands, document.body)
+        this.props.onPostLoad(posts, document.body)
       }
       else {
         // TODO Handle empty
@@ -73,7 +73,7 @@ export default class Posts extends Component {
               ...lazyPosts.content
             ]
           })
-          this._handleAssets(lazyPosts.libraries, lazyPosts.commands, document.body)
+          this.props.onPostLoad(lazyPosts, document.body)
         }
         else {
           this.hasReachedEnd = true
@@ -82,12 +82,6 @@ export default class Posts extends Component {
 
       this.isloading = false
     })
-  }
-
-  _handleAssets(libraries, commands, context) {
-    this.props.assetHandler.loadLibraries(libraries)
-    this.props.assetHandler.executeCommands(commands)
-    this.props.assetHandler.afterLoading(context)
   }
 
   addPost(post) {
@@ -126,7 +120,7 @@ export default class Posts extends Component {
         posts: posts
       })
 
-      this._handleAssets(editedPost.libraries, editedPost.commands, document.body)
+      this.props.onPostLoad(editedPost, document.body)
       scrollPosition.restore()
     }
   }
@@ -152,7 +146,7 @@ export default class Posts extends Component {
 
     for (let i=0; i<posts.length; i++) {
       const newPost = posts[i]
-      this._handleAssets(newPost.libraries, newPost.commands, document.body)
+      this.props.onPostLoad(newPost, document.body)
     }
   }
 
