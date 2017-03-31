@@ -3,6 +3,8 @@ import ScrollPosition from '../helper/ScrollPosition'
 import Notification from './Notification'
 import Post from './Post'
 
+import helperFuncs from '../helper/functions'
+
 import lodash from 'lodash'
 
 export default class Posts extends Component {
@@ -85,9 +87,9 @@ export default class Posts extends Component {
   }
 
   _handleAssets(libraries, commands, context) {
-    this.props.assetHandler.loadLibraries(libraries)
-    this.props.assetHandler.executeCommands(commands)
-    this.props.assetHandler.afterLoading(context)
+    helperFuncs.assetHandler.loadLibraries(libraries)
+    helperFuncs.assetHandler.executeCommands(commands)
+    helperFuncs.assetHandler.afterLoading(context)
   }
 
   addPost(post) {
