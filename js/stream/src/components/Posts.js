@@ -3,8 +3,6 @@ import ScrollPosition from '../helper/ScrollPosition'
 import Notification from './Notification'
 import Post from './Post'
 
-import AssetHandler from '../util/AssetHandler'
-
 import lodash from 'lodash'
 
 export default class Posts extends Component {
@@ -28,7 +26,7 @@ export default class Posts extends Component {
         this.setState({
           posts: posts.content
         })
-        this._handleAssets(posts, document.body)
+        this.props.onPostLoad(posts, document.body)
       }
       else {
         // TODO Handle empty
@@ -75,7 +73,7 @@ export default class Posts extends Component {
               ...lazyPosts.content
             ]
           })
-          this._handleAssets(lazyPosts, document.body)
+          this.props.onPostLoad(lazyPosts, document.body)
         }
         else {
           this.hasReachedEnd = true
@@ -84,10 +82,6 @@ export default class Posts extends Component {
 
       this.isloading = false
     })
-  }
-
-  _handleAssets(post, context) {
-    AssetHandler.handleAssets(post, context)
   }
 
   addPost(post) {
@@ -126,7 +120,7 @@ export default class Posts extends Component {
         posts: posts
       })
 
-      this._handleAssets(editedPost, document.body)
+      this.props.onPostLoad(editedPost, document.body)
       scrollPosition.restore()
     }
   }
@@ -152,7 +146,7 @@ export default class Posts extends Component {
 
     for (let i=0; i<posts.length; i++) {
       const newPost = posts[i]
-      this._handleAssets(newPost, document.body)
+      this.props.onPostLoad(newPost, document.body)
     }
   }
 
