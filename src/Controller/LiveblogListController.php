@@ -48,7 +48,7 @@ class LiveblogListController extends ControllerBase {
     $entities = $storage->loadMultiple($ids);
 
     if (!$entities) {
-      return new JsonResponse([]);
+      return new JsonResponse(['content' => []]);
     }
 
     $content = $render_array = [];
