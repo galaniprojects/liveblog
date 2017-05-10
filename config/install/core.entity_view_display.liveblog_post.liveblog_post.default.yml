@@ -32,14 +32,14 @@ content:
     weight: 8
     label: hidden
     settings:
-      include_map: '1'
-      include_static_map: '0'
-      include_link: '0'
-      include_text: '0'
-      iframe_height: '200'
-      iframe_width: '200'
-      zoom_level: '14'
-      information_bubble: '1'
+      include_map: true
+      include_static_map: false
+      include_link: false
+      include_text: false
+      iframe_height: 200
+      iframe_width: 200
+      zoom_level: 14
+      information_bubble: true
       link_text: 'View larger map'
       map_type: m
       langcode: en
