@@ -37,3 +37,12 @@ function liveblog_install() {
   }
   drupal_set_message(t('@count default highlight terms were created.', ['@count' => count($term_names) + 1]));
 }
+
+/**
+ * Prefill the channel prefix.
+ */
+function liveblog_update_8001() {
+  if (empty(\Drupal::config('liveblog.settings')->get('channel_prefix'))) {
+    \Drupal::configFactory()->getEditable('liveblog.settings')->set('channel_prefix', 'liveblog')->save();
+  }
+}
