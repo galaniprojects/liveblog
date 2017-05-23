@@ -142,6 +142,14 @@ class LiveblogSettingsForm extends ConfigFormBase  {
       ];
     }
 
+    $form['channel_prefix'] = [
+      '#type' => 'textfield',
+      '#title' => t('Channel prefix'),
+      '#description' => t('This can be useful, if you run multiple drupal instances on the same notification channel plugin instance.'),
+      '#default_value' => !empty($config->get('channel_prefix')) ? $config->get('channel_prefix') : 'liveblog',
+      '#required' => TRUE,
+    ];
+
     $form['actions'] = [
       '#type' => 'actions',
     ];
@@ -170,6 +178,7 @@ class LiveblogSettingsForm extends ConfigFormBase  {
    */
   public function submitForm(array &$form, FormStateInterface $form_state) {
     $this->setConfig('notification_channel', $form_state->getValue('notification_channel'));
+    $this->setConfig('channel_prefix', $form_state->getValue('channel_prefix'));
 
     $plugin = $form_state->getValue('notification_channel');
     $plugin = $this->notificationChannelManager->createInstance($plugin);
