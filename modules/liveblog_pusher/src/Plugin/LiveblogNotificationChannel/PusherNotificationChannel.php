@@ -165,7 +165,8 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
    */
   public function triggerLiveblogPostEvent(LiveblogPost $liveblog_post, $event) {
     $client = $this->getClient();
-    $channel = "liveblog-{$liveblog_post->getLiveblog()->id()}";
+    $channel_prefix = \Drupal::config('liveblog.settings')->get('channel_prefix');
+    $channel = "$channel_prefix-{$liveblog_post->getLiveblog()->id()}";
 
     // Trigger an event by providing event name and payload.
     $response = $client->trigger($channel, $event, Payload::create($liveblog_post)->getRenderedPayload(), null, true);

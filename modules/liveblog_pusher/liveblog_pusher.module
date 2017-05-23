@@ -18,11 +18,12 @@ function liveblog_pusher_node_view(array &$build, Node $node, EntityViewDisplayI
 
     $config = Drupal::config('liveblog.notification_channel.liveblog_pusher');
     $key = $config->get('key');
+    $channel_prefix = Drupal::config('liveblog.settings')->get('channel_prefix');
 
     $build['liveblog_posts']['#attached']['library'][] = 'liveblog_pusher/pusher';
     $build['liveblog_posts']['#attached']['drupalSettings']['liveblog_pusher'] = [
       'key' => $key,
-      'channel' => "liveblog-{$node->id()}",
+      'channel' => "$channel_prefix-{$node->id()}",
       'cluster' => $config->get('cluster'),
     ];
   }
