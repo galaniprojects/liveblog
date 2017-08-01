@@ -54,7 +54,7 @@ function liveblog_uninstall() {
   $configFactory = \Drupal::configFactory();
   $logger = \Drupal::logger('liveblog');
 
-  $config = [
+  $configs = [
     'core.base_field_override.node.liveblog.promote',
     'core.entity_form_display.liveblog_post.liveblog_post.default',
     'core.entity_form_display.node.liveblog.default',
@@ -81,12 +81,12 @@ function liveblog_uninstall() {
     'views.view.liveblog_posts',
   ];
 
-  foreach ($config as $tour) {
+  foreach ($configs as $config) {
     try {
-      $configFactory->getEditable($tour)->delete();
+      $configFactory->getEditable($config)->delete();
     }
     catch (\Exception $e) {
-      $logger->warning(sprintf('Unable to uninstall config: %s.', $tour));
+      $logger->warning(sprintf('Unable to uninstall config: %s.', $config));
     }
   }
 }
