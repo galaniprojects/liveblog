@@ -36,8 +36,8 @@ content:
       include_static_map: false
       include_link: false
       include_text: false
-      iframe_height: 200
-      iframe_width: 200
+      iframe_height: '200'
+      iframe_width: '200'
       zoom_level: 14
       information_bubble: true
       link_text: 'View larger map'
