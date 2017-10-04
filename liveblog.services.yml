@@ -2,6 +2,15 @@ services:
   plugin.manager.liveblog.notification_channel:
     class: Drupal\liveblog\NotificationChannel\NotificationChannelManager
     arguments: ['@container.namespaces', '@cache.discovery', '@module_handler', '@config.factory']
+  pusher.payload_renderer.provider:
+    class: Drupal\liveblog\PusherPayloadRendererProvider
+    tags:
+      - { name: service_collector, tag: pusher_payload_renderer, call: addPayloadRenderer }
+  pusher.payload_renderer.default:
+    class: Drupal\liveblog\PusherPayloadRendererDefault
+    arguments: ['@entity_type.manager', '@liveblog.renderer']
+    tags:
+      - { name: pusher_payload_renderer}
   liveblog.renderer:
     class: Drupal\liveblog\LiveblogRenderer
     arguments: ['@liveblog.ajax_response.attachments_processor', '@renderer']

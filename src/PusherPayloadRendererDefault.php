@@ -1,57 +1,55 @@
 <?php
 
-namespace Drupal\liveblog\Utility;
+namespace Drupal\liveblog;
 
+use Drupal\Core\Entity\EntityTypeManager;
 use Drupal\liveblog\Entity\LiveblogPost;
 
 /**
- * Utility for liveblog post payload.
- *
- * @todo: Convert to a trait or service.
+ * Default Pusher payload renderer.
  */
-class Payload {
+class PusherPayloadRendererDefault implements PusherPayloadRendererInterface {
 
   /**
-   * The liveblog post entity.
+   * Entity type manager.
    *
-   * @var \Drupal\liveblog\Entity\LiveblogPost $entity
+   * @var \Drupal\Core\Entity\EntityTypeManager
    */
-  protected $entity;
+  private $entityTypeManager;
 
   /**
-   * Constructors an instance.
+   * Renderer to render Liveblog entity.
    *
-   * @param \Drupal\liveblog\Entity\LiveblogPost $entity
-   *   The liveblog post entity.
+   * @var \Drupal\liveblog\LiveblogRenderer
    */
-  protected function __construct(LiveblogPost $entity) {
-    $this->entity = $entity;
-  }
+  private $liveblogRenderer;
 
   /**
    * Constructors an instance.
    *
-   * @param \Drupal\liveblog\Entity\LiveblogPost $entity
-   *   The liveblog post entity.
-   *
-   * @return self
-   *   Instance of the class.
+   * @param \Drupal\Core\Entity\EntityTypeManager $entityTypeManager
+   *   Entity type manager.
+   * @param \Drupal\liveblog\LiveblogRenderer $liveblogRenderer
+   *   Liveblog entity renderer.
    */
-  public static function create(LiveblogPost $entity) {
-    return new static($entity);
+  public function __construct(EntityTypeManager $entityTypeManager, LiveblogRenderer $liveblogRenderer) {
+    $this->entityTypeManager = $entityTypeManager;
+    $this->liveblogRenderer = $liveblogRenderer;
   }
 
   /**
-   * Gets a rendered payload from the liveblog post entity.
-   *
-   * @return array
-   *   The payload array.
+   * @inheritdoc
    */
-  public function getRenderedPayload() {
-    $entity = $this->entity;
+  public function isDefault() {
+    return TRUE;
+  }
 
-    $rendered_entity = $this->entityTypeManager()->getViewBuilder('liveblog_post')->view($entity);
-    $output = $this->getRenderer()->render($rendered_entity);
+  /**
+   * @inheritdoc
+   */
+  public function getRenderedPayload(LiveblogPost $entity) {
+    $rendered_entity = $this->entityTypeManager->getViewBuilder('liveblog_post')->view($entity);
+    $output = $this->liveblogRenderer->render($rendered_entity);
 
     $data['id'] = $entity->id();
     $data['uuid'] = $entity->uuid();
@@ -71,15 +69,10 @@ class Payload {
   }
 
   /**
-   * Gets payload from the liveblog post entity.
-   *
-   * @return array
-   *   The payload array.
+   * @inheritdoc
    */
-  public function getPayload() {
-    $entity = $this->entity;
-
-    $rendered_entity = $this->entityTypeManager()->getViewBuilder('liveblog_post')->view($entity);
+  public function getPayload(LiveblogPost $entity) {
+    $rendered_entity = $this->entityTypeManager->getViewBuilder('liveblog_post')->view($entity);
 
     $data['id'] = $entity->id();
     $data['uuid'] = $entity->uuid();
@@ -96,24 +89,6 @@ class Payload {
     $data['content'] = $rendered_entity;
 
     return $data;
-  }
-
-  /**
-   * Returns the render API renderer.
-   *
-   * @return \Drupal\liveblog\LiveblogRenderer
-   */
-  protected function getRenderer() {
-    return \Drupal::service('liveblog.renderer');
-  }
-
-  /**
-   * Gets the entity type manager.
-   *
-   * @return \Drupal\Core\Entity\EntityTypeManagerInterface
-   */
-  protected function entityTypeManager() {
-    return \Drupal::entityTypeManager();
   }
 
 }
