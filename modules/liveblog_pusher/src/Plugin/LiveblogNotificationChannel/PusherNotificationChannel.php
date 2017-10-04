@@ -2,6 +2,7 @@
 
 namespace Drupal\liveblog_pusher\Plugin\LiveblogNotificationChannel;
 
+use Pusher\Pusher;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
 use Drupal\Core\Form\FormStateInterface;
@@ -25,7 +26,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
   /**
    * The pusher client.
    *
-   * @var \Pusher
+   * @var \Pusher\Pusher
    */
   protected $client;
 
@@ -110,8 +111,8 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
    * Try to load Pusher library, if it wasn't autoloaded.
    */
   private function loadPusherLibrary() {
-    if (!class_exists('\Pusher') && function_exists('libraries_get_path')) {
-      include_once (DRUPAL_ROOT.'/'.libraries_get_path('pusher') . '/lib/Pusher.php');
+    if (!class_exists('\Pusher\Pusher') && function_exists('libraries_get_path')) {
+      include_once (DRUPAL_ROOT.'/'.libraries_get_path('pusher') . '/src/Pusher.php');
     }
   }
 
@@ -124,15 +125,15 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
     $this->loadPusherLibrary();
 
     // Check the required dependency on the Pusher library.
-    if (!class_exists('\Pusher')) {
-      $form_state->setErrorByName('plugin', t('The "\Pusher" class was not found. Please make sure you have included the <a href="https://github.com/pusher/pusher-http-php">Pusher PHP Library</a>.'));
+    if (!class_exists('\Pusher\Pusher')) {
+      $form_state->setErrorByName('plugin', t('The "\Pusher\Pusher" class was not found. Please make sure you have included the <a href="https://github.com/pusher/pusher-http-php">Pusher PHP Library</a>.'));
     }
   }
 
   /**
    * {@inheritdoc}
    *
-   * @return \Pusher
+   * @return \Pusher\Pusher
    *   The notification channel client.
    */
   public function getClient() {
@@ -149,7 +150,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
         $options['cluster'] = $cluster;
       }
 
-      $this->client = new \Pusher(
+      $this->client = new Pusher(
         $this->getConfigurationValue('key'),
         $this->getConfigurationValue('secret'),
         $this->getConfigurationValue('app_id'),
