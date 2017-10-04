@@ -25,8 +25,8 @@ You have to register an account for it here: https://pusher.com/. Please note do
 the App ID, Key and Secret.  
 You also need the pusher library. See here for instructions: https://github.com/pusher/pusher-http-php
 
-If you are not using a composer workflow, you can download the library here: https://github.com/pusher/pusher-http-php/releases.  
-Use pusher version 3.0.0 or greater.
+If you are not using a composer workflow, you can download the library here: https://github.com/pusher/pusher-http-php/releases.
+Use pusher version 3.0.0 or greater.  
 Extract it into your libraries folder (`libraries` or `sites/<domain>/libraries`) and rename it to `pusher`.
 The library should contain the path `src/Pusher.php`
 
