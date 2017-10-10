@@ -26,6 +26,14 @@
                                     isLoading = false
                                 })
                             }
+                            target.on('liveblog-post--edit-form--removed', function (e) {
+                                var offset = target.offset()
+                                offset.top -= 100
+                                $('html, body').animate({
+                                    'scrollTop': offset.top
+                                })
+                                target.closest('.liveblog-post').addClass('liveblog-post--edit--finished')
+                            })
                         }
                         else {
                             // TODO remove editor
