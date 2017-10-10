@@ -1,5 +1,7 @@
 (function(Drupal, drupalSettings) {
     function AssetHandler(target, url) {
+        // url can't be a falsy value.
+        url = url ? url : ' '
         this.ajaxObject = new Drupal.Ajax(null, target, {url: url, wrapper: 'page-wrapper'})
         this.ajaxCommands = new Drupal.AjaxCommands()
     }
