@@ -3,7 +3,7 @@
     attach: function(context, settings) {
       var self = this
       this.getContainer(context).once('liveblog-stream-initialised').each(function(index, element) {
-        var assetHandler = new settings.liveblog.AssetHandler(self.getContainer(context), '')
+        var assetHandler = new settings.liveblog.AssetHandler(self.getContainer(context).get(0))
 
         LiveblogStream.setTranslatorFunction(function(string) {
           return Drupal.t(string)
