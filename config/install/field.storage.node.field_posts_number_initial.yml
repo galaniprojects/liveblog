@@ -1,6 +1,9 @@
 langcode: en
 status: true
 dependencies:
+  enforced:
+    module:
+      - liveblog
   module:
     - node
 id: node.field_posts_number_initial
