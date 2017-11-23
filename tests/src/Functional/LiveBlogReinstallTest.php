@@ -2,9 +2,7 @@
 
 namespace Drupal\Tests\liveblog\Functional;
 
-use Drupal\Component\Serialization\Json;
-use Drupal\liveblog\Entity\LiveblogPost;
-use Drupal\node\Entity\Node;
+use Drupal\Core\Logger\RfcLogLevel;
 use Drupal\Tests\BrowserTestBase;
 
 /**
@@ -12,24 +10,42 @@ use Drupal\Tests\BrowserTestBase;
  *
  * @group Liveblog
  */
-class LiveBlogReinstallTest extends BrowserTestBase  {
+class LiveBlogReinstallTest extends BrowserTestBase {
 
   /**
-   * Ignore some config schema errors of modules used.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  protected static $configSchemaCheckerExclusions = [
-    'core.entity_view_display.liveblog_post.liveblog_post.default',
-  ];
+  protected static $modules = ['dblog', 'liveblog'];
 
   /**
    * Tests re-installing the live blog module and the config after install.
    */
   public function testReinstall() {
-    $this->container->get('module_installer')->install(['liveblog']);
-    $this->container->get('module_installer')->uninstall(['liveblog']);
-    $this->container->get('module_installer')->install(['liveblog']);
+    $this->drupalLogin($this->createUser(['administer modules']));
+    $count = db_select('watchdog', 'w')
+      ->condition('severity', RfcLogLevel::ERROR)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+    $this->assertEquals(0, $count, 'There are no errors before uninstalling Liveblog');
+
+    // Uninstall and re-install via the UI like a real user.
+    $edit = [];
+    $edit['uninstall[liveblog]'] = TRUE;
+    $this->drupalPostForm('admin/modules/uninstall', $edit, t('Uninstall'));
+    $this->drupalPostForm(NULL, [], t('Uninstall'));
+    $this->rebuildContainer();
+
+    $this->drupalPostForm('admin/modules', ['modules[liveblog][enable]' => "1"], t('Install'));
+    $this->rebuildContainer();
+
+    $count = db_select('watchdog', 'w')
+      ->condition('severity', RfcLogLevel::ERROR)
+      ->countQuery()
+      ->execute()
+      ->fetchField();
+    $this->assertEquals(0, $count, 'There are no errors after uninstalling and re-installing Liveblog');
+
   }
 
 }
