@@ -22,6 +22,7 @@ content:
     weight: 1
     settings: {  }
     third_party_settings: {  }
+    region: content
   field_status:
     weight: 2
     label: hidden
@@ -31,14 +32,17 @@ content:
       format_custom_true: ''
     third_party_settings: {  }
     type: boolean
+    region: content
   links:
     weight: 0
     settings: {  }
     third_party_settings: {  }
+    region: content
   liveblog_posts:
     weight: 3
     settings: {  }
     third_party_settings: {  }
+    region: content
 hidden:
   field_highlights: true
   field_posts_load_limit: true

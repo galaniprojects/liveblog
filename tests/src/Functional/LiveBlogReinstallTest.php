@@ -45,7 +45,6 @@ class LiveBlogReinstallTest extends BrowserTestBase {
       ->execute()
       ->fetchField();
     $this->assertEquals(0, $count, 'There are no errors after uninstalling and re-installing Liveblog');
-
   }
 
 }
