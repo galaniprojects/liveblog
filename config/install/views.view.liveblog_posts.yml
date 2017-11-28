@@ -872,8 +872,6 @@ display:
           text: view
           entity_type: liveblog_post
           plugin_id: entity_link
-          output_url_as_text: false
-          absolute: false
         edit_liveblog_post:
           id: edit_liveblog_post
           table: liveblog_post
