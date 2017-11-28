@@ -17,11 +17,13 @@ content:
       rows: 3
       placeholder: ''
     third_party_settings: {  }
+    region: content
   highlight:
     type: options_select
     weight: 2
     settings: {  }
     third_party_settings: {  }
+    region: content
   location:
     type: string_textfield
     weight: 4
@@ -29,6 +31,7 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+    region: content
   source:
     type: link_default
     weight: 3
@@ -36,12 +39,14 @@ content:
       placeholder_url: ''
       placeholder_title: ''
     third_party_settings: {  }
+    region: content
   status:
     type: boolean_checkbox
     weight: 5
     settings:
       display_label: true
     third_party_settings: {  }
+    region: content
   title:
     type: string_textfield
     weight: 0
@@ -49,6 +54,7 @@ content:
       size: 60
       placeholder: ''
     third_party_settings: {  }
+    region: content
 hidden:
   liveblog: true
   uid: true
