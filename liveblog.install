@@ -44,51 +44,10 @@ function liveblog_install() {
  * Implements hook_uninstall().
  */
 function liveblog_uninstall() {
-
   $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
     'vid' => LiveblogPost::LIVEBLOG_POSTS_HIGHLIGHTS_VID,
   ]);
   \Drupal::entityTypeManager()->getStorage('taxonomy_term')->delete($terms);
-
-  /** @var \Drupal\Core\Config\ConfigFactoryInterface $configFactory */
-  $configFactory = \Drupal::configFactory();
-  $logger = \Drupal::logger('liveblog');
-
-  $configs = [
-    'core.base_field_override.node.liveblog.promote',
-    'core.entity_form_display.liveblog_post.liveblog_post.default',
-    'core.entity_form_display.node.liveblog.default',
-    'core.entity_view_display.liveblog_post.liveblog_post.default',
-    'core.entity_view_display.node.liveblog.default',
-    'core.entity_view_display.node.liveblog.teaser',
-    'core.entity_view_mode.liveblog_post.full',
-    'field.field.node.liveblog.body',
-    'field.field.node.liveblog.field_highlights',
-    'field.field.node.liveblog.field_posts_load_limit',
-    'field.field.node.liveblog.field_posts_number_initial',
-    'field.field.node.liveblog.field_status',
-    'field.storage.node.field_highlights',
-    'field.storage.node.field_posts_load_limit',
-    'field.storage.node.field_posts_number_initial',
-    'field.storage.node.field_status',
-    'language.content_settings.node.liveblog',
-    'language.content_settings.taxonomy_term.highlights',
-    'liveblog.liveblog_post.settings',
-    'liveblog.settings',
-    'node.type.liveblog',
-    'rest.resource.entity.liveblog_post',
-    'taxonomy.vocabulary.highlights',
-    'views.view.liveblog_posts',
-  ];
-
-  foreach ($configs as $config) {
-    try {
-      $configFactory->getEditable($config)->delete();
-    }
-    catch (\Exception $e) {
-      $logger->warning(sprintf('Unable to uninstall config: %s.', $config));
-    }
-  }
 }
 
 /**
@@ -97,5 +56,33 @@ function liveblog_uninstall() {
 function liveblog_update_8001() {
   if (empty(\Drupal::config('liveblog.settings')->get('channel_prefix'))) {
     \Drupal::configFactory()->getEditable('liveblog.settings')->set('channel_prefix', 'liveblog')->save();
+  }
+}
+
+/**
+ * Fix liveblog configuration dependencies.
+ */
+function liveblog_update_8002() {
+  $config_to_fix = [
+    'field.storage.node.field_highlights',
+    'field.storage.node.field_posts_load_limit',
+    'field.storage.node.field_posts_number_initial',
+    'field.storage.node.field_status',
+    'node.type.liveblog',
+    'taxonomy.vocabulary.highlights',
+  ];
+  foreach ($config_to_fix as $name) {
+    $config = \Drupal::configFactory()->getEditable($name);
+    $current_dependencies = $config->get('dependencies.enforced.module');
+    if (!empty($current_dependencies)) {
+      $current_dependencies[] = 'liveblog';
+      sort($current_dependencies);
+    }
+    else {
+      $current_dependencies = ['liveblog'];
+    }
+    $config
+      ->set('dependencies.enforced.module', $current_dependencies)
+      ->save();
   }
 }

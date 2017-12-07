@@ -18,6 +18,7 @@ content:
     label: hidden
     settings: {  }
     third_party_settings: {  }
+    region: content
   created:
     label: hidden
     type: timestamp
@@ -27,6 +28,7 @@ content:
       custom_date_format: ''
       timezone: ''
     third_party_settings: {  }
+    region: content
   location:
     type: simple_gmap
     weight: 8
@@ -44,6 +46,7 @@ content:
       map_type: m
       langcode: en
     third_party_settings: {  }
+    region: content
   source:
     label: inline
     type: link
@@ -55,6 +58,7 @@ content:
       rel: ''
       target: ''
     third_party_settings: {  }
+    region: content
   title:
     label: hidden
     type: string
@@ -62,12 +66,14 @@ content:
     settings:
       link_to_entity: false
     third_party_settings: {  }
+    region: content
   uid:
     label: hidden
     type: author
     weight: 2
     settings: {  }
     third_party_settings: {  }
+    region: content
 hidden:
   changed: true
   highlight: true

@@ -3,7 +3,9 @@ status: true
 dependencies:
   module:
     - hal
+    - liveblog
     - serialization
+    - user
 id: entity.liveblog_post
 plugin_id: 'entity:liveblog_post'
 granularity: method
