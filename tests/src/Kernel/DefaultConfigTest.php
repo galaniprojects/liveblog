@@ -1,6 +1,6 @@
 <?php
 
-namespace Drupal\liveblog\Kernel;
+namespace Drupal\Tests\liveblog\Kernel;
 
 use Drupal\KernelTests\Config\DefaultConfigTest as CoreDefaultConfigTest;
 
