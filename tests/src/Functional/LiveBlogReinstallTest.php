@@ -22,8 +22,12 @@ class LiveBlogReinstallTest extends BrowserTestBase {
    */
   public function testReinstall() {
     $this->drupalLogin($this->createUser(['administer modules']));
-    $count = db_select('watchdog', 'w')
+    $query = db_select('watchdog', 'w');
+    $condition = $query->orConditionGroup()
       ->condition('severity', RfcLogLevel::ERROR)
+      ->condition('severity', RfcLogLevel::CRITICAL);
+    $count = $query
+      ->condition($condition)
       ->countQuery()
       ->execute()
       ->fetchField();
@@ -40,7 +44,7 @@ class LiveBlogReinstallTest extends BrowserTestBase {
     $this->rebuildContainer();
 
     $count = db_select('watchdog', 'w')
-      ->condition('severity', RfcLogLevel::ERROR)
+      ->condition($condition)
       ->countQuery()
       ->execute()
       ->fetchField();

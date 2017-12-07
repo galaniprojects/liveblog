@@ -44,7 +44,6 @@ function liveblog_install() {
  * Implements hook_uninstall().
  */
 function liveblog_uninstall() {
-
   $terms = \Drupal::entityTypeManager()->getStorage('taxonomy_term')->loadByProperties([
     'vid' => LiveblogPost::LIVEBLOG_POSTS_HIGHLIGHTS_VID,
   ]);
@@ -57,5 +56,33 @@ function liveblog_uninstall() {
 function liveblog_update_8001() {
   if (empty(\Drupal::config('liveblog.settings')->get('channel_prefix'))) {
     \Drupal::configFactory()->getEditable('liveblog.settings')->set('channel_prefix', 'liveblog')->save();
+  }
+}
+
+/**
+ * Fix liveblog configuration dependencies.
+ */
+function liveblog_update_8002() {
+  $config_to_fix = [
+    'field.storage.node.field_highlights',
+    'field.storage.node.field_posts_load_limit',
+    'field.storage.node.field_posts_number_initial',
+    'field.storage.node.field_status',
+    'node.type.liveblog',
+    'taxonomy.vocabulary.highlights',
+  ];
+  foreach ($config_to_fix as $name) {
+    $config = \Drupal::configFactory()->getEditable($name);
+    $current_dependencies = $config->get('dependencies.enforced.module');
+    if (!empty($current_dependencies)) {
+      $current_dependencies[] = 'liveblog';
+      sort($current_dependencies);
+    }
+    else {
+      $current_dependencies = ['liveblog'];
+    }
+    $config
+      ->set('dependencies.enforced.module', $current_dependencies)
+      ->save();
   }
 }
