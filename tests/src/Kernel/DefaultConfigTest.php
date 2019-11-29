@@ -7,7 +7,7 @@ use Drupal\KernelTests\Config\DefaultConfigTest as CoreDefaultConfigTest;
 /**
  * Tests that the installed config matches the default config.
  *
- * @group Liveblog
+ * @group liveblog
  */
 class DefaultConfigTest extends CoreDefaultConfigTest {
 

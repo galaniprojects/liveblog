@@ -10,7 +10,7 @@ use Drupal\Tests\BrowserTestBase;
 /**
  * Functional tests for the liveblog list service.
  *
- * @group Liveblog
+ * @group liveblog
  */
 class LiveBlogListTest extends BrowserTestBase  {
 
@@ -24,11 +24,9 @@ class LiveBlogListTest extends BrowserTestBase  {
   ];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'liveblog',
   ];
 
@@ -47,7 +45,7 @@ class LiveBlogListTest extends BrowserTestBase  {
 
     $this->node = Node::create([
       'title' => 'Test blog',
-      'type' => 'liveblog'
+      'type' => 'liveblog',
     ]);
     $this->node->save();
 
