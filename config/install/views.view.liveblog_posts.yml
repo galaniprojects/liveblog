@@ -17,7 +17,6 @@ description: ''
 tag: ''
 base_table: liveblog_post
 base_field: id
-core: 8.x
 display:
   default:
     display_plugin: default
@@ -872,6 +871,8 @@ display:
           text: view
           entity_type: liveblog_post
           plugin_id: entity_link
+          output_url_as_text: false
+          absolute: false
         edit_liveblog_post:
           id: edit_liveblog_post
           table: liveblog_post
@@ -1058,6 +1059,8 @@ display:
               editor: '0'
               seo: '0'
               administrator: '0'
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -1100,6 +1103,8 @@ display:
               editor: '0'
               seo: '0'
               administrator: '0'
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -1142,6 +1147,8 @@ display:
               editor: '0'
               seo: '0'
               administrator: '0'
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -1184,6 +1191,8 @@ display:
               editor: '0'
               seo: '0'
               administrator: '0'
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -1226,6 +1235,8 @@ display:
               editor: '0'
               seo: '0'
               administrator: '0'
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -1268,6 +1279,8 @@ display:
               editor: '0'
               seo: '0'
               administrator: '0'
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -1310,6 +1323,8 @@ display:
               editor: '0'
               seo: '0'
               administrator: '0'
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''
@@ -1375,7 +1390,7 @@ display:
           1: AND
       title: 'Liveblog posts'
     cache_metadata:
-      max-age: 0
+      max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
@@ -1409,7 +1424,7 @@ display:
       defaults:
         access: false
     cache_metadata:
-      max-age: 0
+      max-age: -1
       contexts:
         - 'languages:language_content'
         - 'languages:language_interface'
@@ -1514,6 +1529,8 @@ display:
             multiple: false
             remember_roles:
               authenticated: authenticated
+            operator_limit_selection: false
+            operator_list: {  }
           is_grouped: false
           group_info:
             label: ''

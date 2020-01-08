@@ -10,9 +10,9 @@ use Drupal\Tests\BrowserTestBase;
 /**
  * Functional tests for the liveblog post edit form service.
  *
- * @group Liveblog
+ * @group liveblog
  */
-class LiveBlogEditFormTest extends BrowserTestBase  {
+class LiveBlogEditFormTest extends BrowserTestBase {
 
   /**
    * Ignore some config schema errors of modules used.
@@ -24,11 +24,9 @@ class LiveBlogEditFormTest extends BrowserTestBase  {
   ];
 
   /**
-   * Modules to enable.
-   *
-   * @var array
+   * {@inheritdoc}
    */
-  public static $modules = [
+  protected static $modules = [
     'liveblog',
   ];
 
@@ -54,7 +52,7 @@ class LiveBlogEditFormTest extends BrowserTestBase  {
 
     $this->node = Node::create([
       'title' => 'Test blog',
-      'type' => 'liveblog'
+      'type' => 'liveblog',
     ]);
     $this->node->save();
 

@@ -8,7 +8,7 @@ use Drupal\Tests\BrowserTestBase;
 /**
  * Functional tests for the liveblog module.
  *
- * @group Liveblog
+ * @group liveblog
  */
 class LiveBlogReinstallTest extends BrowserTestBase {
 

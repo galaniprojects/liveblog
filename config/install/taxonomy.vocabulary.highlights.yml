@@ -7,5 +7,4 @@ dependencies:
 name: Highlights
 vid: highlights
 description: 'Post highlights'
-hierarchy: 0
 weight: 0
