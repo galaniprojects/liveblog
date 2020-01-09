@@ -37,7 +37,7 @@ function liveblog_install() {
     $term->parent = [$parent->id()];
     $term->save();
   }
-  drupal_set_message(t('@count default highlight terms were created.', ['@count' => count($term_names) + 1]));
+  \Drupal::messenger()->addMessage(t('@count default highlight terms were created.', ['@count' => count($term_names) + 1]));
 }
 
 /**

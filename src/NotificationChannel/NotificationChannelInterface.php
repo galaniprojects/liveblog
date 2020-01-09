@@ -2,7 +2,7 @@
 
 namespace Drupal\liveblog\NotificationChannel;
 
-use Drupal\Component\Plugin\ConfigurablePluginInterface;
+use Drupal\Component\Plugin\ConfigurableInterface;
 use Drupal\Component\Plugin\PluginInspectionInterface;
 use Drupal\Core\Plugin\ContainerFactoryPluginInterface;
 use Drupal\Core\Plugin\PluginFormInterface;
@@ -14,7 +14,7 @@ use Drupal\liveblog\Entity\LiveblogPost;
  *
  * @ingroup liveblog_notification_channel
  */
-interface NotificationChannelInterface extends PluginInspectionInterface, PluginFormInterface, ConfigurablePluginInterface, ContainerFactoryPluginInterface {
+interface NotificationChannelInterface extends PluginInspectionInterface, PluginFormInterface, ConfigurableInterface, ContainerFactoryPluginInterface {
 
   /**
    * Gets the notification channel client.

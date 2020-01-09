@@ -48,6 +48,8 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
    *   The plugin implementation definition.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager service.
    * @param \Drupal\liveblog_pusher\PusherLoggerInterface $logger
    *   The logger.
    */
@@ -86,7 +88,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
       '#type' => 'textfield',
       '#title' => t('Key'),
       '#required' => TRUE,
-      '#default_value' => !empty($this->configuration['key']) ? $this->configuration['key']: '',
+      '#default_value' => !empty($this->configuration['key']) ? $this->configuration['key'] : '',
       '#description' => t('Please enter your Pusher key.'),
     ];
     $form['secret'] = [
@@ -149,14 +151,14 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
       if (!empty($cluster)) {
         $options['cluster'] = $cluster;
       }
-
+      /** @var \Pusher\Pusher client */
       $this->client = new Pusher(
         $this->getConfigurationValue('key'),
         $this->getConfigurationValue('secret'),
         $this->getConfigurationValue('app_id'),
         $options
       );
-      $this->client->set_logger($this->logger);
+      $this->client->setLogger($this->logger);
     }
     return $this->client;
   }
@@ -170,7 +172,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
     $channel = "$channel_prefix-{$liveblog_post->getLiveblog()->id()}";
 
     // Trigger an event by providing event name and payload.
-    $response = $client->trigger($channel, $event, Payload::create($liveblog_post)->getRenderedPayload(), null, true);
+    $response = $client->trigger($channel, $event, Payload::create($liveblog_post)->getRenderedPayload(), NULL, TRUE);
     if ($response['status'] !== 200) {
       // Log response if there is an error.
       $this->logger->saveLog('error');

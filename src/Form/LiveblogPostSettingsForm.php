@@ -91,7 +91,7 @@ class LiveblogPostSettingsForm extends ConfigFormBase {
     foreach ($form_state->getValue('settings') as $key => $value) {
       $this->setConfig($key, $value);
     }
-    drupal_set_message(t('Liveblog post settings have been updated.'));
+    $this->messenger()->addStatus(t('Liveblog post settings have been updated.'));
   }
 
 }

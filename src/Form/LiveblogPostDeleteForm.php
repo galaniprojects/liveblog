@@ -52,7 +52,7 @@ class LiveblogPostDeleteForm extends ContentEntityConfirmFormBase {
     // Redirect to the posts list.
     $form_state->setRedirect('view.liveblog_posts.liveblog_posts_admin');
 
-    drupal_set_message(t('Liveblog post was successfully deleted.'));
+    $this->messenger()->addStatus(t('Liveblog post was successfully deleted.'));
   }
 
 }

@@ -8,6 +8,7 @@ use Drupal\Core\Entity\ContentEntityBase;
 use Drupal\Core\Entity\EntityTypeInterface;
 use Drupal\liveblog\LiveblogPostInterface;
 use Drupal\node\NodeInterface;
+use Drupal\user\EntityOwnerTrait;
 use Drupal\user\UserInterface;
 use Drupal\Core\Entity\EntityChangedTrait;
 use Drupal\link\LinkItemInterface;
@@ -36,7 +37,8 @@ use Drupal\link\LinkItemInterface;
  *   entity_keys = {
  *     "id" = "id",
  *     "label" = "title",
- *     "uuid" = "uuid"
+ *     "uuid" = "uuid",
+ *     "owner" = "uid"
  *   },
  *   links = {
  *     "canonical" = "/liveblog_post/{liveblog_post}",
@@ -49,6 +51,7 @@ use Drupal\link\LinkItemInterface;
 class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
 
   use EntityChangedTrait;
+  use EntityOwnerTrait;
 
   /**
    * Liveblog posts highlights taxonomy vocabulary id.
@@ -85,36 +88,6 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
    */
   public function getChangedTime() {
     return $this->get('changed')->value;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwner() {
-    return $this->get('uid')->entity;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function getOwnerId() {
-    return $this->get('uid')->target_id;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwnerId($uid) {
-    $this->set('uid', $uid);
-    return $this;
-  }
-
-  /**
-   * {@inheritdoc}
-   */
-  public function setOwner(UserInterface $account) {
-    $this->set('uid', $account->id());
-    return $this;
   }
 
   /**
@@ -172,6 +145,7 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
    * in the GUI. The behaviour of the widgets used can be determined here.
    */
   public static function baseFieldDefinitions(EntityTypeInterface $entity_type) {
+    $fields = static::ownerBaseFieldDefinitions($entity_type);
 
     // Standard field, used as unique if primary index.
     $fields['id'] = BaseFieldDefinition::create('integer')
@@ -299,12 +273,10 @@ class LiveblogPost extends ContentEntityBase implements LiveblogPostInterface {
       ->setDisplayConfigurable('form', TRUE)
       ->setDisplayConfigurable('view', TRUE);
 
-    $fields['uid'] = BaseFieldDefinition::create('entity_reference')
+    $fields['uid']
       ->setLabel(t('Authored by'))
       ->setDescription(t('The username of the content author.'))
       ->setRequired(TRUE)
-      ->setSetting('target_type', 'user')
-      ->setDefaultValueCallback('Drupal\node\Entity\Node::getCurrentUserId')
       ->setDisplayOptions('form', [
         'type' => 'hidden',
       ])
