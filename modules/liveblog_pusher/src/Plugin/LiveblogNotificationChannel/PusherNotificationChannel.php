@@ -2,6 +2,7 @@
 
 namespace Drupal\liveblog_pusher\Plugin\LiveblogNotificationChannel;
 
+use Drupal\Core\Logger\LoggerChannelFactoryInterface;
 use Pusher\Pusher;
 use Drupal\Core\Config\ConfigFactoryInterface;
 use Drupal\Core\Entity\EntityTypeManagerInterface;
@@ -9,7 +10,6 @@ use Drupal\Core\Form\FormStateInterface;
 use Drupal\liveblog\Utility\Payload;
 use Drupal\liveblog\Entity\LiveblogPost;
 use Drupal\liveblog\NotificationChannel\NotificationChannelPluginBase;
-use Drupal\liveblog_pusher\PusherLoggerInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 /**
@@ -31,9 +31,9 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
   protected $client;
 
   /**
-   * The entity type manager.
+   * The logger.
    *
-   * @var \Drupal\liveblog_pusher\PusherLoggerInterface
+   * @var \Drupal\Core\Logger\LoggerChannelInterface
    */
   protected $logger;
 
@@ -48,12 +48,14 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
    *   The plugin implementation definition.
    * @param \Drupal\Core\Config\ConfigFactoryInterface $config_factory
    *   The factory for configuration objects.
-   * @param \Drupal\liveblog_pusher\PusherLoggerInterface $logger
+   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_type_manager
+   *   The entity type manager service.
+   * @param \Drupal\Core\Logger\LoggerChannelFactoryInterface $logger_factory
    *   The logger.
    */
-  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, PusherLoggerInterface $logger) {
+  public function __construct(array $configuration, $plugin_id, $plugin_definition, ConfigFactoryInterface $config_factory, EntityTypeManagerInterface $entity_type_manager, LoggerChannelFactoryInterface $logger_factory) {
     parent::__construct($configuration, $plugin_id, $plugin_definition, $config_factory, $entity_type_manager);
-    $this->logger = $logger;
+    $this->logger = $logger_factory->get('liveblog_pusher');
   }
 
   /**
@@ -66,7 +68,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
       $plugin_definition,
       $container->get('config.factory'),
       $container->get('entity_type.manager'),
-      $container->get('liveblog_pusher.notification_channel.log')
+      $container->get('logger.factory')
     );
   }
 
@@ -86,7 +88,7 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
       '#type' => 'textfield',
       '#title' => t('Key'),
       '#required' => TRUE,
-      '#default_value' => !empty($this->configuration['key']) ? $this->configuration['key']: '',
+      '#default_value' => !empty($this->configuration['key']) ? $this->configuration['key'] : '',
       '#description' => t('Please enter your Pusher key.'),
     ];
     $form['secret'] = [
@@ -149,14 +151,14 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
       if (!empty($cluster)) {
         $options['cluster'] = $cluster;
       }
-
+      /** @var \Pusher\Pusher client */
       $this->client = new Pusher(
         $this->getConfigurationValue('key'),
         $this->getConfigurationValue('secret'),
         $this->getConfigurationValue('app_id'),
         $options
       );
-      $this->client->set_logger($this->logger);
+      $this->client->setLogger($this->logger);
     }
     return $this->client;
   }
@@ -170,10 +172,10 @@ class PusherNotificationChannel extends NotificationChannelPluginBase {
     $channel = "$channel_prefix-{$liveblog_post->getLiveblog()->id()}";
 
     // Trigger an event by providing event name and payload.
-    $response = $client->trigger($channel, $event, Payload::create($liveblog_post)->getRenderedPayload(), null, true);
+    $response = $client->trigger($channel, $event, Payload::create($liveblog_post)->getRenderedPayload(), NULL, TRUE);
     if ($response['status'] !== 200) {
       // Log response if there is an error.
-      $this->logger->saveLog('error');
+      $this->logger->critical('Event could not be triggered.');
       // Throw error.
       throw new \Exception($response['body']);
     }

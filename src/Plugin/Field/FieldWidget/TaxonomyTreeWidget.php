@@ -104,7 +104,7 @@ class TaxonomyTreeWidget extends OptionsWidgetBase {
       return $level;
     };
 
-    while (list($key, $val) = each($data)) {
+    foreach ($data as $key => $val) {
       reset($data);
       $item_level = $get_level($val);
 

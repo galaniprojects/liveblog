@@ -14,7 +14,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
  *
  * @see \Drupal\Core\Form\FormBase
  */
-class LiveblogSettingsForm extends ConfigFormBase  {
+class LiveblogSettingsForm extends ConfigFormBase {
 
   /**
    * The notification channel manager.
@@ -184,7 +184,7 @@ class LiveblogSettingsForm extends ConfigFormBase  {
     $plugin = $this->notificationChannelManager->createInstance($plugin);
     $plugin->submitConfigurationForm($form, $form_state);
 
-    drupal_set_message(t('Liveblog settings have been updated.'));
+    $this->messenger()->addMessage(t('Liveblog settings have been updated.'));
   }
 
   /**

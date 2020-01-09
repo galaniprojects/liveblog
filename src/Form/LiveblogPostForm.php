@@ -2,8 +2,10 @@
 
 namespace Drupal\liveblog\Form;
 
+use Drupal\Component\Datetime\TimeInterface;
 use Drupal\Core\Entity\ContentEntityForm;
-use Drupal\Core\Entity\EntityTypeManagerInterface;
+use Drupal\Core\Entity\EntityRepositoryInterface;
+use Drupal\Core\Entity\EntityTypeBundleInfoInterface;
 use Drupal\Core\Form\FormStateInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
@@ -30,15 +32,10 @@ class LiveblogPostForm extends ContentEntityForm {
   protected $requestStack;
 
   /**
-   * Constructs a ContentEntityForm object.
-   *
-   * @param \Drupal\Core\Entity\EntityTypeManagerInterface $entity_manager
-   *   The entity manager.
-   * @param \Symfony\Component\HttpFoundation\RequestStack
-   *   The current request.
+   * {@inheritdoc}
    */
-  public function __construct(EntityTypeManagerInterface $entity_manager, RequestStack $request_stack) {
-    parent::__construct($entity_manager);
+  public function __construct(EntityRepositoryInterface $entity_repository, EntityTypeBundleInfoInterface $entity_type_bundle_info, TimeInterface $time, RequestStack $request_stack) {
+    parent::__construct($entity_repository, $entity_type_bundle_info, $time);
     $this->requestStack = $request_stack;
   }
 
@@ -47,7 +44,9 @@ class LiveblogPostForm extends ContentEntityForm {
    */
   public static function create(ContainerInterface $container) {
     return new static(
-      $container->get('entity.manager'),
+      $container->get('entity.repository'),
+      $container->get('entity_type.bundle.info'),
+      $container->get('datetime.time'),
       $container->get('request_stack')
     );
   }
@@ -217,17 +216,17 @@ class LiveblogPostForm extends ContentEntityForm {
       $this->entity->save();
     }
     catch (\Exception $e) {
-      drupal_set_message($e->getMessage(), 'error');
+      $this->messenger()->addError($e->getMessage());
       $form_state->disableRedirect();
       $this->clearEntity();
       return;
     }
 
     if ($this->getOperation() == 'edit') {
-      drupal_set_message(t('Liveblog post was successfully updated.'));
+      $this->messenger()->addStatus(t('Liveblog post was successfully updated.'));
     }
     elseif ($this->getOperation() == 'add') {
-      drupal_set_message(t('Liveblog post was successfully created.'));
+      $this->messenger()->addStatus(t('Liveblog post was successfully created.'));
     }
 
     // Redirect to the post's full page if we are not at the liveblog page.

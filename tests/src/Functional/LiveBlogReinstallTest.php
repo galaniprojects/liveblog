@@ -18,11 +18,16 @@ class LiveBlogReinstallTest extends BrowserTestBase {
   protected static $modules = ['dblog', 'liveblog'];
 
   /**
+   * {@inheritdoc}
+   */
+  protected $defaultTheme = 'stark';
+
+  /**
    * Tests re-installing the live blog module and the config after install.
    */
   public function testReinstall() {
     $this->drupalLogin($this->createUser(['administer modules']));
-    $query = db_select('watchdog', 'w');
+    $query = \Drupal::database()->select('watchdog', 'w');
     $condition = $query->orConditionGroup()
       ->condition('severity', RfcLogLevel::ERROR)
       ->condition('severity', RfcLogLevel::CRITICAL);
@@ -43,7 +48,7 @@ class LiveBlogReinstallTest extends BrowserTestBase {
     $this->drupalPostForm('admin/modules', ['modules[liveblog][enable]' => "1"], t('Install'));
     $this->rebuildContainer();
 
-    $count = db_select('watchdog', 'w')
+    $count = \Drupal::database()->select('watchdog', 'w')
       ->condition($condition)
       ->countQuery()
       ->execute()
