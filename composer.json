@@ -1,6 +1,7 @@
 {
   "name": "drupal/liveblog",
   "description": "Liveblogging module for Drupal",
+  "type": "drupal-module",
   "repositories": [
     {
       "type": "composer",
