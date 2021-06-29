@@ -1,7 +1,8 @@
 # Liveblog
 
-This is a new liveblogging module for the Drupal distribution Thunder.  
-This module concentrates on providing the best User Experience for the editor as possible.
+This is a new liveblogging module for the Drupal distribution Thunder.
+
+The Certified Thunder Integrator galaniprojects from Berlin, the Austrian publisher Telekurier Online Medien with its news site kurier.at and Burda with its magazine bunte.de, developed this Drupal 8 module for the live coverage of events, with the help of the Vienna based company Drunomics.
 
 ## Overall Structure
 The Liveblog consists of following structure:
